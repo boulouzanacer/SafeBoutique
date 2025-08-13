@@ -1,0 +1,65 @@
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
+import Dashboard from "@/components/admin/dashboard";
+import Products from "@/components/admin/products";
+import Orders from "@/components/admin/orders";
+import Customers from "@/components/admin/customers";
+import API from "@/components/admin/api";
+
+export default function Admin() {
+  return (
+    <div className="min-h-screen bg-gray-100" data-testid="admin-panel">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="px-6 py-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900" data-testid="text-admin-title">
+              SafeSoft Admin Panel
+            </h1>
+            <Link href="/">
+              <Button variant="ghost" data-testid="button-back-home">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Store
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <div className="p-6">
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5" data-testid="admin-tabs">
+            <TabsTrigger value="dashboard" data-testid="tab-dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="products" data-testid="tab-products">Products</TabsTrigger>
+            <TabsTrigger value="orders" data-testid="tab-orders">Orders</TabsTrigger>
+            <TabsTrigger value="customers" data-testid="tab-customers">Customers</TabsTrigger>
+            <TabsTrigger value="api" data-testid="tab-api">API</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dashboard">
+            <Dashboard />
+          </TabsContent>
+
+          <TabsContent value="products">
+            <Products />
+          </TabsContent>
+
+          <TabsContent value="orders">
+            <Orders />
+          </TabsContent>
+
+          <TabsContent value="customers">
+            <Customers />
+          </TabsContent>
+
+          <TabsContent value="api">
+            <API />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
