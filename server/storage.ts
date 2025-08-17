@@ -46,7 +46,7 @@ export interface IStorage {
   getFamilies(): Promise<string[]>;
 
   // Customers
-  getCustomers(): Promise<Customer[]>;
+  getCustomers(): Promise<(Customer & { totalOrders: number })[]>;
   getCustomer(id: number): Promise<Customer | undefined>;
   getCustomerByEmail(email: string): Promise<Customer | undefined>;
   createCustomer(customer: InsertCustomer): Promise<Customer>;
@@ -166,8 +166,29 @@ export class DatabaseStorage implements IStorage {
     return families.map(f => f.famille).filter(Boolean) as string[];
   }
 
-  async getCustomers(): Promise<Customer[]> {
-    return await db.select().from(customers).orderBy(desc(customers.createdAt));
+  async getCustomers(): Promise<(Customer & { totalOrders: number })[]> {
+    const result = await db
+      .select({
+        id: customers.id,
+        firstName: customers.firstName,
+        lastName: customers.lastName,
+        email: customers.email,
+        phone: customers.phone,
+        address: customers.address,
+        city: customers.city,
+        state: customers.state,
+        zipCode: customers.zipCode,
+        isRegistered: customers.isRegistered,
+        createdAt: customers.createdAt,
+        updatedAt: customers.updatedAt,
+        totalOrders: sql<number>`COUNT(${orders.id})::int`
+      })
+      .from(customers)
+      .leftJoin(orders, eq(customers.id, orders.customerId))
+      .groupBy(customers.id)
+      .orderBy(desc(customers.createdAt));
+    
+    return result as (Customer & { totalOrders: number })[];
   }
 
   async getCustomer(id: number): Promise<Customer | undefined> {
