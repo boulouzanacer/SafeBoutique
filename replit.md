@@ -1,6 +1,6 @@
 # Overview
 
-SafeSoft Boutique is a full-stack e-commerce web application built with React and Express.js. The application provides an online storefront for product browsing and purchasing, with a comprehensive admin panel for inventory and order management. It features a modern, responsive design using shadcn/ui components and Tailwind CSS, with PostgreSQL database integration via Drizzle ORM. The application includes dynamic slider functionality for showcasing promotional content, configurable site settings through the admin panel, comprehensive product review system, and custom email/password authentication system for secure account creation and login functionality.
+SafeSoft Boutique is a full-stack e-commerce web application built with React and Express.js. The application provides an online storefront for product browsing and purchasing, with a comprehensive admin panel for inventory and order management. It features a modern, responsive design using shadcn/ui components and Tailwind CSS, with PostgreSQL database integration via Drizzle ORM. The application includes dynamic slider functionality for showcasing promotional content, configurable site settings through the admin panel, comprehensive product review system, custom email/password authentication system for secure account creation and login functionality, role-based admin access control restricting admin panel to boulouza.nacer@gmail.com only, and animated loading skeletons throughout the application for smooth user experience.
 
 # User Preferences
 
@@ -28,7 +28,7 @@ The application uses a comprehensive PostgreSQL schema with:
 - **Products Table**: Detailed product information including pricing tiers, stock levels, categories, base64 encoded images, and rating system
 - **Orders & Order Items**: Complete order management with customer relationships and line items
 - **Customers Table**: Customer information for order tracking and management
-- **Users Table**: Custom authentication with email, password (bcrypt hashed), and profile information
+- **Users Table**: Custom authentication with email, password (bcrypt hashed), profile information, and isAdmin field for role-based access control
 - **Sessions Table**: Secure session storage for user authentication
 - **Product Reviews**: Customer feedback and rating system with duplicate prevention
 - **Site Settings**: Dynamic site configuration and branding
@@ -42,6 +42,7 @@ The application is organized into logical component directories:
 - **Layout Components**: Structural components (Header with authentication) for consistent page layout
 - **Admin Management**: Complete settings management system with site configuration, slider images, logo/favicon uploads
 - **Authentication**: Custom email/password authentication with signup/login pages for unauthenticated users
+- **Skeleton Components**: Comprehensive loading skeleton system (ProductCard, ProductGrid, AdminTable, StatsCard, ProductDetail, Slider, Header, Form) for smooth user experience during data loading
 
 ## Development Tooling
 - **TypeScript**: Full type safety across client, server, and shared code

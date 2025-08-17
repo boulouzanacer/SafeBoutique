@@ -6,7 +6,7 @@ import { storage } from "./storage";
 import { insertProductSchema, insertCustomerSchema, insertOrderSchema, insertSiteSettingsSchema, insertSliderImageSchema, insertProductReviewSchema, signupUserSchema, loginUserSchema } from "@shared/schema";
 import { z } from "zod";
 import { bulkImportExportService } from "./bulk-import-export";
-import { setupAuth, isAuthenticated } from "./auth";
+import { setupAuth, isAuthenticated, isAdmin } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -27,6 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create session
       req.session.userId = user.id;
+      req.session.isAdmin = user.isAdmin || false;
       
       // Don't return password in response
       const { password, ...userWithoutPassword } = user;
@@ -51,6 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create session
       req.session.userId = user.id;
+      req.session.isAdmin = user.isAdmin || false;
       
       // Don't return password in response
       const { password, ...userWithoutPassword } = user;
@@ -90,6 +92,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Logged out successfully" });
     });
   });
+  // Admin-only routes
+  app.get("/api/admin/*", isAdmin);
+  app.post("/api/admin/*", isAdmin);
+  app.put("/api/admin/*", isAdmin);
+  app.delete("/api/admin/*", isAdmin);
+
   // Products API
   app.get("/api/products", async (req: Request, res: Response) => {
     try {
