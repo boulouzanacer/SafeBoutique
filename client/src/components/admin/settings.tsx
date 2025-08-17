@@ -14,6 +14,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -698,6 +699,11 @@ export default function SiteSettings() {
                       <DialogTitle data-testid="text-slider-dialog-title">
                         {editingSlider ? "Edit Slider Image" : "Add New Slider Image"}
                       </DialogTitle>
+                      <DialogDescription>
+                        {editingSlider 
+                          ? "Update the slider image details and content below."
+                          : "Create a new slider image by filling in the details below."}
+                      </DialogDescription>
                     </DialogHeader>
                     <Form {...sliderForm}>
                       <form onSubmit={sliderForm.handleSubmit(onSliderSubmit)} className="space-y-4">
