@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AdminTableSkeleton } from "@/components/skeletons/admin-table-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -244,11 +245,7 @@ export default function Products() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <AdminTableSkeleton rows={8} columns={8} hasActions={true} />;
   }
 
   return (

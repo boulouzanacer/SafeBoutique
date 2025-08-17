@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AdminTableSkeleton } from "@/components/skeletons/admin-table-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -56,11 +57,7 @@ export default function Customers() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin" data-testid="loading-customers" />
-      </div>
-    );
+    return <AdminTableSkeleton rows={5} columns={6} hasActions={true} />;
   }
 
   return (

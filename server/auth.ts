@@ -36,9 +36,17 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   next();
 };
 
+export const isAdmin: RequestHandler = async (req, res, next) => {
+  if (!req.session || !req.session.userId || !req.session.isAdmin) {
+    return res.status(403).json({ message: "Admin access required" });
+  }
+  next();
+};
+
 // Extend session interface
 declare module "express-session" {
   interface SessionData {
     userId: string;
+    isAdmin: boolean;
   }
 }

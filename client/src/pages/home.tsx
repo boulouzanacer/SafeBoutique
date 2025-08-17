@@ -5,6 +5,7 @@ import ProductCard from "@/components/product-card";
 import CartSidebar from "@/components/cart-sidebar";
 import ImageSlider from "@/components/image-slider";
 import Footer from "@/components/footer";
+import { ProductGridSkeleton } from "@/components/skeletons/product-grid-skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -200,9 +201,7 @@ export default function Home() {
 
         {/* Products Grid */}
         {productsLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400" data-testid="loading-products" />
-          </div>
+          <ProductGridSkeleton count={8} />
         ) : (
           <div 
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { SliderSkeleton } from "@/components/skeletons/slider-skeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -49,16 +50,7 @@ export default function ImageSlider() {
 
   // Show loading state
   if (isLoading) {
-    return (
-      <section className="relative bg-gradient-to-r from-primary to-blue-600 text-white py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="animate-pulse">
-            <div className="h-12 bg-white/20 rounded mb-4 mx-auto max-w-lg"></div>
-            <div className="h-6 bg-white/20 rounded mb-8 mx-auto max-w-md"></div>
-          </div>
-        </div>
-      </section>
-    );
+    return <SliderSkeleton />;
   }
 
   // Show default hero if no slider images
