@@ -25,7 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Loader2, Filter, X, Search } from "lucide-react";
 import { Product, InsertProduct } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getProductPricing } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -516,10 +516,10 @@ export default function Products() {
                         name="promo"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Promotion</FormLabel>
+                            <FormLabel>Promotion Status</FormLabel>
                             <FormControl>
                               <Select 
-                                value={field.value?.toString()} 
+                                value={field.value?.toString() || "0"} 
                                 onValueChange={(value) => field.onChange(parseInt(value))}
                               >
                                 <SelectTrigger data-testid="select-promo">
@@ -535,6 +535,92 @@ export default function Products() {
                           </FormItem>
                         )}
                       />
+                      
+                      {/* Promotional Fields - Only show when promotion is enabled */}
+                      {form.watch("promo") === 1 && (
+                        <>
+                          <FormField
+                            control={form.control}
+                            name="pp1Ht"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Promotional Price (DA)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field} 
+                                    value={field.value || ""}
+                                    type="number" 
+                                    step="0.01"
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    data-testid="input-promo-price"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="qtePromo"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Promotional Quantity</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field} 
+                                    value={field.value || ""}
+                                    type="number"
+                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                    data-testid="input-promo-quantity"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="d1"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Promotion Start Date</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field} 
+                                    value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ""}
+                                    type="datetime-local"
+                                    onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                                    data-testid="input-promo-start"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="d2"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Promotion End Date</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field} 
+                                    value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ""}
+                                    type="datetime-local"
+                                    onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                                    data-testid="input-promo-end"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </>
+                      )}
                       
                       <FormField
                         control={form.control}
@@ -589,13 +675,14 @@ export default function Products() {
                   <TableHead>Stock</TableHead>
                   <TableHead>Family</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Promotion</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {products.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8 text-gray-500" data-testid="text-no-products">
+                    <TableCell colSpan={10} className="text-center py-8 text-gray-500" data-testid="text-no-products">
                       No products found
                     </TableCell>
                   </TableRow>
@@ -615,7 +702,23 @@ export default function Products() {
                         {product.produit || 'N/A'}
                       </TableCell>
                       <TableCell data-testid={`text-price-${product.recordid}`}>
-                        {formatCurrency(product.pv1Ht || 0)}
+                        <div className="space-y-1">
+                          {(() => {
+                            const pricing = getProductPricing(product);
+                            return (
+                              <div>
+                                <div className="font-medium">
+                                  {formatCurrency(pricing.currentPrice)}
+                                </div>
+                                {pricing.isOnPromotion && pricing.originalPrice && (
+                                  <div className="text-xs text-gray-500 line-through">
+                                    {formatCurrency(pricing.originalPrice)}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </div>
                       </TableCell>
                       <TableCell data-testid={`text-stock-${product.recordid}`}>
                         {product.stock || 0}
@@ -638,6 +741,39 @@ export default function Products() {
                             </Badge>
                           )}
                         </div>
+                      </TableCell>
+                      <TableCell data-testid={`cell-promotion-${product.recordid}`}>
+                        {(() => {
+                          const pricing = getProductPricing(product);
+                          if (!pricing.isOnPromotion) {
+                            return <span className="text-gray-400">No promotion</span>;
+                          }
+                          
+                          return (
+                            <div className="space-y-1 text-xs">
+                              <div className="flex items-center gap-1">
+                                <Badge variant="destructive" className="text-xs">
+                                  -{pricing.discountPercentage}%
+                                </Badge>
+                              </div>
+                              {product.d1 && (
+                                <div className="text-gray-600">
+                                  Start: {new Date(product.d1).toLocaleDateString()}
+                                </div>
+                              )}
+                              {product.d2 && (
+                                <div className="text-gray-600">
+                                  End: {new Date(product.d2).toLocaleDateString()}
+                                </div>
+                              )}
+                              {product.qtePromo && product.qtePromo > 0 && (
+                                <div className="text-blue-600">
+                                  Qty: {product.qtePromo} left
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
