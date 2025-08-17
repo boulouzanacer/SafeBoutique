@@ -62,7 +62,8 @@ export default function Orders() {
       
       toast({
         title: "Success",
-        description: "Order status updated successfully"
+        description: "Order status updated successfully",
+        className: "border-green-200 bg-green-50 text-green-800"
       });
 
       // Clear the success indicator after animation
