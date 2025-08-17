@@ -26,7 +26,7 @@ import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 
 interface CustomerWithOrders extends Customer {
-  orders: Order[];
+  totalOrders: number;
 }
 
 export default function Customers() {
@@ -128,7 +128,7 @@ export default function Customers() {
                       </TableCell>
                       <TableCell data-testid={`text-customer-orders-${customer.id}`}>
                         <Badge variant="outline">
-                          {customer.orders?.length || 0} orders
+                          {customer.totalOrders || 0} orders
                         </Badge>
                       </TableCell>
                       <TableCell data-testid={`text-customer-date-${customer.id}`}>

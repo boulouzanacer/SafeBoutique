@@ -185,7 +185,20 @@ export class DatabaseStorage implements IStorage {
       })
       .from(customers)
       .leftJoin(orders, eq(customers.id, orders.customerId))
-      .groupBy(customers.id)
+      .groupBy(
+        customers.id,
+        customers.firstName,
+        customers.lastName,
+        customers.email,
+        customers.phone,
+        customers.address,
+        customers.city,
+        customers.state,
+        customers.zipCode,
+        customers.isRegistered,
+        customers.createdAt,
+        customers.updatedAt
+      )
       .orderBy(desc(customers.createdAt));
     
     return result as (Customer & { totalOrders: number })[];
