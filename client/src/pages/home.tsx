@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import ProductCard from "@/components/product-card";
 import CartSidebar from "@/components/cart-sidebar";
+import ImageSlider from "@/components/image-slider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,33 +72,8 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Header onSearch={handleSearch} />
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-primary to-blue-600 text-white py-20" data-testid="hero-section">
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-blue-600 via-primary to-blue-800 opacity-90"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=1926&h=600')",
-            backgroundSize: "cover",
-            backgroundPosition: "center"
-          }}
-        />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-4" data-testid="text-hero-title">
-            Premium Products for Professionals
-          </h1>
-          <p className="text-xl mb-8 text-blue-100" data-testid="text-hero-subtitle">
-            Discover our curated collection of high-quality products with fast delivery
-          </p>
-          <Button
-            size="lg"
-            className="bg-accent text-white hover:bg-yellow-500 transition-colors"
-            onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-            data-testid="button-shop-now"
-          >
-            Shop Now
-          </Button>
-        </div>
-      </section>
+      {/* Dynamic Image Slider */}
+      <ImageSlider />
 
       {/* Product Catalog */}
       <section id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

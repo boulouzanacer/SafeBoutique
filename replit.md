@@ -1,6 +1,6 @@
 # Overview
 
-SafeSoft Boutique is a full-stack e-commerce web application built with React and Express.js. The application provides an online storefront for product browsing and purchasing, with a comprehensive admin panel for inventory and order management. It features a modern, responsive design using shadcn/ui components and Tailwind CSS, with PostgreSQL database integration via Drizzle ORM.
+SafeSoft Boutique is a full-stack e-commerce web application built with React and Express.js. The application provides an online storefront for product browsing and purchasing, with a comprehensive admin panel for inventory and order management. It features a modern, responsive design using shadcn/ui components and Tailwind CSS, with PostgreSQL database integration via Drizzle ORM. The application includes dynamic slider functionality for showcasing promotional content and configurable site settings through the admin panel.
 
 # User Preferences
 
@@ -33,8 +33,9 @@ The application uses a comprehensive PostgreSQL schema with:
 The application is organized into logical component directories:
 - **UI Components**: Reusable shadcn/ui components for consistent design
 - **Page Components**: Top-level route components (Home, Admin, Checkout)
-- **Feature Components**: Business logic components (ProductCard, CartSidebar, Admin modules)
+- **Feature Components**: Business logic components (ProductCard, CartSidebar, Admin modules, ImageSlider)
 - **Layout Components**: Structural components (Header) for consistent page layout
+- **Admin Management**: Complete settings management system with site configuration, slider images, logo/favicon uploads
 
 ## Development Tooling
 - **TypeScript**: Full type safety across client, server, and shared code
