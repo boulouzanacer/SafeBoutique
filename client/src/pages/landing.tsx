@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/header";
+import { Link } from "wouter";
 import { ShoppingBag, Users, Star, Shield } from "lucide-react";
 
 export default function Landing() {
@@ -17,14 +18,15 @@ export default function Landing() {
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Discover premium products with exceptional quality. Join our community of satisfied customers and enjoy a personalized shopping experience.
           </p>
-          <Button 
-            onClick={() => window.location.href = '/api/login'}
-            size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
-            data-testid="button-login"
-          >
-            Sign In to Shop
-          </Button>
+          <Link href="/login">
+            <Button 
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
+              data-testid="button-login"
+            >
+              Sign In to Shop
+            </Button>
+          </Link>
         </div>
 
         {/* Features Grid */}
@@ -87,22 +89,24 @@ export default function Landing() {
             Create your account to access exclusive deals and personalized recommendations
           </p>
           <div className="space-x-4">
-            <Button 
-              onClick={() => window.location.href = '/api/login'}
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              data-testid="button-signup"
-            >
-              Create Account
-            </Button>
-            <Button 
-              onClick={() => window.location.href = '/api/login'}
-              size="lg"
-              variant="outline"
-              data-testid="button-signin"
-            >
-              Sign In
-            </Button>
+            <Link href="/signup">
+              <Button 
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                data-testid="button-signup"
+              >
+                Create Account
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button 
+                size="lg"
+                variant="outline"
+                data-testid="button-signin"
+              >
+                Sign In
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

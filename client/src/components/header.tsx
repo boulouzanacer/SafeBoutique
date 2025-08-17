@@ -6,6 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
 import {
   DropdownMenu,
@@ -23,6 +27,33 @@ export default function Header({ onSearch }: HeaderProps) {
   const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const totalItems = getTotalItems();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
+
+  const logoutMutation = useMutation({
+    mutationFn: () => apiRequest("/api/auth/logout", "POST"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out.",
+        className: "border-blue-200 bg-blue-50 text-blue-800"
+      });
+      setLocation("/");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,23 +127,24 @@ export default function Header({ onSearch }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => window.location.href = '/api/logout'} data-testid="button-logout">
+                  <DropdownMenuItem onClick={handleLogout} data-testid="button-logout">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-600 hover:text-primary" 
-                onClick={() => window.location.href = '/api/login'}
-                data-testid="button-login"
-              >
-                <User className="h-5 w-5" />
-                <span className="ml-2 hidden sm:inline">Sign In</span>
-              </Button>
+              <Link href="/login">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-600 hover:text-primary" 
+                  data-testid="button-login"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="ml-2 hidden sm:inline">Sign In</span>
+                </Button>
+              </Link>
             )}
             
             {/* Cart */}
