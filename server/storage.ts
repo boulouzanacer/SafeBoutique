@@ -357,6 +357,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProductReview(review: InsertProductReview): Promise<ProductReview> {
+    // Check if user already reviewed this product (if email provided)
+    if (review.customerEmail) {
+      const existingReview = await db.select()
+        .from(productReviews)
+        .where(
+          and(
+            eq(productReviews.productId, review.productId),
+            eq(productReviews.customerEmail, review.customerEmail)
+          )
+        )
+        .limit(1);
+
+      if (existingReview.length > 0) {
+        throw new Error("You have already reviewed this product");
+      }
+    }
+
     const [newReview] = await db.insert(productReviews)
       .values(review)
       .returning();

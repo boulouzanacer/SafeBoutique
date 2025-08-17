@@ -39,7 +39,8 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
       });
       
       if (!response.ok) {
-        throw new Error("Failed to submit review");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to submit review");
       }
       
       return response.json();
@@ -95,6 +96,15 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
       return;
     }
 
+    if (!customerEmail.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address.",
+        className: "border-yellow-200 bg-yellow-50 text-yellow-800"
+      });
+      return;
+    }
+
     submitReviewMutation.mutate({
       productId,
       rating,
@@ -119,15 +129,19 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
           />
         </div>
         <div>
-          <Label htmlFor="customerEmail">Email (optional)</Label>
+          <Label htmlFor="customerEmail">Email (required for review verification)</Label>
           <Input
             id="customerEmail"
             type="email"
             value={customerEmail}
             onChange={(e) => setCustomerEmail(e.target.value)}
             placeholder="your.email@example.com"
+            required
             data-testid="input-customer-email"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            One review per email address per product
+          </p>
         </div>
       </div>
       

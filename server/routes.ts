@@ -404,6 +404,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Invalid review data", details: error.errors });
       }
+      if (error instanceof Error && error.message === "You have already reviewed this product") {
+        return res.status(409).json({ error: error.message });
+      }
       res.status(500).json({ error: "Failed to create review" });
     }
   });
