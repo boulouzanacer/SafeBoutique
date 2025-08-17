@@ -30,13 +30,7 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
       customerEmail: string;
       comment: string;
     }) => {
-      return apiRequest("/api/reviews", {
-        method: "POST",
-        body: JSON.stringify(reviewData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      return apiRequest("/api/reviews", "POST", reviewData);
     },
     onSuccess: () => {
       toast({

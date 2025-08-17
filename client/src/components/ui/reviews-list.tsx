@@ -79,7 +79,7 @@ export function ReviewsList({ productId }: ReviewsListProps) {
                     )}
                   </div>
                   <span className="text-sm text-gray-500">
-                    {new Date(review.createdAt).toLocaleDateString()}
+                    {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Unknown date'}
                   </span>
                 </div>
                 
