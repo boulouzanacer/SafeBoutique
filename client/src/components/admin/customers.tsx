@@ -46,7 +46,7 @@ export default function Customers() {
 
   const viewCustomerDetails = async (customer: Customer) => {
     try {
-      const response = await apiRequest("GET", `/api/customers/${customer.id}`);
+      const response = await apiRequest(`/api/customers/${customer.id}`, "GET");
       const customerDetails = await response.json();
       setSelectedCustomer(customerDetails);
       setIsDetailsOpen(true);
