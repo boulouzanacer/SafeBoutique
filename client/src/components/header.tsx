@@ -1,11 +1,18 @@
 import { Link } from "wouter";
-import { Search, User, ShoppingCart, Settings } from "lucide-react";
+import { Search, User, ShoppingCart, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -13,6 +20,7 @@ interface HeaderProps {
 
 export default function Header({ onSearch }: HeaderProps) {
   const { openCart, getTotalItems } = useCart();
+  const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const totalItems = getTotalItems();
 
@@ -69,9 +77,43 @@ export default function Header({ onSearch }: HeaderProps) {
           {/* Right Actions */}
           <div className="flex items-center space-x-2">
             {/* Account */}
-            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary" data-testid="button-account">
-              <User className="h-5 w-5" />
-            </Button>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary" data-testid="button-account-menu">
+                    {user?.profileImageUrl ? (
+                      <img 
+                        src={user.profileImageUrl} 
+                        alt="Profile" 
+                        className="h-6 w-6 rounded-full object-cover"
+                      />
+                    ) : (
+                      <User className="h-5 w-5" />
+                    )}
+                    <span className="ml-2 hidden sm:inline">
+                      {user?.firstName || user?.email || 'Account'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => window.location.href = '/api/logout'} data-testid="button-logout">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-600 hover:text-primary" 
+                onClick={() => window.location.href = '/api/login'}
+                data-testid="button-login"
+              >
+                <User className="h-5 w-5" />
+                <span className="ml-2 hidden sm:inline">Sign In</span>
+              </Button>
+            )}
             
             {/* Cart */}
             <Button

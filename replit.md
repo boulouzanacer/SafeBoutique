@@ -1,6 +1,6 @@
 # Overview
 
-SafeSoft Boutique is a full-stack e-commerce web application built with React and Express.js. The application provides an online storefront for product browsing and purchasing, with a comprehensive admin panel for inventory and order management. It features a modern, responsive design using shadcn/ui components and Tailwind CSS, with PostgreSQL database integration via Drizzle ORM. The application includes dynamic slider functionality for showcasing promotional content and configurable site settings through the admin panel.
+SafeSoft Boutique is a full-stack e-commerce web application built with React and Express.js. The application provides an online storefront for product browsing and purchasing, with a comprehensive admin panel for inventory and order management. It features a modern, responsive design using shadcn/ui components and Tailwind CSS, with PostgreSQL database integration via Drizzle ORM. The application includes dynamic slider functionality for showcasing promotional content, configurable site settings through the admin panel, comprehensive product review system, and user authentication via Replit Auth for secure account creation and login functionality.
 
 # User Preferences
 
@@ -24,18 +24,23 @@ The server uses Express.js with TypeScript in ESM format:
 
 ## Database Schema
 The application uses a comprehensive PostgreSQL schema with:
-- **Products Table**: Detailed product information including pricing tiers, stock levels, categories, and base64 encoded images
+- **Products Table**: Detailed product information including pricing tiers, stock levels, categories, base64 encoded images, and rating system
 - **Orders & Order Items**: Complete order management with customer relationships and line items
 - **Customers Table**: Customer information for order tracking and management
-- **Users Table**: Basic user authentication structure
+- **Users Table**: Replit Auth integration with profile information (email, name, profile image)
+- **Sessions Table**: Secure session storage for user authentication
+- **Product Reviews**: Customer feedback and rating system with duplicate prevention
+- **Site Settings**: Dynamic site configuration and branding
+- **Slider Images**: Homepage promotional content management
 
 ## Component Architecture
 The application is organized into logical component directories:
 - **UI Components**: Reusable shadcn/ui components for consistent design
-- **Page Components**: Top-level route components (Home, Admin, Checkout)
-- **Feature Components**: Business logic components (ProductCard, CartSidebar, Admin modules, ImageSlider)
-- **Layout Components**: Structural components (Header) for consistent page layout
+- **Page Components**: Top-level route components (Home, Landing, Admin, Checkout, Product Detail)
+- **Feature Components**: Business logic components (ProductCard, CartSidebar, Admin modules, ImageSlider, Reviews, Star Rating)
+- **Layout Components**: Structural components (Header with authentication) for consistent page layout
 - **Admin Management**: Complete settings management system with site configuration, slider images, logo/favicon uploads
+- **Authentication**: Replit Auth integration with landing page for unauthenticated users
 
 ## Development Tooling
 - **TypeScript**: Full type safety across client, server, and shared code
