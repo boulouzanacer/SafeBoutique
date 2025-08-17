@@ -85,6 +85,54 @@ export default function ProductDetail() {
     setQuantity(newQuantity);
   };
 
+  const handleShare = async () => {
+    if (!product) return;
+    
+    const shareData = {
+      title: product.produit || "Product",
+      text: `Check out this product: ${product.produit}`,
+      url: window.location.href
+    };
+
+    // Check if Web Share API is supported
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared Successfully",
+          description: "Product shared successfully!",
+          className: "border-green-200 bg-green-50 text-green-800"
+        });
+      } catch (error) {
+        // User cancelled sharing or error occurred
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Error sharing:", error);
+          fallbackShare();
+        }
+      }
+    } else {
+      fallbackShare();
+    }
+  };
+
+  const fallbackShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link Copied",
+        description: "Product link copied to clipboard!",
+        className: "border-blue-200 bg-blue-50 text-blue-800"
+      });
+    } catch (error) {
+      console.error("Error copying to clipboard:", error);
+      toast({
+        title: "Share",
+        description: `Share this product: ${window.location.href}`,
+        className: "border-gray-200 bg-gray-50 text-gray-800"
+      });
+    }
+  };
+
   const productImages = product?.photo ? [product.photo] : [];
   const currentImage = productImages[selectedImageIndex] || "";
   const pricing = product ? getProductPricing(product) : { currentPrice: 0, isOnPromotion: false };
@@ -335,7 +383,11 @@ export default function ProductDetail() {
                   <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
                 </Button>
                 
-                <Button variant="outline">
+                <Button
+                  variant="outline"
+                  onClick={handleShare}
+                  data-testid="button-share-product"
+                >
                   <Share2 className="h-4 w-4" />
                 </Button>
               </div>
