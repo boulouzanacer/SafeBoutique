@@ -150,13 +150,17 @@ export default function BulkImportExport() {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+      const allowedTypes = ['text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+      const allowedExtensions = ['.csv', '.xls', '.xlsx'];
+      const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+      
+      if (allowedTypes.includes(file.type) || hasValidExtension) {
         setSelectedFile(file);
         setImportResult(null);
       } else {
         toast({
           title: "Invalid File Type",
-          description: "Please select a CSV file",
+          description: "Please select a CSV or Excel file (.csv, .xls, .xlsx)",
           variant: "destructive",
         });
       }
@@ -267,17 +271,17 @@ export default function BulkImportExport() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Import products from a CSV file. Existing products will be updated based on product reference or barcode.
+              Import products from a CSV or Excel file. Existing products will be updated based on product reference or barcode.
             </p>
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="csvFile">Select CSV File</Label>
+                <Label htmlFor="csvFile">Select CSV or Excel File</Label>
                 <Input
                   ref={fileInputRef}
                   id="csvFile"
                   type="file"
-                  accept=".csv"
+                  accept=".csv,.xls,.xlsx"
                   onChange={handleFileSelect}
                   className="mt-2"
                   data-testid="input-csv-file"
@@ -381,11 +385,12 @@ export default function BulkImportExport() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <div>
-            <h4 className="font-medium">CSV Format Requirements:</h4>
+            <h4 className="font-medium">File Format Support:</h4>
             <ul className="mt-2 space-y-1 list-disc list-inside text-muted-foreground">
-              <li>File must be in CSV format with comma separators</li>
+              <li>Supports CSV (.csv) and Excel (.xls, .xlsx) files</li>
+              <li>Uses your exact column format: Code barre, Réf produit, Désignation, etc.</li>
               <li>First row should contain column headers</li>
-              <li>Required columns: Product Name, Product Reference or Barcode</li>
+              <li>Required columns: Désignation, Réf produit</li>
               <li>Maximum file size: 10MB</li>
             </ul>
           </div>

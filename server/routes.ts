@@ -287,17 +287,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Configure multer for file uploads
+  // Configure multer for file uploads - support both CSV and Excel files
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
       fileSize: 10 * 1024 * 1024, // 10MB limit
     },
     fileFilter: (req, file, cb) => {
-      if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+      const allowedTypes = [
+        'text/csv',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel.sheet.macroEnabled.12'
+      ];
+      
+      const allowedExtensions = ['.csv', '.xls', '.xlsx'];
+      const hasValidExtension = allowedExtensions.some(ext => 
+        file.originalname.toLowerCase().endsWith(ext)
+      );
+      
+      if (allowedTypes.includes(file.mimetype) || hasValidExtension) {
         cb(null, true);
       } else {
-        cb(new Error('Only CSV files are allowed'));
+        cb(new Error('Only CSV and Excel files (.csv, .xls, .xlsx) are allowed'));
       }
     }
   });
