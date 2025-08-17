@@ -117,7 +117,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (filters?.promo) {
-      conditions.push(sql`${products.promo} = 1`);
+      conditions.push(sql`${products.pp1Ht} > 0`);
     }
     
     if (conditions.length > 0) {

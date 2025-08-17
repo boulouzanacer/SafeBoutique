@@ -536,36 +536,38 @@ export default function Products() {
                         )}
                       />
                       
-                      {/* Promotional Fields - Only show when promotion is enabled */}
-                      {form.watch("promo") === 1 && (
+                      {/* Promotional Fields - Always show promotional price */}
+                      <FormField
+                        control={form.control}
+                        name="pp1Ht"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Promotional Price (DA) - Set to 0 for no promotion</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                value={field.value || ""}
+                                type="number" 
+                                step="0.01"
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                data-testid="input-promo-price"
+                                placeholder="0 = No promotion"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Additional promotional fields - Only show when pp1Ht > 0 */}
+                      {(form.watch("pp1Ht") || 0) > 0 && (
                         <>
-                          <FormField
-                            control={form.control}
-                            name="pp1Ht"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Promotional Price (DA)</FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    {...field} 
-                                    value={field.value || ""}
-                                    type="number" 
-                                    step="0.01"
-                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                    data-testid="input-promo-price"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
                           <FormField
                             control={form.control}
                             name="qtePromo"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Promotional Quantity</FormLabel>
+                                <FormLabel>Promotional Quantity (Optional)</FormLabel>
                                 <FormControl>
                                   <Input 
                                     {...field} 
@@ -573,6 +575,7 @@ export default function Products() {
                                     type="number"
                                     onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                                     data-testid="input-promo-quantity"
+                                    placeholder="Leave empty for unlimited"
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -585,7 +588,7 @@ export default function Products() {
                             name="d1"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Promotion Start Date</FormLabel>
+                                <FormLabel>Promotion Start Date (Optional)</FormLabel>
                                 <FormControl>
                                   <Input 
                                     {...field} 
@@ -605,7 +608,7 @@ export default function Products() {
                             name="d2"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Promotion End Date</FormLabel>
+                                <FormLabel>Promotion End Date (Optional)</FormLabel>
                                 <FormControl>
                                   <Input 
                                     {...field} 
@@ -735,7 +738,7 @@ export default function Products() {
                           >
                             {(product.stock || 0) > 0 ? 'In Stock' : 'Out of Stock'}
                           </Badge>
-                          {product.promo === 1 && (
+                          {(product.pp1Ht && product.pp1Ht > 0) && (
                             <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">
                               Sale
                             </Badge>

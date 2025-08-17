@@ -22,10 +22,8 @@ export function getProductPricing(product: Product): ProductPricing {
   const now = new Date();
   const regularPrice = product.pv1Ht || 0;
   
-  // Check if product has active promotion
-  const hasPromoFlag = product.promo === 1;
+  // Use pp1Ht to determine promotion: 0 = no promotion, any other value = promotional price
   const hasPromoPrice = product.pp1Ht && product.pp1Ht > 0;
-  const hasPromoQuantity = product.qtePromo && product.qtePromo > 0;
   
   // Check promotion date validity
   let isDateValid = true;
@@ -41,8 +39,8 @@ export function getProductPricing(product: Product): ProductPricing {
     isDateValid = now <= endDate;
   }
   
-  // Check if promotion is active
-  const isOnPromotion = hasPromoFlag && hasPromoPrice && hasPromoQuantity && isDateValid;
+  // Check if promotion is active - only based on pp1Ht value and date validity
+  const isOnPromotion = hasPromoPrice && isDateValid;
   
   if (isOnPromotion) {
     const promoPrice = product.pp1Ht!;
