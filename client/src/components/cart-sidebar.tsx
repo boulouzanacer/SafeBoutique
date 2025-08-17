@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { formatCurrency } from "@/lib/utils";
 import { Link } from "wouter";
 
 export default function CartSidebar() {
@@ -117,7 +118,7 @@ export default function CartSidebar() {
                     {/* Price & Remove */}
                     <div className="text-right">
                       <p className="font-medium text-gray-900" data-testid={`text-cart-price-${item.product.recordid}`}>
-                        ${((item.product.pv1Ht || 0) * item.quantity).toFixed(2)}
+                        {formatCurrency((item.product.pv1Ht || 0) * item.quantity)}
                       </p>
                       <Button
                         variant="ghost"
@@ -141,15 +142,15 @@ export default function CartSidebar() {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal:</span>
-                  <span data-testid="text-subtotal">${total.toFixed(2)}</span>
+                  <span data-testid="text-subtotal">{formatCurrency(total)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Delivery:</span>
-                  <span data-testid="text-delivery">${delivery.toFixed(2)}</span>
+                  <span data-testid="text-delivery">{formatCurrency(delivery)}</span>
                 </div>
                 <div className="flex justify-between items-center font-bold">
                   <span>Total:</span>
-                  <span data-testid="text-total">${finalTotal.toFixed(2)}</span>
+                  <span data-testid="text-total">{formatCurrency(finalTotal)}</span>
                 </div>
               </div>
               

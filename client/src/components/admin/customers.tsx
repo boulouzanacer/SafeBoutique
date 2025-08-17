@@ -21,6 +21,7 @@ import {
 import { Eye, Search, Mail, Phone, Loader2 } from "lucide-react";
 import { Customer, Order } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 
 interface CustomerWithOrders extends Customer {
@@ -40,7 +41,7 @@ export default function Customers() {
   const filteredCustomers = customers.filter(customer =>
     `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    customer.phone.includes(searchTerm)
+    (customer.phone && customer.phone.includes(searchTerm))
   );
 
   const viewCustomerDetails = async (customer: Customer) => {
@@ -237,15 +238,15 @@ export default function Customers() {
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Total Spent:</span>
                       <span className="font-bold" data-testid="text-details-total-spent">
-                        ${selectedCustomer.orders?.reduce((sum, order) => sum + order.total, 0).toFixed(2) || '0.00'}
+                        {formatCurrency(selectedCustomer.orders?.reduce((sum, order) => sum + order.total, 0) || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Avg. Order Value:</span>
                       <span data-testid="text-details-avg-order">
-                        ${selectedCustomer.orders?.length 
-                          ? (selectedCustomer.orders.reduce((sum, order) => sum + order.total, 0) / selectedCustomer.orders.length).toFixed(2)
-                          : '0.00'
+                        {selectedCustomer.orders?.length 
+                          ? formatCurrency(selectedCustomer.orders.reduce((sum, order) => sum + order.total, 0) / selectedCustomer.orders.length)
+                          : formatCurrency(0)
                         }
                       </span>
                     </div>
@@ -300,7 +301,7 @@ export default function Customers() {
                               </Badge>
                             </TableCell>
                             <TableCell data-testid={`history-order-total-${order.id}`}>
-                              ${order.total.toFixed(2)}
+                              {formatCurrency(order.total)}
                             </TableCell>
                           </TableRow>
                         ))}

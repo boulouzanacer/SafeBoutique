@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 
 interface ProductCardProps {
@@ -85,7 +86,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         
         <div className="mb-4">
           <span className="text-lg font-light text-gray-900 tracking-wide" data-testid={`text-price-${product.recordid}`}>
-            ${price.toFixed(2)}
+            {formatCurrency(price)}
           </span>
           {!isInStock && (
             <p className="text-sm text-red-500 mt-1 font-light">Out of Stock</p>

@@ -26,6 +26,7 @@ import {
 import { Eye, Package, Loader2 } from "lucide-react";
 import { Order, OrderItem, Product, Customer } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -159,7 +160,7 @@ export default function Orders() {
                         {new Date(order.createdAt!).toLocaleDateString()}
                       </TableCell>
                       <TableCell data-testid={`text-total-${order.id}`}>
-                        ${order.total.toFixed(2)}
+                        {formatCurrency(order.total)}
                       </TableCell>
                       <TableCell data-testid={`text-payment-${order.id}`}>
                         <Badge variant="outline">COD</Badge>
@@ -337,10 +338,10 @@ export default function Orders() {
                             {item.quantity}
                           </TableCell>
                           <TableCell data-testid={`item-price-${item.id}`}>
-                            ${item.price.toFixed(2)}
+                            {formatCurrency(item.price)}
                           </TableCell>
                           <TableCell data-testid={`item-total-${item.id}`}>
-                            ${(item.price * item.quantity).toFixed(2)}
+                            {formatCurrency(item.price * item.quantity)}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -351,15 +352,15 @@ export default function Orders() {
                   <div className="mt-4 space-y-2 border-t pt-4">
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
-                      <span data-testid="text-details-subtotal">${selectedOrder.subtotal.toFixed(2)}</span>
+                      <span data-testid="text-details-subtotal">{formatCurrency(selectedOrder.subtotal)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Delivery:</span>
-                      <span data-testid="text-details-delivery">${(selectedOrder.delivery || 0).toFixed(2)}</span>
+                      <span data-testid="text-details-delivery">{formatCurrency(selectedOrder.delivery || 0)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg">
                       <span>Total:</span>
-                      <span data-testid="text-details-total">${selectedOrder.total.toFixed(2)}</span>
+                      <span data-testid="text-details-total">{formatCurrency(selectedOrder.total)}</span>
                     </div>
                   </div>
                 </CardContent>

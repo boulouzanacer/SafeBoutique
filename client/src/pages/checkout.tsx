@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/lib/cart";
+import { formatCurrency } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, CreditCard } from "lucide-react";
 
@@ -355,7 +356,7 @@ export default function Checkout() {
                         <p className="text-gray-500">Qty: {item.quantity}</p>
                       </div>
                       <span data-testid={`text-summary-price-${item.product.recordid}`}>
-                        ${((item.product.pv1Ht || 0) * item.quantity).toFixed(2)}
+                        {formatCurrency((item.product.pv1Ht || 0) * item.quantity)}
                       </span>
                     </div>
                   ))}
@@ -365,15 +366,15 @@ export default function Checkout() {
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
-                    <span data-testid="text-summary-subtotal">${subtotal.toFixed(2)}</span>
+                    <span data-testid="text-summary-subtotal">{formatCurrency(subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Delivery:</span>
-                    <span data-testid="text-summary-delivery">${delivery.toFixed(2)}</span>
+                    <span data-testid="text-summary-delivery">{formatCurrency(delivery)}</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total:</span>
-                    <span data-testid="text-summary-total">${total.toFixed(2)}</span>
+                    <span data-testid="text-summary-total">{formatCurrency(total)}</span>
                   </div>
                 </div>
 
