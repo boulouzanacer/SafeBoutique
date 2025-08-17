@@ -6,13 +6,17 @@ import CartSidebar from "@/components/cart-sidebar";
 import ImageSlider from "@/components/image-slider";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, X, Filter } from "lucide-react";
 import { Product } from "@shared/schema";
 
 export default function Home() {
   const [filters, setFilters] = useState({
     famille: "",
-    search: ""
+    search: "",
+    inStock: false,
+    promo: false
   });
 
   // Fetch products
@@ -21,7 +25,7 @@ export default function Home() {
     queryFn: async () => {
       const params = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
-        if (value !== "" && value !== false && value !== 0) {
+        if (value !== "" && value !== false) {
           params.append(key, value.toString());
         }
       });
@@ -61,8 +65,114 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="flex justify-center mb-12">
+        {/* Advanced Filters */}
+        <div className="mb-12 space-y-6">
+          {/* Filter Bar */}
+          <div className="flex flex-wrap gap-4 items-center justify-center bg-gray-50 p-4 rounded-lg">
+            {/* Family Filter */}
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <Select 
+                value={filters.famille || "all"} 
+                onValueChange={(value) => setFilters(prev => ({ ...prev, famille: value === "all" ? "" : value }))}
+              >
+                <SelectTrigger className="w-[180px]" data-testid="select-family">
+                  <SelectValue placeholder="Filter by Family" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Families</SelectItem>
+                  {families.map((family) => (
+                    <SelectItem key={family} value={family}>
+                      {family}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Status Filters */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant={filters.inStock ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({ ...prev, inStock: !prev.inStock }))}
+                data-testid="filter-in-stock"
+                className="font-light tracking-wide"
+              >
+                In Stock Only
+              </Button>
+              
+              <Button
+                variant={filters.promo ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({ ...prev, promo: !prev.promo }))}
+                data-testid="filter-promotions"
+                className="font-light tracking-wide"
+              >
+                On Promotion
+              </Button>
+            </div>
+
+            {/* Clear Filters */}
+            {(filters.famille || filters.inStock || filters.promo) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setFilters({ famille: "", search: "", inStock: false, promo: false })}
+                data-testid="clear-filters"
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Clear All
+              </Button>
+            )}
+          </div>
+
+          {/* Active Filter Tags */}
+          {(filters.famille || filters.inStock || filters.promo || filters.search) && (
+            <div className="flex flex-wrap gap-2 justify-center">
+              {filters.famille && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Family: {filters.famille}
+                  <X 
+                    className="h-3 w-3 cursor-pointer" 
+                    onClick={() => setFilters(prev => ({ ...prev, famille: "" }))}
+                  />
+                </Badge>
+              )}
+              {filters.search && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Search: {filters.search}
+                  <X 
+                    className="h-3 w-3 cursor-pointer" 
+                    onClick={() => setFilters(prev => ({ ...prev, search: "" }))}
+                  />
+                </Badge>
+              )}
+              {filters.inStock && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  In Stock Only
+                  <X 
+                    className="h-3 w-3 cursor-pointer" 
+                    onClick={() => setFilters(prev => ({ ...prev, inStock: false }))}
+                  />
+                </Badge>
+              )}
+              {filters.promo && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  On Promotion
+                  <X 
+                    className="h-3 w-3 cursor-pointer" 
+                    onClick={() => setFilters(prev => ({ ...prev, promo: false }))}
+                  />
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Quick Category Filter Pills */}
+        <div className="flex justify-center mb-8">
           <div className="flex flex-wrap gap-3 items-center">
             <Button
               variant={filters.famille === "" ? "default" : "outline"}

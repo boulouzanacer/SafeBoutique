@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Filter, X, Search } from "lucide-react";
 import { Product, InsertProduct } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/utils";
@@ -42,6 +42,12 @@ import {
 export default function Products() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [filters, setFilters] = useState({
+    famille: "",
+    search: "",
+    inStock: false,
+    promo: false
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -87,7 +93,24 @@ export default function Products() {
   });
 
   const { data: products = [], isLoading } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
+    queryKey: ["/api/products", filters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== "" && value !== false) {
+          params.append(key, value.toString());
+        }
+      });
+      
+      const response = await fetch(`/api/products?${params}`);
+      if (!response.ok) throw new Error("Failed to fetch products");
+      return response.json();
+    }
+  });
+
+  // Fetch families for filter dropdown
+  const { data: families = [] } = useQuery<string[]>({
+    queryKey: ["/api/families"],
   });
 
   const createProductMutation = useMutation({
@@ -232,8 +255,121 @@ export default function Products() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle data-testid="text-products-title">Product Management</CardTitle>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle data-testid="text-products-title">Product Management</CardTitle>
+              
+              {/* Advanced Filters */}
+              <div className="mt-4 space-y-4">
+                <div className="flex flex-wrap gap-4 items-center">
+                  {/* Search */}
+                  <div className="flex items-center gap-2">
+                    <Search className="h-4 w-4 text-gray-500" />
+                    <Input
+                      placeholder="Search products..."
+                      value={filters.search}
+                      onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                      className="w-64"
+                      data-testid="input-search-products"
+                    />
+                  </div>
+                  
+                  {/* Family Filter */}
+                  <Select 
+                    value={filters.famille || "all"} 
+                    onValueChange={(value) => setFilters(prev => ({ ...prev, famille: value === "all" ? "" : value }))}
+                  >
+                    <SelectTrigger className="w-[180px]" data-testid="select-family-filter">
+                      <SelectValue placeholder="Filter by Family" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Families</SelectItem>
+                      {families.map((family) => (
+                        <SelectItem key={family} value={family}>
+                          {family}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Status Filters */}
+                  <Button
+                    variant={filters.inStock ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilters(prev => ({ ...prev, inStock: !prev.inStock }))}
+                    data-testid="filter-in-stock-admin"
+                  >
+                    In Stock Only
+                  </Button>
+                  
+                  <Button
+                    variant={filters.promo ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilters(prev => ({ ...prev, promo: !prev.promo }))}
+                    data-testid="filter-promotions-admin"
+                  >
+                    On Promotion
+                  </Button>
+
+                  {/* Clear Filters */}
+                  {(filters.famille || filters.search || filters.inStock || filters.promo) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFilters({ famille: "", search: "", inStock: false, promo: false })}
+                      data-testid="clear-filters-admin"
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Clear
+                    </Button>
+                  )}
+                </div>
+
+                {/* Active Filter Tags */}
+                {(filters.famille || filters.search || filters.inStock || filters.promo) && (
+                  <div className="flex flex-wrap gap-2">
+                    {filters.famille && (
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        Family: {filters.famille}
+                        <X 
+                          className="h-3 w-3 cursor-pointer" 
+                          onClick={() => setFilters(prev => ({ ...prev, famille: "" }))}
+                        />
+                      </Badge>
+                    )}
+                    {filters.search && (
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        Search: {filters.search}
+                        <X 
+                          className="h-3 w-3 cursor-pointer" 
+                          onClick={() => setFilters(prev => ({ ...prev, search: "" }))}
+                        />
+                      </Badge>
+                    )}
+                    {filters.inStock && (
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        In Stock Only
+                        <X 
+                          className="h-3 w-3 cursor-pointer" 
+                          onClick={() => setFilters(prev => ({ ...prev, inStock: false }))}
+                        />
+                      </Badge>
+                    )}
+                    {filters.promo && (
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        On Promotion
+                        <X 
+                          className="h-3 w-3 cursor-pointer" 
+                          onClick={() => setFilters(prev => ({ ...prev, promo: false }))}
+                        />
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={handleNewProduct} data-testid="button-add-product">
