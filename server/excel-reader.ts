@@ -18,8 +18,9 @@ export function readExcelFile(filePath: string): any[] {
     console.log('Number of rows:', data.length);
     
     if (data.length > 0) {
-      console.log('Column headers:', Object.keys(data[0]));
-      console.log('First row sample:', data[0]);
+      const firstRow = data[0] as Record<string, any>;
+      console.log('Column headers:', Object.keys(firstRow));
+      console.log('First row sample:', firstRow);
       if (data.length > 1) {
         console.log('Second row sample:', data[1]);
       }
