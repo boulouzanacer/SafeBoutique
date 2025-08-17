@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { Product } from '@shared/schema';
+import { getProductPricing } from './utils';
 
 export interface CartItem {
   product: Product;
@@ -78,8 +79,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const getTotalPrice = useCallback(() => {
     return items.reduce((total, item) => {
-      const price = item.product.pv1Ht || 0;
-      return total + (price * item.quantity);
+      const pricing = getProductPricing(item.product);
+      return total + (pricing.currentPrice * item.quantity);
     }, 0);
   }, [items]);
 

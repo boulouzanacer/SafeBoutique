@@ -20,10 +20,12 @@ import {
   ChevronRight,
   Truck,
   Shield,
-  RotateCcw
+  RotateCcw,
+  Clock,
+  Tag
 } from "lucide-react";
 import { Product } from "@shared/schema";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getProductPricing, formatPromoEndDate } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
 import { useToast } from "@/hooks/use-toast";
 
@@ -81,6 +83,7 @@ export default function ProductDetail() {
 
   const productImages = product?.photo ? [product.photo] : [];
   const currentImage = productImages[selectedImageIndex] || "";
+  const pricing = product ? getProductPricing(product) : { currentPrice: 0, isOnPromotion: false };
 
   if (isLoading) {
     return (
@@ -212,22 +215,42 @@ export default function ProductDetail() {
                 {product.produit || "Product Name"}
               </h1>
               
-              {product.famille && (
-                <Badge variant="secondary" className="mb-4">
-                  {product.famille}
-                </Badge>
-              )}
+              <div className="flex items-center gap-2 mb-4">
+                {product.famille && (
+                  <Badge variant="secondary">
+                    {product.famille}
+                  </Badge>
+                )}
+                {pricing.isOnPromotion && (
+                  <Badge className="bg-red-600 text-white">
+                    <Tag className="h-3 w-3 mr-1" />
+                    {pricing.discountPercentage ? `-${pricing.discountPercentage}%` : 'PROMO'}
+                  </Badge>
+                )}
+              </div>
 
               <div className="flex items-baseline space-x-4 mb-4">
                 <span className="text-3xl font-bold text-gray-900" data-testid="product-price">
-                  {formatCurrency(product.pv1Ht || 0)}
+                  {formatCurrency(pricing.currentPrice)}
                 </span>
-                {product.pv2Ht && product.pv2Ht !== product.pv1Ht && (
+                {pricing.isOnPromotion && pricing.originalPrice && (
                   <span className="text-xl text-gray-500 line-through">
-                    {formatCurrency(product.pv2Ht)}
+                    {formatCurrency(pricing.originalPrice)}
                   </span>
                 )}
               </div>
+
+              {/* Promotion Timer */}
+              {pricing.isOnPromotion && pricing.promoEndDate && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+                  <div className="flex items-center text-orange-700">
+                    <Clock className="h-4 w-4 mr-2" />
+                    <span className="text-sm font-medium">
+                      Promotion ends: {formatPromoEndDate(pricing.promoEndDate)}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Stock Status */}
               <div className="flex items-center space-x-2 mb-6">
@@ -393,6 +416,12 @@ export default function ProductDetail() {
                         <span className="text-gray-500">Price (excl. tax):</span>
                         <span className="font-medium">{formatCurrency(product.paHt || 0)}</span>
                       </div>
+                      {pricing.isOnPromotion && product.pp1Ht && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Promo Price:</span>
+                          <span className="font-medium text-red-600">{formatCurrency(product.pp1Ht)}</span>
+                        </div>
+                      )}
                       {product.tva && (
                         <div className="flex justify-between">
                           <span className="text-gray-500">VAT:</span>

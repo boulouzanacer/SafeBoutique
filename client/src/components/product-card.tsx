@@ -2,9 +2,9 @@ import { Product } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Clock } from "lucide-react";
 import { useCart } from "@/lib/cart";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getProductPricing, formatPromoEndDate } from "@/lib/utils";
 import { useState } from "react";
 import { Link } from "wouter";
 
@@ -25,10 +25,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     }, 1000);
   };
 
-  const price = product.pv1Ht || 0;
   const stock = product.stock || 0;
   const isInStock = stock > 0;
-  const isOnSale = product.promo === 1;
+  const pricing = getProductPricing(product);
 
   return (
     <div className="group product-card-hover elegant-shadow bg-white overflow-hidden" data-testid={`card-product-${product.recordid}`}>
@@ -68,14 +67,22 @@ export default function ProductCard({ product }: ProductCardProps) {
           </Button>
         </div>
         
-        {/* Sale Badge */}
-        {isOnSale && (
-          <div className="absolute top-3 left-3">
-            <Badge className="bg-primary text-white text-xs font-light px-2 py-1">
-              Special Offer
-            </Badge>
-          </div>
-        )}
+        {/* Promotion Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {pricing.isOnPromotion && (
+            <>
+              <Badge className="bg-red-600 text-white text-xs font-medium px-2 py-1">
+                {pricing.discountPercentage ? `-${pricing.discountPercentage}%` : 'PROMO'}
+              </Badge>
+              {pricing.promoEndDate && (
+                <Badge className="bg-orange-600 text-white text-xs font-medium px-2 py-1 flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {formatPromoEndDate(pricing.promoEndDate)}
+                </Badge>
+              )}
+            </>
+          )}
+        </div>
         </div>
       </Link>
 
@@ -90,9 +97,16 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="border-t border-gray-100 my-3"></div>
         
         <div className="mb-4">
-          <span className="text-lg font-light text-gray-900 tracking-wide" data-testid={`text-price-${product.recordid}`}>
-            {formatCurrency(price)}
-          </span>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-lg font-light text-gray-900 tracking-wide" data-testid={`text-price-${product.recordid}`}>
+              {formatCurrency(pricing.currentPrice)}
+            </span>
+            {pricing.isOnPromotion && pricing.originalPrice && (
+              <span className="text-sm text-gray-500 line-through">
+                {formatCurrency(pricing.originalPrice)}
+              </span>
+            )}
+          </div>
           {!isInStock && (
             <p className="text-sm text-red-500 mt-1 font-light">Out of Stock</p>
           )}

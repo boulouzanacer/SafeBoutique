@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getProductPricing } from "@/lib/utils";
 import { Link } from "wouter";
 
 export default function CartSidebar() {
@@ -117,9 +117,21 @@ export default function CartSidebar() {
 
                     {/* Price & Remove */}
                     <div className="text-right">
-                      <p className="font-medium text-gray-900" data-testid={`text-cart-price-${item.product.recordid}`}>
-                        {formatCurrency((item.product.pv1Ht || 0) * item.quantity)}
-                      </p>
+                      {(() => {
+                        const pricing = getProductPricing(item.product);
+                        return (
+                          <div>
+                            <p className="font-medium text-gray-900" data-testid={`text-cart-price-${item.product.recordid}`}>
+                              {formatCurrency(pricing.currentPrice * item.quantity)}
+                            </p>
+                            {pricing.isOnPromotion && pricing.originalPrice && (
+                              <p className="text-xs text-gray-500 line-through">
+                                {formatCurrency(pricing.originalPrice * item.quantity)}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })()}
                       <Button
                         variant="ghost"
                         size="sm"
