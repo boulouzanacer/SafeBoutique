@@ -20,7 +20,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         promo: req.query.promo === 'true'
       };
 
-      const products = await storage.getProducts(filters);
+      let products = await storage.getProducts(filters);
+      
+      // Limit results if specified
+      if (req.query.limit) {
+        const limitNum = parseInt(req.query.limit as string);
+        products = products.slice(0, limitNum);
+      }
+      
       res.json(products);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch products" });

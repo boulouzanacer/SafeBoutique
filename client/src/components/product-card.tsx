@@ -6,6 +6,7 @@ import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
+import { Link } from "wouter";
 
 interface ProductCardProps {
   product: Product;
@@ -32,7 +33,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="group product-card-hover elegant-shadow bg-white overflow-hidden" data-testid={`card-product-${product.recordid}`}>
       {/* Product Image */}
-      <div className="aspect-square relative overflow-hidden bg-gray-50">
+      <Link href={`/product/${product.recordid}`}>
+        <div className="aspect-square relative overflow-hidden bg-gray-50 cursor-pointer">
         {product.photo ? (
           <img
             src={product.photo.startsWith('data:') ? product.photo : `data:image/jpeg;base64,${product.photo}`}
@@ -74,13 +76,16 @@ export default function ProductCard({ product }: ProductCardProps) {
             </Badge>
           </div>
         )}
-      </div>
+        </div>
+      </Link>
 
       {/* Product Details */}
       <div className="p-6 text-center">
-        <h3 className="font-light text-gray-900 mb-2 text-lg tracking-wide" data-testid={`text-product-name-${product.recordid}`}>
-          {product.produit || 'Unknown Product'}
-        </h3>
+        <Link href={`/product/${product.recordid}`}>
+          <h3 className="font-light text-gray-900 mb-2 text-lg tracking-wide cursor-pointer hover:text-primary transition-colors" data-testid={`text-product-name-${product.recordid}`}>
+            {product.produit || 'Unknown Product'}
+          </h3>
+        </Link>
         
         <div className="border-t border-gray-100 my-3"></div>
         
