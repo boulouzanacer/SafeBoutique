@@ -307,7 +307,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSliderImages(): Promise<SliderImage[]> {
-    return await db.select().from(sliderImages).orderBy(sliderImages.sortOrder, sliderImages.createdAt);
+    return await db.select().from(sliderImages)
+      .where(eq(sliderImages.isActive, true))
+      .orderBy(sliderImages.sortOrder, sliderImages.createdAt);
+  }
+
+  async getAllSliderImages(): Promise<SliderImage[]> {
+    return await db.select().from(sliderImages)
+      .orderBy(sliderImages.sortOrder, sliderImages.createdAt);
   }
 
   async getSliderImage(id: number): Promise<SliderImage | undefined> {

@@ -148,7 +148,7 @@ export default function SiteSettings() {
   });
 
   const { data: sliderImages = [], isLoading: sliderLoading } = useQuery<SliderImage[]>({
-    queryKey: ["/api/slider-images"],
+    queryKey: ["/api/admin/slider-images"],
   });
 
   const saveSettingsMutation = useMutation({
@@ -179,6 +179,7 @@ export default function SiteSettings() {
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/slider-images"] });
       queryClient.invalidateQueries({ queryKey: ["/api/slider-images"] });
       setIsSliderDialogOpen(false);
       sliderForm.reset();
@@ -204,6 +205,7 @@ export default function SiteSettings() {
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/slider-images"] });
       queryClient.invalidateQueries({ queryKey: ["/api/slider-images"] });
       setIsSliderDialogOpen(false);
       sliderForm.reset();
@@ -228,6 +230,7 @@ export default function SiteSettings() {
       await apiRequest("DELETE", `/api/slider-images/${id}`);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/slider-images"] });
       queryClient.invalidateQueries({ queryKey: ["/api/slider-images"] });
       toast({
         title: "Success",

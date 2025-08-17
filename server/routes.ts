@@ -235,6 +235,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/admin/slider-images", async (req: Request, res: Response) => {
+    try {
+      const images = await storage.getAllSliderImages();
+      res.json(images);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch all slider images" });
+    }
+  });
+
   app.get("/api/slider-images/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);

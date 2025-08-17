@@ -20,15 +20,6 @@ export default function ImageSlider() {
   // Fetch active slider images
   const { data: sliderImages = [], isLoading } = useQuery<SliderImage[]>({
     queryKey: ["/api/slider-images"],
-    queryFn: async () => {
-      const response = await fetch("/api/slider-images");
-      if (!response.ok) throw new Error("Failed to fetch slider images");
-      const images = await response.json();
-      // Filter only active images and sort by sortOrder
-      return images
-        .filter((img: SliderImage) => img.isActive)
-        .sort((a: SliderImage, b: SliderImage) => a.sortOrder - b.sortOrder);
-    }
   });
 
   // Auto-advance slider every 5 seconds
