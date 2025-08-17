@@ -1,8 +1,11 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
 import { storage } from "./storage";
 import { insertProductSchema, insertCustomerSchema, insertOrderSchema, insertSiteSettingsSchema, insertSliderImageSchema } from "@shared/schema";
 import { z } from "zod";
+import { bulkImportExportService } from "./bulk-import-export";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Products API
@@ -281,6 +284,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete slider image" });
+    }
+  });
+
+  // Configure multer for file uploads
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB limit
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only CSV files are allowed'));
+      }
+    }
+  });
+
+  // Bulk Import/Export API
+  app.post("/api/products/export", async (req: Request, res: Response) => {
+    try {
+      const result = await bulkImportExportService.exportProductsToCSV();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to export products" });
+    }
+  });
+
+  app.post("/api/products/import", upload.single('csvFile'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No CSV file uploaded" });
+      }
+
+      const result = await bulkImportExportService.importProductsFromCSV(req.file.buffer);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to import products" });
+    }
+  });
+
+  app.get("/api/products/export/:filename", async (req: Request, res: Response) => {
+    try {
+      const filename = req.params.filename;
+      const filepath = await bulkImportExportService.getExportFilePath(filename);
+      
+      if (!filepath) {
+        return res.status(404).json({ error: "File not found or expired" });
+      }
+
+      res.download(filepath, filename, (error) => {
+        if (error) {
+          console.error("Download error:", error);
+          if (!res.headersSent) {
+            res.status(500).json({ error: "Failed to download file" });
+          }
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to download export file" });
+    }
+  });
+
+  app.post("/api/products/template", async (req: Request, res: Response) => {
+    try {
+      const result = await bulkImportExportService.generateCSVTemplate();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate template" });
     }
   });
 
