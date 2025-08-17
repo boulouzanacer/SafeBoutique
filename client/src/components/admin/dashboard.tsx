@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart, DollarSign, Package, Users } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 interface Stats {
   totalProducts: number;
@@ -47,7 +48,7 @@ export default function Dashboard() {
     },
     {
       title: "Revenue",
-      value: `$${(stats?.revenue || 0).toFixed(2)}`,
+      value: formatCurrency(stats?.revenue || 0),
       icon: DollarSign,
       bgColor: "bg-green-100",
       iconColor: "text-green-600",

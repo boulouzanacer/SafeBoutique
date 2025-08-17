@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import { Product, InsertProduct } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -478,7 +479,7 @@ export default function Products() {
                         {product.produit || 'N/A'}
                       </TableCell>
                       <TableCell data-testid={`text-price-${product.recordid}`}>
-                        ${(product.pv1Ht || 0).toFixed(2)}
+                        {formatCurrency(product.pv1Ht || 0)}
                       </TableCell>
                       <TableCell data-testid={`text-stock-${product.recordid}`}>
                         {product.stock || 0}
