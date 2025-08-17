@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/lib/cart";
 import { useState } from "react";
+import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -21,47 +22,54 @@ export default function Header({ onSearch }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" data-testid="header">
+    <header className="bg-white minimal-border sticky top-0 z-50" data-testid="header">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" data-testid="link-home">
               <div className="flex-shrink-0 cursor-pointer">
-                <h1 className="text-2xl font-bold text-primary">SafeSoft</h1>
-                <p className="text-xs text-gray-500">Boutique</p>
+                <h1 className="text-3xl font-light tracking-wide text-primary">SafeSoft</h1>
+                <p className="text-sm text-gray-400 font-light tracking-widest uppercase">Boutique</p>
               </div>
             </Link>
           </div>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link href="/" data-testid="link-home-nav">
-              <a className="text-gray-700 hover:text-primary transition-colors">Home</a>
-            </Link>
-            <a href="#products" className="text-gray-700 hover:text-primary transition-colors">Products</a>
-            <a href="#categories" className="text-gray-700 hover:text-primary transition-colors">Categories</a>
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center space-x-4">
+          {/* Center Content */}
+          <div className="hidden md:flex items-center space-x-8">
+            {/* Social Media Icons */}
+            <div className="flex items-center space-x-3">
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors" data-testid="link-facebook">
+                <SiFacebook className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors" data-testid="link-instagram">
+                <SiInstagram className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors" data-testid="link-x">
+                <SiX className="h-5 w-5" />
+              </a>
+            </div>
+            
             {/* Search */}
-            <form onSubmit={handleSearch} className="hidden md:block">
+            <form onSubmit={handleSearch}>
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-64 pl-10"
+                  className="w-48 border-0 border-b border-gray-200 rounded-none bg-transparent focus:border-primary focus:ring-0 px-0 font-light"
                   data-testid="input-search"
                 />
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Search className="absolute right-0 top-3 h-4 w-4 text-gray-400" />
               </div>
             </form>
-            
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex items-center space-x-2">
             {/* Account */}
-            <Button variant="ghost" size="sm" data-testid="button-account">
+            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary" data-testid="button-account">
               <User className="h-5 w-5" />
             </Button>
             
@@ -69,15 +77,14 @@ export default function Header({ onSearch }: HeaderProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="relative"
+              className="relative text-gray-600 hover:text-primary"
               onClick={openCart}
               data-testid="button-cart"
             >
               <ShoppingCart className="h-5 w-5" />
               {totalItems > 0 && (
                 <Badge
-                  variant="destructive"
-                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-accent hover:bg-accent"
+                  className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-xs bg-primary text-white text-[10px]"
                   data-testid="badge-cart-count"
                 >
                   {totalItems}
@@ -87,8 +94,8 @@ export default function Header({ onSearch }: HeaderProps) {
 
             {/* Admin Link */}
             <Link href="/admin" data-testid="link-admin">
-              <Button className="bg-primary text-white hover:bg-blue-600 transition-colors">
-                <Settings className="mr-2 h-4 w-4" />
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary font-light">
+                <Settings className="mr-1 h-4 w-4" />
                 Admin
               </Button>
             </Link>
