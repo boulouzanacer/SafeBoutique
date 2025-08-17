@@ -30,7 +30,19 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
       customerEmail: string;
       comment: string;
     }) => {
-      return apiRequest("/api/reviews", "POST", reviewData);
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reviewData),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to submit review");
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({
