@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Package, Loader2 } from "lucide-react";
+import { Eye, Package, Loader2, CheckCircle2 } from "lucide-react";
 import { Order, OrderItem, Product, Customer } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/utils";
@@ -38,6 +38,8 @@ interface OrderWithDetails extends Order {
 export default function Orders() {
   const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
+  const [justUpdatedOrderId, setJustUpdatedOrderId] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -47,18 +49,29 @@ export default function Orders() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ orderId, status }: { orderId: number; status: string }) => {
+      setUpdatingOrderId(orderId);
       const response = await apiRequest("PUT", `/api/orders/${orderId}/status`, { status });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      setUpdatingOrderId(null);
+      setJustUpdatedOrderId(variables.orderId);
+      
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      
       toast({
         title: "Success",
         description: "Order status updated successfully"
       });
+
+      // Clear the success indicator after animation
+      setTimeout(() => {
+        setJustUpdatedOrderId(null);
+      }, 2000);
     },
     onError: () => {
+      setUpdatingOrderId(null);
       toast({
         title: "Error",
         description: "Failed to update order status",
@@ -147,7 +160,15 @@ export default function Orders() {
                   </TableRow>
                 ) : (
                   orders.map((order) => (
-                    <TableRow key={order.id} data-testid={`row-order-${order.id}`}>
+                    <TableRow 
+                      key={order.id} 
+                      data-testid={`row-order-${order.id}`}
+                      className={`transition-all duration-500 ${
+                        justUpdatedOrderId === order.id 
+                          ? 'bg-green-50 border-l-4 border-l-green-400' 
+                          : ''
+                      }`}
+                    >
                       <TableCell className="font-mono" data-testid={`text-order-number-${order.id}`}>
                         #{order.orderNumber}
                       </TableCell>
@@ -167,13 +188,25 @@ export default function Orders() {
                         <Badge variant="outline">COD</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge 
-                          variant={getStatusBadgeVariant(order.status || 'pending')}
-                          className={getStatusBadgeClass(order.status || 'pending')}
-                          data-testid={`badge-status-${order.id}`}
-                        >
-                          {(order.status || 'pending').charAt(0).toUpperCase() + (order.status || 'pending').slice(1)}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={getStatusBadgeVariant(order.status || 'pending')}
+                            className={`${getStatusBadgeClass(order.status || 'pending')} transition-all duration-500 ${
+                              justUpdatedOrderId === order.id 
+                                ? 'ring-2 ring-green-400 ring-offset-1 scale-105' 
+                                : ''
+                            }`}
+                            data-testid={`badge-status-${order.id}`}
+                          >
+                            {(order.status || 'pending').charAt(0).toUpperCase() + (order.status || 'pending').slice(1)}
+                          </Badge>
+                          {justUpdatedOrderId === order.id && (
+                            <CheckCircle2 
+                              className="h-4 w-4 text-green-600 animate-pulse" 
+                              data-testid={`icon-success-${order.id}`}
+                            />
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -188,9 +221,21 @@ export default function Orders() {
                           <Select
                             value={order.status || 'pending'}
                             onValueChange={(status) => handleStatusChange(order.id, status)}
+                            disabled={updatingOrderId === order.id}
                           >
-                            <SelectTrigger className="w-32" data-testid={`select-status-${order.id}`}>
-                              <Package className="h-4 w-4 mr-2" />
+                            <SelectTrigger 
+                              className={`w-32 transition-all duration-300 ${
+                                updatingOrderId === order.id 
+                                  ? 'opacity-60 cursor-not-allowed' 
+                                  : ''
+                              }`} 
+                              data-testid={`select-status-${order.id}`}
+                            >
+                              {updatingOrderId === order.id ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <Package className="h-4 w-4 mr-2" />
+                              )}
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
