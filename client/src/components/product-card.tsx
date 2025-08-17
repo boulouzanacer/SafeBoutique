@@ -2,6 +2,7 @@ import { Product } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { RatingDisplay } from "@/components/ui/star-rating";
 import { ShoppingCart, Clock } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { formatCurrency, getProductPricing, formatPromoEndDate } from "@/lib/utils";
@@ -95,6 +96,16 @@ export default function ProductCard({ product }: ProductCardProps) {
         </Link>
         
         <div className="border-t border-gray-100 my-3"></div>
+        
+        {/* Rating Display */}
+        <div className="mb-3 flex justify-center">
+          <RatingDisplay 
+            rating={product.rating || 0} 
+            ratingCount={product.ratingCount || 0} 
+            size="sm"
+            showCount={true}
+          />
+        </div>
         
         <div className="mb-4">
           <div className="flex items-center justify-center gap-2">

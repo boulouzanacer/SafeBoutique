@@ -6,6 +6,7 @@ import {
   users,
   siteSettings,
   sliderImages,
+  productReviews,
   type Product, 
   type InsertProduct,
   type Customer,
@@ -19,7 +20,9 @@ import {
   type SiteSettings,
   type InsertSiteSettings,
   type SliderImage,
-  type InsertSliderImage
+  type InsertSliderImage,
+  type ProductReview,
+  type InsertProductReview
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, isNull, or, sql } from "drizzle-orm";
@@ -76,6 +79,11 @@ export interface IStorage {
   createSliderImage(image: InsertSliderImage): Promise<SliderImage>;
   updateSliderImage(id: number, image: Partial<InsertSliderImage>): Promise<SliderImage>;
   deleteSliderImage(id: number): Promise<void>;
+
+  // Product Reviews
+  getProductReviews(productId: number): Promise<ProductReview[]>;
+  createProductReview(review: InsertProductReview): Promise<ProductReview>;
+  updateProductRating(productId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -338,6 +346,53 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSliderImage(id: number): Promise<void> {
     await db.delete(sliderImages).where(eq(sliderImages.id, id));
+  }
+
+  // Product Reviews
+  async getProductReviews(productId: number): Promise<ProductReview[]> {
+    return await db.select()
+      .from(productReviews)
+      .where(eq(productReviews.productId, productId))
+      .orderBy(desc(productReviews.createdAt));
+  }
+
+  async createProductReview(review: InsertProductReview): Promise<ProductReview> {
+    const [newReview] = await db.insert(productReviews)
+      .values(review)
+      .returning();
+    
+    // Update product rating after adding review
+    await this.updateProductRating(review.productId);
+    
+    return newReview;
+  }
+
+  async updateProductRating(productId: number): Promise<void> {
+    // Calculate average rating and count
+    const reviews = await db.select()
+      .from(productReviews)
+      .where(eq(productReviews.productId, productId));
+    
+    if (reviews.length === 0) {
+      // No reviews, set rating to null
+      await db.update(products)
+        .set({
+          rating: null,
+          ratingCount: 0
+        })
+        .where(eq(products.recordid, productId));
+    } else {
+      // Calculate average rating
+      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+      const averageRating = Math.round((totalRating / reviews.length) * 10) / 10; // Round to 1 decimal
+      
+      await db.update(products)
+        .set({
+          rating: averageRating,
+          ratingCount: reviews.length
+        })
+        .where(eq(products.recordid, productId));
+    }
   }
 }
 

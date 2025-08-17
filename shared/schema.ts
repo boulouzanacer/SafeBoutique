@@ -44,6 +44,8 @@ export const products = pgTable("products", {
   um: varchar("um", { length: 5 }),
   poids: doublePrecision("poids"),
   utilisateur: varchar("utilisateur", { length: 25 }),
+  rating: doublePrecision("rating").default(0),
+  ratingCount: integer("rating_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -119,8 +121,29 @@ export const customersRelations = relations(customers, ({ many }) => ({
   orders: many(orders),
 }));
 
+// Product Reviews Table
+export const productReviews = pgTable("product_reviews", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id").references(() => products.recordid).notNull(),
+  customerName: varchar("customer_name", { length: 100 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 255 }),
+  rating: integer("rating").notNull(), // 1-5 stars
+  comment: text("comment"),
+  isVerified: boolean("is_verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
 export const productsRelations = relations(products, ({ many }) => ({
   orderItems: many(orderItems),
+  reviews: many(productReviews),
+}));
+
+export const productReviewsRelations = relations(productReviews, ({ one }) => ({
+  product: one(products, {
+    fields: [productReviews.productId],
+    references: [products.recordid],
+  }),
 }));
 
 // Insert schemas
@@ -214,3 +237,12 @@ export type SiteSettings = typeof siteSettings.$inferSelect;
 export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
 export type SliderImage = typeof sliderImages.$inferSelect;
 export type InsertSliderImage = z.infer<typeof insertSliderImageSchema>;
+
+export const insertProductReviewSchema = createInsertSchema(productReviews).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type ProductReview = typeof productReviews.$inferSelect;
+export type InsertProductReview = z.infer<typeof insertProductReviewSchema>;

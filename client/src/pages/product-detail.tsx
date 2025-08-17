@@ -22,8 +22,12 @@ import {
   Shield,
   RotateCcw,
   Clock,
-  Tag
+  Tag,
+  Send
 } from "lucide-react";
+import { StarRating, RatingDisplay } from "@/components/ui/star-rating";
+import ReviewForm from "@/components/ui/review-form";
+import ReviewsList from "@/components/ui/reviews-list";
 import { Product } from "@shared/schema";
 import { formatCurrency, getProductPricing, formatPromoEndDate } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
@@ -240,6 +244,16 @@ export default function ProductDetail() {
                 )}
               </div>
 
+              {/* Rating Display */}
+              <div className="mb-4">
+                <RatingDisplay 
+                  rating={product.rating || 0} 
+                  ratingCount={product.ratingCount || 0} 
+                  size="md"
+                  showCount={true}
+                />
+              </div>
+
               {/* Promotion Timer */}
               {pricing.isOnPromotion && pricing.promoEndDate && (
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
@@ -437,10 +451,33 @@ export default function ProductDetail() {
             <TabsContent value="reviews" className="mt-6">
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <Star className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Reviews Yet</h3>
-                    <p className="text-gray-500">Be the first to review this product!</p>
+                  <div className="space-y-6">
+                    {/* Rating Summary */}
+                    <div className="border-b pb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">Customer Reviews</h3>
+                        <div className="text-right">
+                          <RatingDisplay 
+                            rating={product.rating || 0} 
+                            ratingCount={product.ratingCount || 0} 
+                            size="lg"
+                            showCount={true}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Add Review Form */}
+                    <div className="border-b pb-6">
+                      <h4 className="text-md font-semibold mb-4">Write a Review</h4>
+                      <ReviewForm productId={product.recordid} onReviewSubmitted={() => {
+                        // Refresh product data to get updated rating
+                        window.location.reload();
+                      }} />
+                    </div>
+
+                    {/* Reviews List */}
+                    <ReviewsList productId={product.recordid} />
                   </div>
                 </CardContent>
               </Card>
