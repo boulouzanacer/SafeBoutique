@@ -47,7 +47,7 @@ export interface IStorage {
 
   // Customers
   getCustomers(): Promise<(Customer & { totalOrders: number })[]>;
-  getCustomer(id: number): Promise<Customer | undefined>;
+  getCustomer(id: number): Promise<(Customer & { orders: (Order & { items: (OrderItem & { product: Product })[] })[] }) | undefined>;
   getCustomerByEmail(email: string): Promise<Customer | undefined>;
   createCustomer(customer: InsertCustomer): Promise<Customer>;
   updateCustomer(id: number, customer: Partial<InsertCustomer>): Promise<Customer>;
@@ -204,9 +204,23 @@ export class DatabaseStorage implements IStorage {
     return result as (Customer & { totalOrders: number })[];
   }
 
-  async getCustomer(id: number): Promise<Customer | undefined> {
-    const [customer] = await db.select().from(customers).where(eq(customers.id, id));
-    return customer || undefined;
+  async getCustomer(id: number): Promise<(Customer & { orders: (Order & { items: (OrderItem & { product: Product })[] })[] }) | undefined> {
+    const customer = await db.query.customers.findFirst({
+      where: eq(customers.id, id),
+      with: {
+        orders: {
+          with: {
+            items: {
+              with: {
+                product: true
+              }
+            }
+          },
+          orderBy: [desc(orders.createdAt)]
+        }
+      }
+    });
+    return customer;
   }
 
   async getCustomerByEmail(email: string): Promise<Customer | undefined> {

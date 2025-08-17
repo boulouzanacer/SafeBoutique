@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Eye, Search, Mail, Phone, Loader2 } from "lucide-react";
-import { Customer, Order } from "@shared/schema";
+import { Customer, Order, OrderItem, Product } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
@@ -29,8 +29,12 @@ interface CustomerWithOrders extends Customer {
   totalOrders: number;
 }
 
+interface CustomerWithFullOrders extends Customer {
+  orders: (Order & { items: (OrderItem & { product: Product })[] })[];
+}
+
 export default function Customers() {
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithOrders | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithFullOrders | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
@@ -45,10 +49,10 @@ export default function Customers() {
     (customer.phone && customer.phone.includes(searchTerm))
   );
 
-  const viewCustomerDetails = async (customer: Customer) => {
+  const viewCustomerDetails = async (customer: CustomerWithOrders) => {
     try {
       const response = await apiRequest(`/api/customers/${customer.id}`, "GET");
-      const customerDetails = await response.json();
+      const customerDetails: CustomerWithFullOrders = await response.json();
       setSelectedCustomer(customerDetails);
       setIsDetailsOpen(true);
     } catch (error) {
