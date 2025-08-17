@@ -153,6 +153,52 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
 });
 
+export const siteSettings = pgTable("site_settings", {
+  id: serial("id").primaryKey(),
+  siteName: varchar("site_name", { length: 200 }).notNull(),
+  siteDescription: text("site_description").notNull(),
+  logo: text("logo"),
+  favicon: text("favicon"),
+  contactEmail: varchar("contact_email", { length: 200 }).notNull(),
+  contactPhone: varchar("contact_phone", { length: 50 }).notNull(),
+  contactAddress: text("contact_address").notNull(),
+  socialFacebook: text("social_facebook"),
+  socialInstagram: text("social_instagram"),
+  socialTwitter: text("social_twitter"),
+  footerText: text("footer_text").notNull(),
+  headerMessage: text("header_message"),
+  deliveryInfo: text("delivery_info").notNull(),
+  returnPolicy: text("return_policy").notNull(),
+  privacyPolicy: text("privacy_policy").notNull(),
+  termsOfService: text("terms_of_service").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const sliderImages = pgTable("slider_images", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description").notNull(),
+  image: text("image").notNull(),
+  linkUrl: text("link_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertSiteSettingsSchema = createInsertSchema(siteSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSliderImageSchema = createInsertSchema(sliderImages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
@@ -164,3 +210,7 @@ export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type SiteSettings = typeof siteSettings.$inferSelect;
+export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
+export type SliderImage = typeof sliderImages.$inferSelect;
+export type InsertSliderImage = z.infer<typeof insertSliderImageSchema>;

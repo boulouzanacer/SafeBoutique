@@ -4,6 +4,8 @@ import {
   orders, 
   orderItems, 
   users,
+  siteSettings,
+  sliderImages,
   type Product, 
   type InsertProduct,
   type Customer,
@@ -13,7 +15,11 @@ import {
   type OrderItem,
   type InsertOrderItem,
   type User,
-  type InsertUser
+  type InsertUser,
+  type SiteSettings,
+  type InsertSiteSettings,
+  type SliderImage,
+  type InsertSliderImage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, isNull, or, sql } from "drizzle-orm";
@@ -59,6 +65,17 @@ export interface IStorage {
     totalCustomers: number;
     revenue: number;
   }>;
+
+  // Site Settings
+  getSiteSettings(): Promise<SiteSettings | undefined>;
+  updateSiteSettings(settings: InsertSiteSettings): Promise<SiteSettings>;
+
+  // Slider Images
+  getSliderImages(): Promise<SliderImage[]>;
+  getSliderImage(id: number): Promise<SliderImage | undefined>;
+  createSliderImage(image: InsertSliderImage): Promise<SliderImage>;
+  updateSliderImage(id: number, image: Partial<InsertSliderImage>): Promise<SliderImage>;
+  deleteSliderImage(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -104,7 +121,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = query.where(and(...conditions)) as any;
     }
     
     return await query.orderBy(desc(products.createdAt));
@@ -263,6 +280,57 @@ export class DatabaseStorage implements IStorage {
       totalCustomers: customerCount.count,
       revenue: revenueSum.sum
     };
+  }
+
+  async getSiteSettings(): Promise<SiteSettings | undefined> {
+    const [settings] = await db.select().from(siteSettings).limit(1);
+    return settings || undefined;
+  }
+
+  async updateSiteSettings(settingsData: InsertSiteSettings): Promise<SiteSettings> {
+    // Check if settings exist
+    const existing = await this.getSiteSettings();
+    
+    if (existing) {
+      // Update existing settings
+      const [updated] = await db
+        .update(siteSettings)
+        .set({ ...settingsData, updatedAt: new Date() })
+        .where(eq(siteSettings.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new settings
+      const [created] = await db.insert(siteSettings).values(settingsData).returning();
+      return created;
+    }
+  }
+
+  async getSliderImages(): Promise<SliderImage[]> {
+    return await db.select().from(sliderImages).orderBy(sliderImages.sortOrder, sliderImages.createdAt);
+  }
+
+  async getSliderImage(id: number): Promise<SliderImage | undefined> {
+    const [image] = await db.select().from(sliderImages).where(eq(sliderImages.id, id));
+    return image || undefined;
+  }
+
+  async createSliderImage(imageData: InsertSliderImage): Promise<SliderImage> {
+    const [created] = await db.insert(sliderImages).values(imageData).returning();
+    return created;
+  }
+
+  async updateSliderImage(id: number, imageData: Partial<InsertSliderImage>): Promise<SliderImage> {
+    const [updated] = await db
+      .update(sliderImages)
+      .set({ ...imageData, updatedAt: new Date() })
+      .where(eq(sliderImages.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteSliderImage(id: number): Promise<void> {
+    await db.delete(sliderImages).where(eq(sliderImages.id, id));
   }
 }
 

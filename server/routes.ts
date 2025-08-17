@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProductSchema, insertCustomerSchema, insertOrderSchema } from "@shared/schema";
+import { insertProductSchema, insertCustomerSchema, insertOrderSchema, insertSiteSettingsSchema, insertSliderImageSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -196,6 +196,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  // Site Settings API
+  app.get("/api/settings", async (req: Request, res: Response) => {
+    try {
+      const settings = await storage.getSiteSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch settings" });
+    }
+  });
+
+  app.post("/api/settings", async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertSiteSettingsSchema.parse(req.body);
+      const settings = await storage.updateSiteSettings(validatedData);
+      res.json(settings);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      res.status(500).json({ error: "Failed to update settings" });
+    }
+  });
+
+  // Slider Images API
+  app.get("/api/slider-images", async (req: Request, res: Response) => {
+    try {
+      const images = await storage.getSliderImages();
+      res.json(images);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch slider images" });
+    }
+  });
+
+  app.get("/api/slider-images/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const image = await storage.getSliderImage(id);
+      
+      if (!image) {
+        return res.status(404).json({ error: "Slider image not found" });
+      }
+      
+      res.json(image);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch slider image" });
+    }
+  });
+
+  app.post("/api/slider-images", async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertSliderImageSchema.parse(req.body);
+      const image = await storage.createSliderImage(validatedData);
+      res.status(201).json(image);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create slider image" });
+    }
+  });
+
+  app.put("/api/slider-images/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertSliderImageSchema.partial().parse(req.body);
+      const image = await storage.updateSliderImage(id, validatedData);
+      res.json(image);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      res.status(500).json({ error: "Failed to update slider image" });
+    }
+  });
+
+  app.delete("/api/slider-images/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteSliderImage(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete slider image" });
     }
   });
 

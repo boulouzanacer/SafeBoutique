@@ -8,6 +8,7 @@ import Products from "@/components/admin/products";
 import Orders from "@/components/admin/orders";
 import Customers from "@/components/admin/customers";
 import API from "@/components/admin/api";
+import Settings from "@/components/admin/settings";
 
 export default function Admin() {
   return (
@@ -31,11 +32,12 @@ export default function Admin() {
 
       <div className="p-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5" data-testid="admin-tabs">
+          <TabsList className="grid w-full grid-cols-6" data-testid="admin-tabs">
             <TabsTrigger value="dashboard" data-testid="tab-dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="products" data-testid="tab-products">Products</TabsTrigger>
             <TabsTrigger value="orders" data-testid="tab-orders">Orders</TabsTrigger>
             <TabsTrigger value="customers" data-testid="tab-customers">Customers</TabsTrigger>
+            <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
             <TabsTrigger value="api" data-testid="tab-api">API</TabsTrigger>
           </TabsList>
 
@@ -53,6 +55,10 @@ export default function Admin() {
 
           <TabsContent value="customers">
             <Customers />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Settings />
           </TabsContent>
 
           <TabsContent value="api">
