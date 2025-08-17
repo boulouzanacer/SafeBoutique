@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShoppingCart, DollarSign, Package, Users } from "lucide-react";
+import { ShoppingCart, DollarSign, Package, Users, RefreshCw } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface Stats {
   totalProducts: number;
@@ -11,9 +12,36 @@ interface Stats {
 }
 
 export default function Dashboard() {
-  const { data: stats, isLoading } = useQuery<Stats>({
+  const [isAutoRefresh, setIsAutoRefresh] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  
+  const { data: stats, isLoading, refetch, isFetching } = useQuery<Stats>({
     queryKey: ["/api/stats"],
+    refetchInterval: isAutoRefresh ? 30000 : false, // Auto-refresh every 30 seconds
+    refetchIntervalInBackground: true
   });
+
+  // Update lastUpdated when data changes
+  useEffect(() => {
+    if (stats) {
+      setLastUpdated(new Date());
+    }
+  }, [stats]);
+
+  // Manual refresh function
+  const handleManualRefresh = () => {
+    refetch();
+  };
+
+  // Format time ago helper
+  const getTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  };
 
   if (isLoading) {
     return (
@@ -74,7 +102,40 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold" data-testid="text-dashboard-title">Dashboard Overview</h2>
+      {/* Header with refresh controls */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900" data-testid="text-dashboard-title">
+            Dashboard Overview
+          </h2>
+          <p className="text-sm text-gray-500" data-testid="text-last-updated">
+            Last updated: {getTimeAgo(lastUpdated)}
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={isAutoRefresh}
+              onChange={(e) => setIsAutoRefresh(e.target.checked)}
+              className="rounded"
+              data-testid="checkbox-auto-refresh"
+            />
+            Auto-refresh (30s)
+          </label>
+          <button
+            onClick={handleManualRefresh}
+            disabled={isFetching}
+            className={`flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${
+              isFetching ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            data-testid="button-manual-refresh"
+          >
+            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((card) => (
