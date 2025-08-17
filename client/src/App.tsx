@@ -10,12 +10,13 @@ import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import Admin from "@/pages/admin";
+import AdminAccessDenied from "@/pages/admin-access-denied";
 import Checkout from "@/pages/checkout";
 import ProductDetail from "@/pages/product-detail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   return (
     <Switch>
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/signup" component={Signup} />
       {isAuthenticated && (
         <>
+          {/* Admin route - accessible by all authenticated users but protected within component */}
           <Route path="/admin" component={Admin} />
           <Route path="/checkout" component={Checkout} />
         </>

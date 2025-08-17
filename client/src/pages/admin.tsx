@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "@/components/admin/dashboard";
 import Products from "@/components/admin/products";
 import Orders from "@/components/admin/orders";
@@ -10,8 +11,28 @@ import Customers from "@/components/admin/customers";
 import API from "@/components/admin/api";
 import Settings from "@/components/admin/settings";
 import BulkImportExport from "@/components/admin/bulk-import-export";
+import AdminAccessDenied from "@/pages/admin-access-denied";
 
 export default function Admin() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // Redirect non-admin users
+  useEffect(() => {
+    if (!isLoading && (!isAuthenticated || !user?.isAdmin)) {
+      setLocation("/");
+    }
+  }, [isAuthenticated, user, isLoading, setLocation]);
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Show access denied if not admin
+  if (!isAuthenticated || !user?.isAdmin) {
+    return <AdminAccessDenied />;
+  }
   return (
     <div className="min-h-screen bg-gray-100" data-testid="admin-panel">
       {/* Header */}

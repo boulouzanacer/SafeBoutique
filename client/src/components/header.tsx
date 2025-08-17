@@ -166,13 +166,15 @@ export default function Header({ onSearch }: HeaderProps) {
               )}
             </Button>
 
-            {/* Admin Link */}
-            <Link href="/admin" data-testid="link-admin">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary font-light">
-                <Settings className="mr-1 h-4 w-4" />
-                Admin
-              </Button>
-            </Link>
+            {/* Admin Link - Only show for admin users */}
+            {isAuthenticated && user?.isAdmin && (
+              <Link href="/admin" data-testid="link-admin">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary font-light">
+                  <Settings className="mr-1 h-4 w-4" />
+                  Admin
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
