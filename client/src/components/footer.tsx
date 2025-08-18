@@ -1,6 +1,8 @@
 import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="bg-gray-50 border-t minimal-border mt-20" data-testid="footer">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -9,11 +11,10 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="mb-6">
               <h3 className="text-2xl font-light tracking-wide text-primary mb-2" data-testid="text-footer-brand">
-                SafeSoft Boutique
+                {t('footer.brand')}
               </h3>
               <p className="text-gray-600 font-light leading-relaxed max-w-md" data-testid="text-footer-description">
-                Your premier destination for professional software solutions and premium products. 
-                We specialize in delivering quality and elegance in every purchase.
+                {t('footer.description')}
               </p>
             </div>
             
@@ -46,27 +47,27 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase mb-4" data-testid="text-quick-links">
-              Quick Links
+              {t('footer.quickLinks')}
             </h4>
             <ul className="space-y-3 font-light">
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-about">
-                  About Us
+                  {t('nav.about')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-products">
-                  Products
+                  {t('nav.products')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-contact">
-                  Contact
+                  {t('nav.contact')}
                 </a>
               </li>
               <li>
                 <a href="/admin" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-footer-admin">
-                  Admin Panel
+                  {t('header.admin')}
                 </a>
               </li>
             </ul>
@@ -75,17 +76,17 @@ export default function Footer() {
           {/* Customer Service */}
           <div>
             <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase mb-4" data-testid="text-customer-service">
-              Customer Service
+              {t('footer.customerService')}
             </h4>
             <ul className="space-y-3 font-light">
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-shipping">
-                  Shipping Info
+                  {t('footer.shipping')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-returns">
-                  Returns
+                  {t('footer.returns')}
                 </a>
               </li>
               <li>
@@ -95,7 +96,7 @@ export default function Footer() {
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-support">
-                  Support
+                  {t('footer.support')}
                 </a>
               </li>
             </ul>
@@ -106,14 +107,14 @@ export default function Footer() {
         <div className="border-t border-gray-200 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 font-light text-sm" data-testid="text-copyright">
-              © 2024 SafeSoft Boutique. All rights reserved.
+              {t('footer.copyright')}
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-privacy">
-                Privacy Policy
+                {t('footer.privacy')}
               </a>
               <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-terms">
-                Terms of Service
+                {t('footer.terms')}
               </a>
             </div>
           </div>

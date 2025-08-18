@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart";
 import { formatCurrency, getProductPricing, formatPromoEndDate } from "@/lib/utils";
 import { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from 'react-i18next';
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +17,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
+  const { t } = useTranslation();
 
   const handleAddToCart = async () => {
     setIsAdding(true);
@@ -64,7 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             onClick={handleAddToCart}
             disabled={!isInStock || isAdding}
           >
-            {isAdding ? 'Added ✓' : 'Quick Add'}
+            {isAdding ? `${t('product.addToCart')} ✓` : t('product.addToCart')}
           </Button>
         </div>
         
@@ -119,7 +121,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
           {!isInStock && (
-            <p className="text-sm text-red-500 mt-1 font-light">Out of Stock</p>
+            <p className="text-sm text-red-500 mt-1 font-light">{t('product.outOfStock')}</p>
           )}
         </div>
       </div>

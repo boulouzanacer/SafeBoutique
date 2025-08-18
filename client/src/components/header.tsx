@@ -10,6 +10,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from "@/components/language-selector";
 
 import {
   DropdownMenu,
@@ -30,6 +32,7 @@ export default function Header({ onSearch }: HeaderProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   const logoutMutation = useMutation({
     mutationFn: () => apiRequest("/api/auth/logout", "POST"),
@@ -86,7 +89,7 @@ export default function Header({ onSearch }: HeaderProps) {
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="Search..."
+                  placeholder={t('search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-48 border-0 border-b border-gray-200 rounded-none bg-transparent focus:border-primary focus:ring-0 px-0 font-light"
@@ -99,6 +102,8 @@ export default function Header({ onSearch }: HeaderProps) {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-2">
+            {/* Language Selector */}
+            <LanguageSelector />
             {/* Account */}
             {isAuthenticated ? (
               <DropdownMenu>
@@ -121,7 +126,7 @@ export default function Header({ onSearch }: HeaderProps) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleLogout} data-testid="button-logout">
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
+                    {t('header.signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -134,7 +139,7 @@ export default function Header({ onSearch }: HeaderProps) {
                   data-testid="button-login"
                 >
                   <User className="h-5 w-5" />
-                  <span className="ml-2 hidden sm:inline">Sign In</span>
+                  <span className="ml-2 hidden sm:inline">{t('header.signIn')}</span>
                 </Button>
               </Link>
             )}

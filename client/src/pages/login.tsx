@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useTranslation } from 'react-i18next';
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
@@ -24,6 +25,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -45,8 +47,8 @@ export default function Login() {
       }
       
       toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
+        title: t('auth.welcome'),
+        description: t('auth.signInSuccess'),
         className: "border-green-200 bg-green-50 text-green-800"
       });
       
@@ -56,8 +58,8 @@ export default function Login() {
     },
     onError: (error: any) => {
       toast({
-        title: "Sign In Failed",
-        description: error.message || "Please check your email and password",
+        title: t('common.error'),
+        description: error.message || t('auth.invalidCredentials'),
         variant: "destructive",
       });
     },
@@ -74,11 +76,11 @@ export default function Login() {
           <CardHeader className="text-center">
             <Link href="/" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-800 mb-4">
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Back to Home
+              {t('auth.backToHome')}
             </Link>
-            <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t('auth.signIn')}</CardTitle>
             <CardDescription>
-              Welcome back! Please sign in to your account
+              {t('auth.signInDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -89,11 +91,11 @@ export default function Login() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t('auth.email')}</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="Enter your email"
+                          placeholder={t('auth.email')}
                           {...field}
                           data-testid="input-email"
                         />
@@ -108,12 +110,12 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>{t('auth.password')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
-                            placeholder="Enter your password"
+                            placeholder={t('auth.password')}
                             {...field}
                             data-testid="input-password"
                           />
@@ -144,15 +146,15 @@ export default function Login() {
                   disabled={loginMutation.isPending}
                   data-testid="button-signin"
                 >
-                  {loginMutation.isPending ? "Signing In..." : "Sign In"}
+                  {loginMutation.isPending ? t('common.loading') : t('auth.signIn')}
                 </Button>
               </form>
             </Form>
 
             <div className="mt-6 text-center text-sm">
-              <span className="text-gray-600">Don't have an account? </span>
+              <span className="text-gray-600">{t('auth.noAccount')} </span>
               <Link href="/signup" className="text-blue-600 hover:text-blue-800 font-medium">
-                Create Account
+                {t('auth.signUp')}
               </Link>
             </div>
           </CardContent>

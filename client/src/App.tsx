@@ -14,6 +14,7 @@ import AdminAccessDenied from "@/pages/admin-access-denied";
 import Checkout from "@/pages/checkout";
 import ProductDetail from "@/pages/product-detail";
 import NotFound from "@/pages/not-found";
+import "./lib/i18n"; // Initialize i18n
 
 function Router() {
   const { user, isAuthenticated, isLoading } = useAuth();
