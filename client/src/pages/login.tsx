@@ -35,18 +35,24 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginForm) => apiRequest("/api/auth/login", "POST", data),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
         className: "border-green-200 bg-green-50 text-green-800"
       });
-      // Wait a bit before invalidating to ensure session is properly set
-      setTimeout(() => {
-        // Invalidate user query to refetch user data
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-        setLocation("/");
-      }, 200);
+      
+      // Wait longer to ensure session is properly committed
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Invalidate all queries to ensure fresh data
+      await queryClient.invalidateQueries();
+      
+      // Force refetch auth user
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
+      
+      // Navigate to home page
+      setLocation("/");
     },
     onError: (error: any) => {
       toast({

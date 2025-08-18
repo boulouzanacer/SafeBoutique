@@ -62,22 +62,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.isAdmin = user.isAdmin || false;
       
-      // Save session explicitly and wait a bit to ensure it's committed
-      req.session.save((err) => {
+      // Force session regeneration to create a new session ID
+      req.session.regenerate((err) => {
         if (err) {
-          console.error("Session save error:", err);
+          console.error("Session regeneration error:", err);
           return res.status(500).json({ message: "Session creation failed" });
         }
         
-        console.log('Login success - sessionID:', req.sessionID);
-        console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
+        // Set session data after regeneration
+        req.session.userId = user.id;
+        req.session.isAdmin = user.isAdmin || false;
         
-        // Small delay to ensure session is committed to store
-        setTimeout(() => {
+        // Save session explicitly
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("Session save error:", saveErr);
+            return res.status(500).json({ message: "Session save failed" });
+          }
+          
+          console.log('Login success - sessionID:', req.sessionID);
+          console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
+          
           // Don't return password in response
           const { password, ...userWithoutPassword } = user;
           res.json(userWithoutPassword);
-        }, 100);
+        });
       });
     } catch (error) {
       if (error instanceof z.ZodError) {

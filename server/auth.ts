@@ -1,15 +1,12 @@
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
-import connectPg from "connect-pg-simple";
+import MemoryStore from "memorystore";
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
-    ttl: sessionTtl,
-    tableName: "sessions",
+  const MemStore = MemoryStore(session);
+  const sessionStore = new MemStore({
+    checkPeriod: 86400000, // Prune expired entries every 24h
   });
 
   // Handle session store errors
@@ -26,7 +23,7 @@ export function getSession() {
       httpOnly: true,
       secure: false, // Set to true in production with HTTPS
       maxAge: sessionTtl,
-      sameSite: 'lax', // 'none' requires secure=true
+      sameSite: 'lax',
       path: '/',
     },
     rolling: true, // Reset session expiry on each request
@@ -37,13 +34,21 @@ export function getSession() {
 export function setupAuth(app: Express) {
   app.set("trust proxy", 1);
   
-  // Simple CORS for session cookies in development
+  // Enhanced CORS for session cookies in development
   app.use((req, res, next) => {
     const origin = req.headers.origin;
-    if (origin) {
+    if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
       res.header('Access-Control-Allow-Origin', origin);
       res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     }
+    
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(200);
+      return;
+    }
+    
     next();
   });
   
