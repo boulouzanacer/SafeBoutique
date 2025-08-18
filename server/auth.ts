@@ -51,22 +51,55 @@ export function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  console.log('Session check - sessionID:', req.sessionID);
-  console.log('Session check - cookies received:', req.headers.cookie);
-  console.log('Session check - session:', req.session);
-  console.log('Session check - userId:', req.session?.userId);
+  console.log('Auth check - cookies received:', req.headers.cookie);
   
-  if (!req.session || !req.session.userId) {
-    return res.status(401).json({ message: "Unauthorized" });
+  // First try session authentication
+  if (req.session?.userId) {
+    console.log('Auth check - session valid:', req.session.userId);
+    return next();
   }
-  next();
+  
+  // Fallback to token authentication
+  const authToken = req.cookies?.auth_token;
+  if (authToken) {
+    try {
+      const decoded = JSON.parse(Buffer.from(authToken, 'base64').toString());
+      if (decoded.expires > Date.now()) {
+        console.log('Auth check - token valid:', decoded.userId);
+        // Set session data for consistency
+        req.session.userId = decoded.userId;
+        req.session.isAdmin = decoded.isAdmin;
+        return next();
+      }
+    } catch (e) {
+      console.log('Auth check - invalid token');
+    }
+  }
+  
+  console.log('Auth check - unauthorized');
+  return res.status(401).json({ message: "Unauthorized" });
 };
 
 export const isAdmin: RequestHandler = async (req, res, next) => {
-  if (!req.session || !req.session.userId || !req.session.isAdmin) {
-    return res.status(403).json({ message: "Admin access required" });
+  // Check session first
+  if (req.session?.userId && req.session?.isAdmin) {
+    return next();
   }
-  next();
+  
+  // Fallback to token
+  const authToken = req.cookies?.auth_token;
+  if (authToken) {
+    try {
+      const decoded = JSON.parse(Buffer.from(authToken, 'base64').toString());
+      if (decoded.expires > Date.now() && decoded.isAdmin) {
+        return next();
+      }
+    } catch (e) {
+      // Invalid token
+    }
+  }
+  
+  return res.status(403).json({ message: "Admin access required" });
 };
 
 // Extend session interface

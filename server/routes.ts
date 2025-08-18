@@ -58,26 +58,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // Set session data directly without regeneration
+      // Set session data
       req.session.userId = user.id;
       req.session.isAdmin = user.isAdmin || false;
       
-      // Save session explicitly
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error("Session save error:", saveErr);
-          return res.status(500).json({ message: "Session save failed" });
-        }
-        
-        console.log('Login success - sessionID:', req.sessionID);
-        console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
-        
-        // Session cookie is automatically set by express-session
-        
-        // Don't return password in response
-        const { password, ...userWithoutPassword } = user;
-        res.json(userWithoutPassword);
+      // Also set a simple auth token cookie that works better in development
+      const authToken = Buffer.from(JSON.stringify({ 
+        userId: user.id, 
+        isAdmin: user.isAdmin || false,
+        expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
+      })).toString('base64');
+      
+      res.cookie('auth_token', authToken, {
+        httpOnly: false, // Allow JS access for development
+        secure: false,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        sameSite: 'lax',
+        path: '/'
       });
+      
+      console.log('Login success - sessionID:', req.sessionID);
+      console.log('Login success - auth token set');
+      
+      // Don't return password in response
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid login data", details: error.errors });
@@ -88,16 +93,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/api/auth/user', async (req: Request, res: Response) => {
-    console.log('Session check - sessionID:', req.sessionID);
-    console.log('Session check - session:', req.session);
-    console.log('Session check - userId:', req.session?.userId);
+    console.log('Auth check - cookies received:', req.headers.cookie);
     
-    if (!req.session || !req.session.userId) {
+    let userId: string | undefined;
+    let isAdmin = false;
+    
+    // First try session authentication
+    if (req.session?.userId) {
+      console.log('Auth check - session valid:', req.session.userId);
+      userId = req.session.userId;
+      isAdmin = req.session.isAdmin || false;
+    } else {
+      // Fallback to token authentication
+      const authToken = req.cookies?.auth_token;
+      if (authToken) {
+        try {
+          const decoded = JSON.parse(Buffer.from(authToken, 'base64').toString());
+          if (decoded.expires > Date.now()) {
+            console.log('Auth check - token valid:', decoded.userId);
+            userId = decoded.userId;
+            isAdmin = decoded.isAdmin;
+            // Set session data for consistency
+            req.session.userId = decoded.userId;
+            req.session.isAdmin = decoded.isAdmin;
+          }
+        } catch (e) {
+          console.log('Auth check - invalid token');
+        }
+      }
+    }
+    
+    if (!userId) {
+      console.log('Auth check - unauthorized');
       return res.status(401).json({ message: "Unauthorized" });
     }
     
     try {
-      const userId = req.session.userId!;
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -115,11 +146,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/logout", async (req: Request, res: Response) => {
     req.session.destroy((err) => {
       if (err) {
-        return res.status(500).json({ message: "Failed to logout" });
+        console.error("Session destroy error:", err);
       }
-      res.clearCookie("connect.sid");
-      res.json({ message: "Logged out successfully" });
     });
+    // Clear both session and token cookies
+    res.clearCookie("sessionid");
+    res.clearCookie("auth_token");
+    res.json({ message: "Logged out successfully" });
   });
   // Admin-only routes
   app.get("/api/admin/*", isAdmin);
