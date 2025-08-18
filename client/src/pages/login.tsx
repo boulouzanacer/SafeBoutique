@@ -42,11 +42,11 @@ export default function Login() {
         className: "border-green-200 bg-green-50 text-green-800"
       });
       
-      // Invalidate auth queries immediately
-      queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+      // Wait a moment for session cookie to be set
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Navigate to home page and let useAuth refetch
-      setLocation("/");
+      // Force a full page reload to ensure session is picked up
+      window.location.href = "/";
     },
     onError: (error: any) => {
       toast({

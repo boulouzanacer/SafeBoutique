@@ -71,7 +71,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log('Login success - sessionID:', req.sessionID);
         console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
-        console.log('Login success - cookie sent:', res.getHeaders()['set-cookie']);
+        
+        // Session cookie is automatically set by express-session
         
         // Don't return password in response
         const { password, ...userWithoutPassword } = user;

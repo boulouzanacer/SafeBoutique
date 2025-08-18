@@ -20,7 +20,7 @@ export function getSession() {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      httpOnly: false, // Allow JavaScript access for debugging
+      httpOnly: true,
       secure: false,
       maxAge: sessionTtl,
       sameSite: 'lax',
@@ -32,6 +32,21 @@ export function getSession() {
 }
 
 export function setupAuth(app: Express) {
+  // Add CORS middleware specifically for session handling
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Cookie');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(200);
+      return;
+    }
+    
+    next();
+  });
+  
   app.use(getSession());
 }
 
