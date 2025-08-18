@@ -7,6 +7,15 @@ SafeSoft Boutique is a full-stack e-commerce web application built with React an
 Preferred communication style: Simple, everyday language.
 Authentication preference: Custom email/password authentication without third-party dependencies.
 
+# Recent Changes (August 18, 2025)
+
+## Session Management Fix
+- Resolved authentication session persistence issues that were preventing successful login flow
+- Switched from connect-pg-simple to MemoryStore for session storage to avoid ESM compatibility issues  
+- Updated session configuration with proper cookie settings for development environment
+- Fixed Dialog accessibility warnings by adding missing DialogDescription components
+- Admin credentials: boulouza.nacer@gmail.com / 123456
+
 # System Architecture
 
 ## Frontend Architecture

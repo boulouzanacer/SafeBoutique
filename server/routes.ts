@@ -58,35 +58,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // Create session
+      // Set session data directly without regeneration
       req.session.userId = user.id;
       req.session.isAdmin = user.isAdmin || false;
       
-      // Force session regeneration to create a new session ID
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error("Session regeneration error:", err);
-          return res.status(500).json({ message: "Session creation failed" });
+      // Save session explicitly
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error("Session save error:", saveErr);
+          return res.status(500).json({ message: "Session save failed" });
         }
         
-        // Set session data after regeneration
-        req.session.userId = user.id;
-        req.session.isAdmin = user.isAdmin || false;
+        console.log('Login success - sessionID:', req.sessionID);
+        console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
+        console.log('Login success - cookie sent:', res.getHeaders()['set-cookie']);
         
-        // Save session explicitly
-        req.session.save((saveErr) => {
-          if (saveErr) {
-            console.error("Session save error:", saveErr);
-            return res.status(500).json({ message: "Session save failed" });
-          }
-          
-          console.log('Login success - sessionID:', req.sessionID);
-          console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
-          
-          // Don't return password in response
-          const { password, ...userWithoutPassword } = user;
-          res.json(userWithoutPassword);
-        });
+        // Don't return password in response
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
       });
     } catch (error) {
       if (error instanceof z.ZodError) {

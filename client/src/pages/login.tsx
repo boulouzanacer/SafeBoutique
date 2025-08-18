@@ -42,16 +42,10 @@ export default function Login() {
         className: "border-green-200 bg-green-50 text-green-800"
       });
       
-      // Wait longer to ensure session is properly committed
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Invalidate auth queries immediately
+      queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
       
-      // Invalidate all queries to ensure fresh data
-      await queryClient.invalidateQueries();
-      
-      // Force refetch auth user
-      await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
-      
-      // Navigate to home page
+      // Navigate to home page and let useAuth refetch
       setLocation("/");
     },
     onError: (error: any) => {

@@ -20,42 +20,27 @@ export function getSession() {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      httpOnly: true,
-      secure: false, // Set to true in production with HTTPS
+      httpOnly: false, // Allow JavaScript access for debugging
+      secure: false,
       maxAge: sessionTtl,
       sameSite: 'lax',
       path: '/',
     },
-    rolling: true, // Reset session expiry on each request
-    name: 'connect.sid'
+    rolling: true,
+    name: 'sessionid'
   });
 }
 
 export function setupAuth(app: Express) {
-  app.set("trust proxy", 1);
-  
-  // Enhanced CORS for session cookies in development
-  app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
-      res.header('Access-Control-Allow-Origin', origin);
-      res.header('Access-Control-Allow-Credentials', 'true');
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
-      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    }
-    
-    if (req.method === 'OPTIONS') {
-      res.sendStatus(200);
-      return;
-    }
-    
-    next();
-  });
-  
   app.use(getSession());
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  console.log('Session check - sessionID:', req.sessionID);
+  console.log('Session check - cookies received:', req.headers.cookie);
+  console.log('Session check - session:', req.session);
+  console.log('Session check - userId:', req.session?.userId);
+  
   if (!req.session || !req.session.userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
