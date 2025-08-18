@@ -51,10 +51,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
+      console.log('Login attempt for:', req.body.email);
       const validatedData = loginUserSchema.parse(req.body);
       
       const user = await storage.verifyUserPassword(validatedData.email, validatedData.password);
       if (!user) {
+        console.log('Login failed - invalid credentials for:', validatedData.email);
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
@@ -65,13 +67,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
       })).toString('base64');
       
-      console.log('Login success - token created for user:', user.id);
+      console.log('Login success - token created for user:', user.id, 'isAdmin:', user.isAdmin, 'environment:', process.env.NODE_ENV || 'development');
       
       // Don't return password in response, but include auth token
       const { password, ...userWithoutPassword } = user;
       res.json({ ...userWithoutPassword, authToken });
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.log('Login validation error:', error.errors);
         return res.status(400).json({ message: "Invalid login data", details: error.errors });
       }
       console.error("Login error:", error);
@@ -118,6 +121,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // No server-side session cleanup needed for localStorage tokens
     // Client will remove the token from localStorage
     res.json({ message: "Logged out successfully" });
+  });
+
+  // Debug endpoint for troubleshooting production auth issues
+  app.get("/api/auth/debug", async (req: Request, res: Response) => {
+    const debugInfo: any = {
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString(),
+      origin: req.headers.origin,
+      userAgent: req.headers['user-agent'],
+      authHeader: req.headers.authorization ? 'Present' : 'Missing',
+      tokenLength: req.headers.authorization ? req.headers.authorization.length : 0,
+      database: {
+        url: process.env.DATABASE_URL ? 'Connected' : 'Missing',
+        ssl: process.env.DATABASE_URL?.includes('sslmode=require') ? 'Required' : 'Not required'
+      },
+      session: {
+        secret: process.env.SESSION_SECRET ? 'Set' : 'Missing'
+      }
+    };
+    
+    // Try to validate token if provided
+    if (req.headers.authorization?.startsWith('Bearer ')) {
+      const token = req.headers.authorization.substring(7);
+      try {
+        const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
+        debugInfo.token = {
+          valid: 'Parsed successfully',
+          userId: decoded.userId ? 'Present' : 'Missing',
+          isAdmin: decoded.isAdmin || false,
+          expires: new Date(decoded.expires).toISOString(),
+          expired: decoded.expires <= Date.now()
+        };
+      } catch (error: any) {
+        debugInfo.token = {
+          valid: 'Failed to parse',
+          error: error?.message || 'Unknown error'
+        };
+      }
+    }
+    
+    res.json(debugInfo);
   });
   // Admin-only routes
   app.get("/api/admin/*", isAdmin);

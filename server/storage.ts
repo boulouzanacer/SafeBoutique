@@ -358,13 +358,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async verifyUserPassword(email: string, password: string): Promise<User | null> {
-    const user = await this.getUserByEmail(email);
-    if (!user) return null;
-
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) return null;
-
-    return user;
+    try {
+      console.log('Attempting to verify password for email:', email);
+      const user = await this.getUserByEmail(email);
+      
+      if (!user) {
+        console.log('User not found for email:', email);
+        return null;
+      }
+      
+      console.log('User found, verifying password for:', email, 'isAdmin:', user.isAdmin);
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      
+      if (!isValidPassword) {
+        console.log('Password mismatch for:', email);
+        return null;
+      }
+      
+      console.log('Password verification successful for:', email);
+      return user;
+    } catch (error) {
+      console.error('Database error during password verification:', error);
+      return null;
+    }
   }
 
   async getStats(): Promise<{

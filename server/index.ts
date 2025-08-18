@@ -3,6 +3,13 @@ import cookieParser from 'cookie-parser';
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Log environment and startup information
+console.log('=== SafeSoft Boutique Server Starting ===');
+console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('Database URL:', process.env.DATABASE_URL ? 'Connected' : 'Missing');
+console.log('Session Secret:', process.env.SESSION_SECRET ? 'Set' : 'Missing');
+console.log('Timestamp:', new Date().toISOString());
+
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));

@@ -45,6 +45,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method,
     headers,
+    credentials: 'include', // Include credentials for CORS
     body: data ? JSON.stringify(data) : undefined,
   });
 
@@ -67,6 +68,7 @@ export const getQueryFn: <T>(options: {
 
     const res = await fetch(queryKey.join("/") as string, {
       headers,
+      credentials: 'include', // Include credentials for CORS
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
