@@ -163,6 +163,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     res.json(debugInfo);
   });
+
+  // Admin creation endpoint for production setup
+  app.post("/api/auth/create-admin", async (req: Request, res: Response) => {
+    try {
+      // Only allow this in development or if explicitly requested
+      if (process.env.NODE_ENV === 'production' && req.body.confirmProduction !== 'yes') {
+        return res.status(403).json({ 
+          message: "Admin creation in production requires confirmation",
+          instructions: "Add 'confirmProduction: yes' to request body"
+        });
+      }
+
+      const adminEmail = 'boulouza.nacer@gmail.com';
+      const adminPassword = '123456';
+
+      // Check if admin already exists
+      const existingUser = await storage.getUserByEmail(adminEmail);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Admin user already exists",
+          email: existingUser.email,
+          isAdmin: existingUser.isAdmin
+        });
+      }
+
+      // Create admin user
+      const adminUser = await storage.createUser({
+        email: adminEmail,
+        password: adminPassword,
+        firstName: 'Nacer',
+        lastName: 'Boulouza'
+      });
+
+      console.log('Admin user created via API:', adminUser.email);
+
+      res.status(201).json({ 
+        message: "Admin user created successfully",
+        email: adminUser.email,
+        isAdmin: adminUser.isAdmin
+      });
+    } catch (error) {
+      console.error("Error creating admin user:", error);
+      res.status(500).json({ message: "Failed to create admin user" });
+    }
+  });
+
   // Admin-only routes
   app.get("/api/admin/*", isAdmin);
   app.post("/api/admin/*", isAdmin);

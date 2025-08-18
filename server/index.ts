@@ -2,7 +2,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from 'cookie-parser';
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-
 // Log environment and startup information
 console.log('=== SafeSoft Boutique Server Starting ===');
 console.log('Environment:', process.env.NODE_ENV || 'development');
