@@ -9,7 +9,7 @@ import { ProductGridSkeleton } from "@/components/skeletons/product-grid-skeleto
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, X, Filter } from "lucide-react";
+import { Loader2, X, Filter, Search } from "lucide-react";
 import { Product } from "@shared/schema";
 
 export default function Home() {
@@ -209,8 +209,40 @@ export default function Home() {
           >
             {products.length === 0 ? (
               <div className="col-span-full text-center py-20 text-gray-500" data-testid="text-no-products">
-                <p className="font-light text-lg mb-2">No products found</p>
-                <p className="text-sm">Try adjusting your category filter</p>
+                <Search className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                <p className="font-light text-xl mb-2">No products found</p>
+                {filters.search ? (
+                  <div className="text-sm space-y-2">
+                    <p>No results for "<strong>{filters.search}</strong>"</p>
+                    <div className="text-xs text-gray-400 space-y-1">
+                      <p>• Try searching for product names, brands, or categories</p>
+                      <p>• Check your spelling or try different keywords</p>
+                      <p>• Use more general terms (e.g., "LCD" instead of "LCD Nokia")</p>
+                      {(filters.famille || filters.inStock || filters.promo) && (
+                        <p>• Remove filters to see more results</p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm space-y-2">
+                    <p>No products match your current filters</p>
+                    <div className="text-xs text-gray-400">
+                      <p>Try removing some filters or browsing all products</p>
+                    </div>
+                  </div>
+                )}
+                {(filters.famille || filters.inStock || filters.promo || filters.search) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-4 font-light"
+                    onClick={() => setFilters({ famille: "", search: "", inStock: false, promo: false })}
+                    data-testid="button-clear-all-filters"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Clear All Filters
+                  </Button>
+                )}
               </div>
             ) : (
               products.map((product) => (

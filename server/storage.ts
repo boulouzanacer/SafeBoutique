@@ -107,12 +107,38 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (filters?.search) {
-      conditions.push(
-        or(
-          like(products.produit, `%${filters.search}%`),
-          like(products.refProduit, `%${filters.search}%`)
-        )
-      );
+      // Enhanced intelligent search: case-insensitive, multiple fields, partial matching
+      const searchTerm = filters.search.toLowerCase().trim();
+      
+      // Create individual search conditions for better database performance
+      const searchConditions = [
+        // Product name - case insensitive
+        sql`LOWER(${products.produit}) LIKE '%' || ${searchTerm} || '%'`,
+        // Product reference - case insensitive  
+        sql`LOWER(${products.refProduit}) LIKE '%' || ${searchTerm} || '%'`,
+        // Product details/description - case insensitive
+        sql`LOWER(COALESCE(${products.detaille}, '')) LIKE '%' || ${searchTerm} || '%'`,
+        // Product family - case insensitive
+        sql`LOWER(COALESCE(${products.famille}, '')) LIKE '%' || ${searchTerm} || '%'`,
+        // Product subfamily - case insensitive
+        sql`LOWER(COALESCE(${products.sousFamille}, '')) LIKE '%' || ${searchTerm} || '%'`,
+        // Product brand/marque - case insensitive
+        sql`LOWER(COALESCE(${products.marque}, '')) LIKE '%' || ${searchTerm} || '%'`,
+        // Barcode search - for exact product codes
+        sql`${products.codeBarre} LIKE '%' || ${searchTerm} || '%'`,
+      ];
+
+      // Add word-by-word search for multi-word queries
+      if (searchTerm.includes(' ')) {
+        const words = searchTerm.split(' ').filter(word => word.length > 0);
+        for (const word of words) {
+          searchConditions.push(
+            sql`LOWER(${products.produit}) LIKE '%' || ${word} || '%'`
+          );
+        }
+      }
+      
+      conditions.push(or(...searchConditions));
     }
     
     if (filters?.minPrice !== undefined) {

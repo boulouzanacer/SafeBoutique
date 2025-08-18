@@ -90,7 +90,7 @@ export default function Header({ onSearch }: HeaderProps) {
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder={t('search.placeholder')}
+                  placeholder="Search products, brands, categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-48 border-0 border-b border-gray-200 rounded-none bg-transparent focus:border-primary focus:ring-0 px-0 font-light"
