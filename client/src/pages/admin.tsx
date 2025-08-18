@@ -17,20 +17,16 @@ export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
-  // Redirect non-admin users
-  useEffect(() => {
-    if (!isLoading && (!isAuthenticated || !user?.isAdmin)) {
-      setLocation("/");
-    }
-  }, [isAuthenticated, user, isLoading, setLocation]);
-
   // Show loading while checking auth
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="text-lg">Loading...</div>
+    </div>;
   }
 
-  // Show access denied if not admin
+  // Redirect or show access denied if not admin
   if (!isAuthenticated || !user?.isAdmin) {
+    console.log('Admin access check:', { isAuthenticated, user: user?.email, isAdmin: user?.isAdmin });
     return <AdminAccessDenied />;
   }
   return (

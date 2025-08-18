@@ -25,12 +25,10 @@ function Router() {
       <Route path="/landing" component={Landing} />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
+      {/* Admin route - check authentication within component to avoid 404 */}
+      <Route path="/admin" component={Admin} />
       {isAuthenticated && (
-        <>
-          {/* Admin route - accessible by all authenticated users but protected within component */}
-          <Route path="/admin" component={Admin} />
-          <Route path="/checkout" component={Checkout} />
-        </>
+        <Route path="/checkout" component={Checkout} />
       )}
       <Route component={NotFound} />
     </Switch>
