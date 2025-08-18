@@ -29,9 +29,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.isAdmin = user.isAdmin || false;
       
-      // Don't return password in response
-      const { password, ...userWithoutPassword } = user;
-      res.status(201).json(userWithoutPassword);
+      // Save session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Session creation failed" });
+        }
+        
+        // Don't return password in response
+        const { password, ...userWithoutPassword } = user;
+        res.status(201).json(userWithoutPassword);
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid user data", details: error.errors });
@@ -54,9 +62,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.isAdmin = user.isAdmin || false;
       
-      // Don't return password in response
-      const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      // Save session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Session creation failed" });
+        }
+        
+        // Don't return password in response
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid login data", details: error.errors });
