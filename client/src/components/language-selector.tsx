@@ -18,17 +18,31 @@ export default function LanguageSelector() {
   const { i18n, t } = useTranslation();
 
   const changeLanguage = (languageCode: string) => {
-    i18n.changeLanguage(languageCode);
-    localStorage.setItem('language', languageCode);
+    // Add transition class to body for smooth direction change
+    document.body.classList.add('language-transitioning');
     
-    // Update document direction for RTL languages
-    if (languageCode === 'ar') {
-      document.documentElement.dir = 'rtl';
-      document.documentElement.lang = 'ar';
-    } else {
-      document.documentElement.dir = 'ltr';
+    // Update document direction with smooth transition
+    const newDir = languageCode === 'ar' ? 'rtl' : 'ltr';
+    
+    // Apply fade effect during language change
+    document.documentElement.style.transition = 'opacity 0.3s ease-in-out';
+    document.documentElement.style.opacity = '0.95';
+    
+    setTimeout(() => {
+      document.documentElement.dir = newDir;
       document.documentElement.lang = languageCode;
-    }
+      i18n.changeLanguage(languageCode);
+      localStorage.setItem('language', languageCode);
+      
+      // Restore opacity
+      document.documentElement.style.opacity = '1';
+      
+      // Remove transition class after animation
+      setTimeout(() => {
+        document.body.classList.remove('language-transitioning');
+        document.documentElement.style.transition = '';
+      }, 300);
+    }, 150);
   };
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];

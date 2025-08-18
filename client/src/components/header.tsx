@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from "@/components/language-selector";
+import AnimatedText from "@/components/animated-text";
 
 import {
   DropdownMenu,
@@ -126,7 +127,7 @@ export default function Header({ onSearch }: HeaderProps) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleLogout} data-testid="button-logout">
                     <LogOut className="mr-2 h-4 w-4" />
-                    {t('header.signOut')}
+                    <AnimatedText translationKey="header.signOut" className="inline" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -139,7 +140,7 @@ export default function Header({ onSearch }: HeaderProps) {
                   data-testid="button-login"
                 >
                   <User className="h-5 w-5" />
-                  <span className="ml-2 hidden sm:inline">{t('header.signIn')}</span>
+                  <AnimatedText translationKey="header.signIn" className="ml-2 hidden sm:inline" />
                 </Button>
               </Link>
             )}

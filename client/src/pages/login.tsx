@@ -9,6 +9,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from 'react-i18next';
+import AnimatedText from "@/components/animated-text";
+import LanguageTransition from "@/components/language-transition";
 import { z } from "zod";
 import { Link, useLocation } from "wouter";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
@@ -72,6 +74,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        <LanguageTransition>
         <Card>
           <CardHeader className="text-center">
             <Link href="/" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-800 mb-4">
@@ -159,6 +162,7 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
+        </LanguageTransition>
       </div>
     </div>
   );

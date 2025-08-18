@@ -1,20 +1,23 @@
 import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
 import { useTranslation } from 'react-i18next';
+import AnimatedText from "@/components/animated-text";
+import LanguageTransition from "@/components/language-transition";
 
 export default function Footer() {
   const { t } = useTranslation();
   return (
     <footer className="bg-gray-50 border-t minimal-border mt-20" data-testid="footer">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <LanguageTransition>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="mb-6">
               <h3 className="text-2xl font-light tracking-wide text-primary mb-2" data-testid="text-footer-brand">
-                {t('footer.brand')}
+                <AnimatedText translationKey="footer.brand" className="inline-block" />
               </h3>
               <p className="text-gray-600 font-light leading-relaxed max-w-md" data-testid="text-footer-description">
-                {t('footer.description')}
+                <AnimatedText translationKey="footer.description" className="inline-block" />
               </p>
             </div>
             
@@ -47,7 +50,7 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase mb-4" data-testid="text-quick-links">
-              {t('footer.quickLinks')}
+              <AnimatedText translationKey="footer.quickLinks" className="inline-block" />
             </h4>
             <ul className="space-y-3 font-light">
               <li>
@@ -119,6 +122,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
+        </LanguageTransition>
       </div>
     </footer>
   );

@@ -168,3 +168,65 @@
 .hover-scale:hover {
   transform: scale(1.02);
 }
+
+/* Language transition animations */
+.language-transitioning * {
+  transition: all 0.3s ease-in-out !important;
+}
+
+/* Smooth text transitions */
+.text-transition {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* RTL support with smooth transitions */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .flex {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+  margin-right: calc(1rem * var(--tw-space-x-reverse));
+  margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+/* Smooth language switching animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.language-fade-in {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.language-fade-out {
+  animation: fadeOutDown 0.2s ease-in;
+}
