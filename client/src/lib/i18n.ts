@@ -252,6 +252,20 @@ const resources = {
       "bulk.testSmallFile": "Test with a small file first",
       "bulk.reviewResults": "Review import results and fix any errors",
       
+      // API Documentation
+      "api.title": "API Documentation & Testing",
+      "api.description": "Complete REST API endpoints for desktop application integration",
+      "api.endpoints": "Endpoints",
+      "api.codeExamples": "Code Examples",
+      "api.testing": "Testing",
+      "api.availableEndpoints": "Available Endpoints",
+      "api.schemaNote": "All endpoints return JSON data and support the PRODUIT schema with 39+ fields",
+      "api.method": "Method",
+      "api.endpoint": "Endpoint",
+      "api.descriptionColumn": "Description",
+      "api.parameters": "Parameters",
+      "api.actions": "Actions",
+      
       // Language selector
       "language.select": "Language",
       "language.english": "English",
@@ -504,6 +518,20 @@ const resources = {
       "bulk.testSmallFile": "Testez d'abord avec un petit fichier",
       "bulk.reviewResults": "Examinez les résultats d'importation et corrigez les erreurs",
       
+      // API Documentation
+      "api.title": "Documentation et Test de l'API",
+      "api.description": "Points de terminaison API REST complets pour l'intégration d'applications de bureau",
+      "api.endpoints": "Points de Terminaison",
+      "api.codeExamples": "Exemples de Code",
+      "api.testing": "Tests",
+      "api.availableEndpoints": "Points de Terminaison Disponibles",
+      "api.schemaNote": "Tous les points de terminaison retournent des données JSON et supportent le schéma PRODUIT avec 39+ champs",
+      "api.method": "Méthode",
+      "api.endpoint": "Point de Terminaison",
+      "api.descriptionColumn": "Description",
+      "api.parameters": "Paramètres",
+      "api.actions": "Actions",
+      
       // Language selector
       "language.select": "Langue",
       "language.english": "English",
@@ -755,6 +783,20 @@ const resources = {
       "bulk.prepareData": "أعد بياناتك باستخدام بنية القالب",
       "bulk.testSmallFile": "اختبر بملف صغير أولاً",
       "bulk.reviewResults": "راجع نتائج الاستيراد وأصلح أي أخطاء",
+      
+      // API Documentation
+      "api.title": "وثائق واختبار API",
+      "api.description": "نقاط نهاية API REST الكاملة لتكامل تطبيقات سطح المكتب",
+      "api.endpoints": "نقاط النهاية",
+      "api.codeExamples": "أمثلة الكود",
+      "api.testing": "الاختبار",
+      "api.availableEndpoints": "نقاط النهاية المتاحة",
+      "api.schemaNote": "جميع نقاط النهاية ترجع بيانات JSON وتدعم مخطط PRODUIT مع 39+ حقل",
+      "api.method": "الطريقة",
+      "api.endpoint": "نقطة النهاية",
+      "api.descriptionColumn": "الوصف",
+      "api.parameters": "المعاملات",
+      "api.actions": "الإجراءات",
       
       // Language selector
       "language.select": "اللغة",

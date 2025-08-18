@@ -20,6 +20,7 @@ import {
 import { Code, Copy, ExternalLink, Key, Server, Database, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import AnimatedText from "@/components/animated-text";
 
 interface ApiEndpoint {
   method: string;
@@ -174,27 +175,27 @@ export default function ApiDocumentation() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="text-api-title">
             <Server className="h-5 w-5" />
-            API Documentation & Testing
+            <AnimatedText translationKey="api.title" />
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Complete REST API endpoints for desktop application integration
+            <AnimatedText translationKey="api.description" />
           </p>
         </CardHeader>
       </Card>
 
       <Tabs defaultValue="endpoints" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="endpoints" data-testid="tab-endpoints">Endpoints</TabsTrigger>
-          <TabsTrigger value="examples" data-testid="tab-examples">Code Examples</TabsTrigger>
-          <TabsTrigger value="testing" data-testid="tab-testing">Testing</TabsTrigger>
+          <TabsTrigger value="endpoints" data-testid="tab-endpoints"><AnimatedText translationKey="api.endpoints" /></TabsTrigger>
+          <TabsTrigger value="examples" data-testid="tab-examples"><AnimatedText translationKey="api.codeExamples" /></TabsTrigger>
+          <TabsTrigger value="testing" data-testid="tab-testing"><AnimatedText translationKey="api.testing" /></TabsTrigger>
         </TabsList>
 
         <TabsContent value="endpoints" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Available Endpoints</CardTitle>
+              <CardTitle className="text-lg"><AnimatedText translationKey="api.availableEndpoints" /></CardTitle>
               <p className="text-sm text-gray-600">
-                All endpoints return JSON data and support the PRODUIT schema with 39+ fields
+                <AnimatedText translationKey="api.schemaNote" />
               </p>
             </CardHeader>
             <CardContent>
@@ -202,11 +203,11 @@ export default function ApiDocumentation() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Endpoint</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Parameters</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead><AnimatedText translationKey="api.method" /></TableHead>
+                      <TableHead><AnimatedText translationKey="api.endpoint" /></TableHead>
+                      <TableHead><AnimatedText translationKey="api.descriptionColumn" /></TableHead>
+                      <TableHead><AnimatedText translationKey="api.parameters" /></TableHead>
+                      <TableHead><AnimatedText translationKey="api.actions" /></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
