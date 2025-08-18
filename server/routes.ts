@@ -196,16 +196,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: 'Boulouza'
       });
 
+      // Update user to have admin privileges using direct SQL
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(process.env.DATABASE_URL!);
+      await sql`
+        UPDATE users 
+        SET is_admin = true, updated_at = NOW()
+        WHERE email = ${adminEmail}
+      `;
+
       console.log('Admin user created via API:', adminUser.email);
 
       res.status(201).json({ 
         message: "Admin user created successfully",
         email: adminUser.email,
-        isAdmin: adminUser.isAdmin
+        isAdmin: true
       });
     } catch (error) {
       console.error("Error creating admin user:", error);
       res.status(500).json({ message: "Failed to create admin user" });
+    }
+  });
+
+  // Admin privilege update endpoint 
+  app.get("/api/auth/fix-admin-production", async (req: Request, res: Response) => {
+    try {
+      const adminEmail = 'boulouza.nacer@gmail.com';
+      
+      // Check current status
+      const existingUser = await storage.getUserByEmail(adminEmail);
+      if (!existingUser) {
+        return res.status(404).json({ message: "Admin user not found" });
+      }
+      
+      // Update using storage interface first
+      const { neon } = await import('@neondatabase/serverless');
+      const sql = neon(process.env.DATABASE_URL!);
+      
+      console.log('Production admin fix - before update:', {
+        email: existingUser.email,
+        isAdmin: existingUser.isAdmin,
+        environment: process.env.NODE_ENV
+      });
+      
+      // Direct SQL update
+      const result = await sql`
+        UPDATE users 
+        SET is_admin = true, updated_at = NOW()
+        WHERE email = ${adminEmail}
+        RETURNING id, email, first_name, last_name, is_admin, updated_at
+      `;
+      
+      console.log('Production admin fix - SQL result:', result[0]);
+      
+      // Verify the update worked
+      const verifyUser = await storage.getUserByEmail(adminEmail);
+      console.log('Production admin fix - verification:', {
+        email: verifyUser?.email,
+        isAdmin: verifyUser?.isAdmin
+      });
+      
+      res.json({ 
+        message: "Production admin fix completed",
+        before: { isAdmin: existingUser.isAdmin },
+        sqlUpdate: result[0],
+        after: { isAdmin: verifyUser?.isAdmin },
+        environment: process.env.NODE_ENV
+      });
+      
+    } catch (error) {
+      console.error("Production admin fix error:", error);
+      res.status(500).json({ 
+        message: "Failed to fix admin",
+        error: error.message
+      });
     }
   });
 
