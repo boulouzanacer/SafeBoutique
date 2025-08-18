@@ -98,10 +98,10 @@ export default function Customers() {
                 <TableRow>
                   <TableHead>ID</TableHead>
                   <TableHead><AnimatedText translationKey="customers.name" /></TableHead>
-                  <TableHead>Contact</TableHead>
+                  <TableHead><AnimatedText translationKey="customers.contact" /></TableHead>
                   <TableHead><AnimatedText translationKey="customers.orders" /></TableHead>
                   <TableHead><AnimatedText translationKey="customers.joined" /></TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead><AnimatedText translationKey="customers.status" /></TableHead>
                   <TableHead><AnimatedText translationKey="customers.actions" /></TableHead>
                 </TableRow>
               </TableHeader>
@@ -139,7 +139,7 @@ export default function Customers() {
                       </TableCell>
                       <TableCell data-testid={`text-customer-orders-${customer.id}`}>
                         <Badge variant="outline">
-                          {customer.totalOrders || 0} orders
+  {customer.totalOrders || 0} {t("customers.ordersText", "orders")}
                         </Badge>
                       </TableCell>
                       <TableCell data-testid={`text-customer-date-${customer.id}`}>
@@ -154,7 +154,7 @@ export default function Customers() {
                           className="bg-green-100 text-green-800 hover:bg-green-100"
                           data-testid={`badge-customer-status-${customer.id}`}
                         >
-                          Active
+{t("common.active")}
                         </Badge>
                       </TableCell>
                       <TableCell>

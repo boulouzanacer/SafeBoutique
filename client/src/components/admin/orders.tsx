@@ -151,7 +151,7 @@ export default function Orders() {
                   <TableHead><AnimatedText translationKey="orders.customer" /></TableHead>
                   <TableHead><AnimatedText translationKey="orders.date" /></TableHead>
                   <TableHead><AnimatedText translationKey="orders.total" /></TableHead>
-                  <TableHead>Payment</TableHead>
+                  <TableHead><AnimatedText translationKey="common.payment" /></TableHead>
                   <TableHead><AnimatedText translationKey="orders.status" /></TableHead>
                   <TableHead><AnimatedText translationKey="orders.actions" /></TableHead>
                 </TableRow>
@@ -160,7 +160,7 @@ export default function Orders() {
                 {orders.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8 text-gray-500" data-testid="text-no-orders">
-                      No orders found
+{t("orders.noResults", "No orders found")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -180,7 +180,7 @@ export default function Orders() {
                       <TableCell data-testid={`text-customer-${order.id}`}>
                         {order.customer 
                           ? `${order.customer.firstName} ${order.customer.lastName}`
-                          : 'Guest Customer'
+                          : t("common.guest")
                         }
                       </TableCell>
                       <TableCell data-testid={`text-date-${order.id}`}>
@@ -190,7 +190,7 @@ export default function Orders() {
                         {formatCurrency(order.total)}
                       </TableCell>
                       <TableCell data-testid={`text-payment-${order.id}`}>
-                        <Badge variant="outline">COD</Badge>
+                        <Badge variant="outline">{t("common.cod")}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

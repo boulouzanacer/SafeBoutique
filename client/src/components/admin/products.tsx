@@ -656,16 +656,16 @@ export default function Products() {
                         onClick={() => setIsDialogOpen(false)}
                         data-testid="button-cancel"
                       >
-                        Cancel
+<AnimatedText translationKey="common.cancel" />
                       </Button>
                       <Button 
                         type="submit"
                         disabled={createProductMutation.isPending || updateProductMutation.isPending}
                         data-testid="button-save"
                       >
-                        {createProductMutation.isPending || updateProductMutation.isPending 
-                          ? "Saving..." 
-                          : editingProduct ? "Update" : "Create"}
+{createProductMutation.isPending || updateProductMutation.isPending 
+                          ? <AnimatedText translationKey="common.saving" />
+                          : editingProduct ? <AnimatedText translationKey="common.update" /> : <AnimatedText translationKey="common.create" />}
                       </Button>
                     </div>
                   </form>
@@ -745,11 +745,11 @@ export default function Products() {
                             className={(product.stock || 0) > 0 ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}
                             data-testid={`badge-stock-${product.recordid}`}
                           >
-                            {(product.stock || 0) > 0 ? t("products.inStock") : 'Out of Stock'}
+{(product.stock || 0) > 0 ? t("products.inStock") : t("common.outOfStock")}
                           </Badge>
                           {(product.pp1Ht && product.pp1Ht > 0) && (
                             <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">
-                              Sale
+{t("common.sale")}
                             </Badge>
                           )}
                         </div>
@@ -758,7 +758,7 @@ export default function Products() {
                         {(() => {
                           const pricing = getProductPricing(product);
                           if (!pricing.isOnPromotion) {
-                            return <span className="text-gray-400">No promotion</span>;
+return <span className="text-gray-400">{t("products.noPromotion", "No promotion")}</span>;
                           }
                           
                           return (

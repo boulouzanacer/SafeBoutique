@@ -36,6 +36,16 @@ const resources = {
       "common.confirm": "Confirm",
       "common.yes": "Yes",
       "common.no": "No",
+      "common.create": "Create",
+      "common.update": "Update",
+      "common.saving": "Saving...",
+      "common.noResults": "No results found",
+      "common.guest": "Guest Customer",
+      "common.payment": "Payment",
+      "common.cod": "COD",
+      "common.outOfStock": "Out of Stock",
+      "common.sale": "Sale",
+      "common.active": "Active",
       
       // Auth
       "auth.signIn": "Sign In",
@@ -130,6 +140,8 @@ const resources = {
       "products.inStock": "In Stock",
       "products.promotion": "Promotion",
       "products.success": "Product saved successfully",
+      "products.noResults": "No products found",
+      "products.noPromotion": "No promotion",
       
       // Orders
       "orders.title": "Order Management",
@@ -147,6 +159,7 @@ const resources = {
       "orders.cancelled": "Cancelled",
       "orders.updateStatus": "Update Status",
       "orders.success": "Order status updated successfully",
+      "orders.noResults": "No orders found",
       
       // Customers
       "customers.title": "Customer Management",
@@ -158,6 +171,10 @@ const resources = {
       "customers.search": "Search customers...",
       "customers.details": "Customer Details",
       "customers.orderHistory": "Order History",
+      "customers.actions": "Actions",
+      "customers.contact": "Contact",
+      "customers.status": "Status",
+      "customers.ordersText": "orders",
       
       // Settings
       "settings.title": "Settings",
@@ -231,6 +248,16 @@ const resources = {
       "common.confirm": "Confirmer",
       "common.yes": "Oui",
       "common.no": "Non",
+      "common.create": "Créer",
+      "common.update": "Mettre à jour",
+      "common.saving": "Enregistrement...",
+      "common.noResults": "Aucun résultat trouvé",
+      "common.guest": "Client Invité",
+      "common.payment": "Paiement",
+      "common.cod": "Paiement à la livraison",
+      "common.outOfStock": "Rupture de stock",
+      "common.sale": "Promotion",
+      "common.active": "Actif",
       
       // Auth
       "auth.signIn": "Se connecter",
@@ -325,6 +352,8 @@ const resources = {
       "products.inStock": "En Stock",
       "products.promotion": "Promotion",
       "products.success": "Produit enregistré avec succès",
+      "products.noResults": "Aucun produit trouvé",
+      "products.noPromotion": "Aucune promotion",
       
       // Orders
       "orders.title": "Gestion des Commandes",
@@ -342,6 +371,7 @@ const resources = {
       "orders.cancelled": "Annulé",
       "orders.updateStatus": "Mettre à jour le statut",
       "orders.success": "Statut de commande mis à jour avec succès",
+      "orders.noResults": "Aucune commande trouvée",
       
       // Customers
       "customers.title": "Gestion des Clients",
@@ -353,6 +383,10 @@ const resources = {
       "customers.search": "Rechercher clients...",
       "customers.details": "Détails du Client",
       "customers.orderHistory": "Historique des Commandes",
+      "customers.actions": "Actions",
+      "customers.contact": "Contact",
+      "customers.status": "Statut",
+      "customers.ordersText": "commandes",
       
       // Settings
       "settings.title": "Paramètres",
@@ -426,6 +460,16 @@ const resources = {
       "common.confirm": "تأكيد",
       "common.yes": "نعم",
       "common.no": "لا",
+      "common.create": "إنشاء",
+      "common.update": "تحديث",
+      "common.saving": "جاري الحفظ...",
+      "common.noResults": "لا توجد نتائج",
+      "common.guest": "عميل ضيف",
+      "common.payment": "الدفع",
+      "common.cod": "الدفع عند التسليم",
+      "common.outOfStock": "غير متوفر في المخزون",
+      "common.sale": "تخفيض",
+      "common.active": "نشط",
       
       // Auth
       "auth.signIn": "تسجيل الدخول",
@@ -520,6 +564,8 @@ const resources = {
       "products.inStock": "متوفر في المخزون",
       "products.promotion": "ترويج",
       "products.success": "تم حفظ المنتج بنجاح",
+      "products.noResults": "لم يتم العثور على منتجات",
+      "products.noPromotion": "لا يوجد ترويج",
       
       // Orders
       "orders.title": "إدارة الطلبات",
@@ -537,6 +583,7 @@ const resources = {
       "orders.cancelled": "ملغي",
       "orders.updateStatus": "تحديث الحالة",
       "orders.success": "تم تحديث حالة الطلب بنجاح",
+      "orders.noResults": "لم يتم العثور على طلبات",
       
       // Customers
       "customers.title": "إدارة العملاء",
@@ -548,6 +595,10 @@ const resources = {
       "customers.search": "البحث في العملاء...",
       "customers.details": "تفاصيل العميل",
       "customers.orderHistory": "تاريخ الطلبات",
+      "customers.actions": "الإجراءات",
+      "customers.contact": "جهة الاتصال",
+      "customers.status": "الحالة",
+      "customers.ordersText": "طلبات",
       
       // Settings
       "settings.title": "الإعدادات",
