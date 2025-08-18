@@ -4,6 +4,8 @@ import { StatsCardSkeleton } from "@/components/skeletons/stats-card-skeleton";
 import { ShoppingCart, DollarSign, Package, Users, RefreshCw } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
+import AnimatedText from "@/components/animated-text";
 
 interface Stats {
   totalProducts: number;
@@ -15,6 +17,7 @@ interface Stats {
 export default function Dashboard() {
   const [isAutoRefresh, setIsAutoRefresh] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const { t } = useTranslation();
   
   const { data: stats, isLoading, refetch, isFetching } = useQuery<Stats>({
     queryKey: ["/api/stats"],
@@ -56,7 +59,7 @@ export default function Dashboard() {
 
   const statCards = [
     {
-      title: "Total Orders",
+      title: t("admin.totalOrders"),
       value: stats?.totalOrders || 0,
       icon: ShoppingCart,
       bgColor: "bg-blue-100",
@@ -64,7 +67,7 @@ export default function Dashboard() {
       testId: "stat-orders"
     },
     {
-      title: "Revenue",
+      title: t("admin.revenue"),
       value: formatCurrency(stats?.revenue || 0),
       icon: DollarSign,
       bgColor: "bg-green-100",
@@ -72,7 +75,7 @@ export default function Dashboard() {
       testId: "stat-revenue"
     },
     {
-      title: "Products",
+      title: t("admin.totalProducts"),
       value: stats?.totalProducts || 0,
       icon: Package,
       bgColor: "bg-yellow-100",
@@ -80,7 +83,7 @@ export default function Dashboard() {
       testId: "stat-products"
     },
     {
-      title: "Customers",
+      title: t("admin.totalCustomers"),
       value: stats?.totalCustomers || 0,
       icon: Users,
       bgColor: "bg-purple-100",
@@ -95,10 +98,10 @@ export default function Dashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900" data-testid="text-dashboard-title">
-            Dashboard Overview
+            <AnimatedText translationKey="admin.dashboard" /> Overview
           </h2>
           <p className="text-sm text-gray-500" data-testid="text-last-updated">
-            Last updated: {getTimeAgo(lastUpdated)}
+            <AnimatedText translationKey="admin.lastUpdated" />: {getTimeAgo(lastUpdated)}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -110,7 +113,7 @@ export default function Dashboard() {
               className="rounded"
               data-testid="checkbox-auto-refresh"
             />
-            Auto-refresh (30s)
+            <AnimatedText translationKey="admin.autoRefresh" /> (30s)
           </label>
           <button
             onClick={handleManualRefresh}
@@ -121,7 +124,7 @@ export default function Dashboard() {
             data-testid="button-manual-refresh"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-            Refresh
+            <AnimatedText translationKey="admin.manualRefresh" />
           </button>
         </div>
       </div>
