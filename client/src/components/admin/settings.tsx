@@ -326,7 +326,7 @@ export default function SiteSettings() {
             <AnimatedText translationKey="settings.title" />
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Configure your boutique's header, footer, contact information, and slider images
+<AnimatedText translationKey="settings.description" />
           </p>
         </CardHeader>
       </Card>
@@ -345,7 +345,7 @@ export default function SiteSettings() {
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-lg">General Site Settings</CardTitle>
+                <CardTitle className="text-lg"><AnimatedText translationKey="settings.generalSettings" /></CardTitle>
                 <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button onClick={handleSettingsEdit} data-testid="button-edit-settings">
@@ -356,20 +356,20 @@ export default function SiteSettings() {
                   <DialogContent className="max-w-4xl max-h-screen overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle data-testid="text-settings-dialog-title">
-                        Site Settings Configuration
+                        <AnimatedText translationKey="settings.configuration" />
                       </DialogTitle>
                       <DialogDescription>
-                        Configure your website's basic information, contact details, and branding
+                        <AnimatedText translationKey="settings.configurationDescription" />
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...settingsForm}>
                       <form onSubmit={settingsForm.handleSubmit(onSettingsSubmit)} className="space-y-6">
                         <Tabs defaultValue="basic" className="space-y-4">
                           <TabsList>
-                            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                            <TabsTrigger value="contact">Contact & Social</TabsTrigger>
-                            <TabsTrigger value="policies">Policies & Legal</TabsTrigger>
-                            <TabsTrigger value="branding">Branding</TabsTrigger>
+                            <TabsTrigger value="basic"><AnimatedText translationKey="settings.basicInfo" /></TabsTrigger>
+                            <TabsTrigger value="contact"><AnimatedText translationKey="settings.contactSocial" /></TabsTrigger>
+                            <TabsTrigger value="policies"><AnimatedText translationKey="settings.policiesLegal" /></TabsTrigger>
+                            <TabsTrigger value="branding"><AnimatedText translationKey="settings.branding" /></TabsTrigger>
                           </TabsList>
 
                           <TabsContent value="basic" className="space-y-4">
@@ -379,7 +379,7 @@ export default function SiteSettings() {
                                 name="siteName"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Site Name *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.siteName" /> *</FormLabel>
                                     <FormControl>
                                       <Input {...field} data-testid="input-site-name" />
                                     </FormControl>
@@ -393,7 +393,7 @@ export default function SiteSettings() {
                                 name="headerMessage"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Header Message</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.headerMessage" /></FormLabel>
                                     <FormControl>
                                       <Input {...field} value={field.value || ""} placeholder="Special offers, announcements..." data-testid="input-header-message" />
                                     </FormControl>
@@ -407,7 +407,7 @@ export default function SiteSettings() {
                                 name="siteDescription"
                                 render={({ field }) => (
                                   <FormItem className="col-span-2">
-                                    <FormLabel>Site Description *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.siteDescription" /> *</FormLabel>
                                     <FormControl>
                                       <Textarea {...field} rows={3} data-testid="textarea-site-description" />
                                     </FormControl>
@@ -421,7 +421,7 @@ export default function SiteSettings() {
                                 name="deliveryInfo"
                                 render={({ field }) => (
                                   <FormItem className="col-span-2">
-                                    <FormLabel>Delivery Information *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.delivery" /> *</FormLabel>
                                     <FormControl>
                                       <Textarea {...field} rows={2} data-testid="textarea-delivery-info" />
                                     </FormControl>
@@ -439,7 +439,7 @@ export default function SiteSettings() {
                                 name="contactEmail"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Contact Email *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.email" /> *</FormLabel>
                                     <FormControl>
                                       <Input {...field} type="email" data-testid="input-contact-email" />
                                     </FormControl>
@@ -453,7 +453,7 @@ export default function SiteSettings() {
                                 name="contactPhone"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Contact Phone *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.phone" /> *</FormLabel>
                                     <FormControl>
                                       <Input {...field} data-testid="input-contact-phone" />
                                     </FormControl>
@@ -467,7 +467,7 @@ export default function SiteSettings() {
                                 name="contactAddress"
                                 render={({ field }) => (
                                   <FormItem className="col-span-2">
-                                    <FormLabel>Address *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.address" /> *</FormLabel>
                                     <FormControl>
                                       <Textarea {...field} rows={2} data-testid="textarea-contact-address" />
                                     </FormControl>
@@ -481,7 +481,7 @@ export default function SiteSettings() {
                                 name="socialFacebook"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Facebook URL</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.facebook" /> URL</FormLabel>
                                     <FormControl>
                                       <Input {...field} value={field.value || ""} placeholder="https://facebook.com/..." data-testid="input-facebook" />
                                     </FormControl>
@@ -495,7 +495,7 @@ export default function SiteSettings() {
                                 name="socialInstagram"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Instagram URL</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.instagram" /> URL</FormLabel>
                                     <FormControl>
                                       <Input {...field} value={field.value || ""} placeholder="https://instagram.com/..." data-testid="input-instagram" />
                                     </FormControl>
@@ -513,7 +513,7 @@ export default function SiteSettings() {
                                 name="returnPolicy"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Return Policy *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.returns" /> *</FormLabel>
                                     <FormControl>
                                       <Textarea {...field} rows={3} data-testid="textarea-return-policy" />
                                     </FormControl>
@@ -527,7 +527,7 @@ export default function SiteSettings() {
                                 name="privacyPolicy"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Privacy Policy *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.privacy" /> *</FormLabel>
                                     <FormControl>
                                       <Textarea {...field} rows={3} data-testid="textarea-privacy-policy" />
                                     </FormControl>
@@ -541,7 +541,7 @@ export default function SiteSettings() {
                                 name="termsOfService"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Terms of Service *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.terms" /> *</FormLabel>
                                     <FormControl>
                                       <Textarea {...field} rows={3} data-testid="textarea-terms-service" />
                                     </FormControl>
@@ -555,7 +555,7 @@ export default function SiteSettings() {
                                 name="footerText"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Footer Text *</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.footer" /> *</FormLabel>
                                     <FormControl>
                                       <Input {...field} data-testid="input-footer-text" />
                                     </FormControl>
@@ -573,7 +573,7 @@ export default function SiteSettings() {
                                 name="logo"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Logo (Base64 or URL)</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.logo" /> (Base64 or URL)</FormLabel>
                                     <FormControl>
                                       <div className="space-y-2">
                                         <Input
@@ -595,7 +595,7 @@ export default function SiteSettings() {
                                 name="favicon"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Favicon (Base64 or URL)</FormLabel>
+                                    <FormLabel><AnimatedText translationKey="settings.favicon" /> (Base64 or URL)</FormLabel>
                                     <FormControl>
                                       <div className="space-y-2">
                                         <Input
@@ -622,14 +622,14 @@ export default function SiteSettings() {
                             onClick={() => setIsSettingsDialogOpen(false)}
                             data-testid="button-cancel-settings"
                           >
-                            Cancel
+                            <AnimatedText translationKey="common.cancel" />
                           </Button>
                           <Button 
                             type="submit"
                             disabled={saveSettingsMutation.isPending}
                             data-testid="button-save-settings"
                           >
-                            {saveSettingsMutation.isPending ? "Saving..." : "Save Settings"}
+{saveSettingsMutation.isPending ? <AnimatedText translationKey="common.saving" /> : <AnimatedText translationKey="settings.save" />}
                           </Button>
                         </div>
                       </form>
