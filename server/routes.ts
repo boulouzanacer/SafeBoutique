@@ -62,7 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.isAdmin = user.isAdmin || false;
       
-      // Save session explicitly
+      // Save session explicitly and wait a bit to ensure it's committed
       req.session.save((err) => {
         if (err) {
           console.error("Session save error:", err);
@@ -72,9 +72,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('Login success - sessionID:', req.sessionID);
         console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
         
-        // Don't return password in response
-        const { password, ...userWithoutPassword } = user;
-        res.json(userWithoutPassword);
+        // Small delay to ensure session is committed to store
+        setTimeout(() => {
+          // Don't return password in response
+          const { password, ...userWithoutPassword } = user;
+          res.json(userWithoutPassword);
+        }, 100);
       });
     } catch (error) {
       if (error instanceof z.ZodError) {

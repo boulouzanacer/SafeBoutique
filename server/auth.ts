@@ -21,8 +21,10 @@ export function getSession() {
       secure: false, // Set to true in production with HTTPS
       maxAge: sessionTtl,
       sameSite: 'lax',
+      path: '/',
     },
     rolling: true, // Reset session expiry on each request
+    name: 'connect.sid'
   });
 }
 

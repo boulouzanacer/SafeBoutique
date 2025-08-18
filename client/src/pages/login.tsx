@@ -41,9 +41,12 @@ export default function Login() {
         description: "You have successfully signed in.",
         className: "border-green-200 bg-green-50 text-green-800"
       });
-      // Invalidate user query to refetch user data
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      setLocation("/");
+      // Wait a bit before invalidating to ensure session is properly set
+      setTimeout(() => {
+        // Invalidate user query to refetch user data
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        setLocation("/");
+      }, 200);
     },
     onError: (error: any) => {
       toast({
