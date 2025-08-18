@@ -69,6 +69,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ message: "Session creation failed" });
         }
         
+        console.log('Login success - sessionID:', req.sessionID);
+        console.log('Login success - session saved:', { userId: req.session.userId, isAdmin: req.session.isAdmin });
+        
         // Don't return password in response
         const { password, ...userWithoutPassword } = user;
         res.json(userWithoutPassword);
@@ -82,7 +85,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/auth/user', isAuthenticated, async (req: Request, res: Response) => {
+  app.get('/api/auth/user', async (req: Request, res: Response) => {
+    console.log('Session check - sessionID:', req.sessionID);
+    console.log('Session check - session:', req.session);
+    console.log('Session check - userId:', req.session?.userId);
+    
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
     try {
       const userId = req.session.userId!;
       const user = await storage.getUser(userId);
