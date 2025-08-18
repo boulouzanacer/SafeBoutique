@@ -3,6 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminTableSkeleton } from "@/components/skeletons/admin-table-skeleton";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from 'react-i18next';
+import AnimatedText from "@/components/animated-text";
+import LanguageTransition from "@/components/language-transition";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +55,7 @@ export default function Products() {
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const form = useForm<InsertProduct>({
     resolver: zodResolver(insertProductSchema),
@@ -255,7 +259,9 @@ export default function Products() {
         <CardHeader>
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle data-testid="text-products-title">Product Management</CardTitle>
+              <CardTitle data-testid="text-products-title">
+                <AnimatedText translationKey="products.title" />
+              </CardTitle>
               
               {/* Advanced Filters */}
               <div className="mt-4 space-y-4">
@@ -264,7 +270,7 @@ export default function Products() {
                   <div className="flex items-center gap-2">
                     <Search className="h-4 w-4 text-gray-500" />
                     <Input
-                      placeholder="Search products..."
+                      placeholder={t("products.search")}
                       value={filters.search}
                       onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                       className="w-64"
@@ -372,13 +378,13 @@ export default function Products() {
               <DialogTrigger asChild>
                 <Button onClick={handleNewProduct} data-testid="button-add-product">
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Product
+                  <AnimatedText translationKey="products.add" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-4xl max-h-screen overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle data-testid="text-product-dialog-title">
-                    {editingProduct ? "Edit Product" : "Add New Product"}
+                    <AnimatedText translationKey={editingProduct ? "products.edit" : "products.add"} />
                   </DialogTitle>
                   <DialogDescription>
                     {editingProduct 
@@ -674,22 +680,22 @@ export default function Products() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>Barcode</TableHead>
-                  <TableHead>Reference</TableHead>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Family</TableHead>
+                  <TableHead><AnimatedText translationKey="products.barcode" /></TableHead>
+                  <TableHead><AnimatedText translationKey="products.reference" /></TableHead>
+                  <TableHead><AnimatedText translationKey="products.name" /></TableHead>
+                  <TableHead><AnimatedText translationKey="products.price" /></TableHead>
+                  <TableHead><AnimatedText translationKey="products.stock" /></TableHead>
+                  <TableHead><AnimatedText translationKey="products.family" /></TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Promotion</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead><AnimatedText translationKey="products.promotion" /></TableHead>
+                  <TableHead><AnimatedText translationKey="products.actions" /></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {products.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={10} className="text-center py-8 text-gray-500" data-testid="text-no-products">
-                      No products found
+                      {t("products.noResults", "No products found")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -739,7 +745,7 @@ export default function Products() {
                             className={(product.stock || 0) > 0 ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}
                             data-testid={`badge-stock-${product.recordid}`}
                           >
-                            {(product.stock || 0) > 0 ? 'In Stock' : 'Out of Stock'}
+                            {(product.stock || 0) > 0 ? t("products.inStock") : 'Out of Stock'}
                           </Badge>
                           {(product.pp1Ht && product.pp1Ht > 0) && (
                             <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">

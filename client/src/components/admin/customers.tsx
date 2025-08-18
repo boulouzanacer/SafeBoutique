@@ -4,6 +4,9 @@ import { AdminTableSkeleton } from "@/components/skeletons/admin-table-skeleton"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from 'react-i18next';
+import AnimatedText from "@/components/animated-text";
+import LanguageTransition from "@/components/language-transition";
 import {
   Table,
   TableBody,
@@ -39,6 +42,7 @@ export default function Customers() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const { data: customers = [], isLoading } = useQuery<CustomerWithOrders[]>({
     queryKey: ["/api/customers"],
@@ -70,12 +74,14 @@ export default function Customers() {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle data-testid="text-customers-title">Customer Management</CardTitle>
+            <CardTitle data-testid="text-customers-title">
+              <AnimatedText translationKey="customers.title" />
+            </CardTitle>
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Search customers..."
+                  placeholder={t("customers.search")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 w-64"
@@ -90,13 +96,13 @@ export default function Customers() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Customer ID</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>ID</TableHead>
+                  <TableHead><AnimatedText translationKey="customers.name" /></TableHead>
                   <TableHead>Contact</TableHead>
-                  <TableHead>Total Orders</TableHead>
-                  <TableHead>Registration Date</TableHead>
+                  <TableHead><AnimatedText translationKey="customers.orders" /></TableHead>
+                  <TableHead><AnimatedText translationKey="customers.joined" /></TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead><AnimatedText translationKey="customers.actions" /></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

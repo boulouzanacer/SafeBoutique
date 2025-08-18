@@ -3,6 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminTableSkeleton } from "@/components/skeletons/admin-table-skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from 'react-i18next';
+import AnimatedText from "@/components/animated-text";
+import LanguageTransition from "@/components/language-transition";
 import {
   Table,
   TableBody,
@@ -44,6 +47,7 @@ export default function Orders() {
   const [justUpdatedOrderId, setJustUpdatedOrderId] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
     queryKey: ["/api/orders"],
@@ -134,20 +138,22 @@ export default function Orders() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle data-testid="text-orders-title">Order Management</CardTitle>
+          <CardTitle data-testid="text-orders-title">
+            <AnimatedText translationKey="orders.title" />
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead><AnimatedText translationKey="orders.number" /></TableHead>
+                  <TableHead><AnimatedText translationKey="orders.customer" /></TableHead>
+                  <TableHead><AnimatedText translationKey="orders.date" /></TableHead>
+                  <TableHead><AnimatedText translationKey="orders.total" /></TableHead>
                   <TableHead>Payment</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead><AnimatedText translationKey="orders.status" /></TableHead>
+                  <TableHead><AnimatedText translationKey="orders.actions" /></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from 'react-i18next';
+import AnimatedText from "@/components/animated-text";
+import LanguageTransition from "@/components/language-transition";
 import {
   Tabs,
   TabsContent,
@@ -108,6 +111,7 @@ export default function SiteSettings() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const settingsForm = useForm<SiteSettings>({
     resolver: zodResolver(settingsSchema),
@@ -319,7 +323,7 @@ export default function SiteSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="text-settings-title">
             <Settings className="h-5 w-5" />
-            Site Settings Management
+            <AnimatedText translationKey="settings.title" />
           </CardTitle>
           <p className="text-sm text-gray-600">
             Configure your boutique's header, footer, contact information, and slider images
@@ -329,8 +333,12 @@ export default function SiteSettings() {
 
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="general" data-testid="tab-general">General Settings</TabsTrigger>
-          <TabsTrigger value="slider" data-testid="tab-slider">Slider Images</TabsTrigger>
+          <TabsTrigger value="general" data-testid="tab-general">
+            <AnimatedText translationKey="settings.general" />
+          </TabsTrigger>
+          <TabsTrigger value="slider" data-testid="tab-slider">
+            <AnimatedText translationKey="settings.slider" />
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-4">
@@ -342,7 +350,7 @@ export default function SiteSettings() {
                   <DialogTrigger asChild>
                     <Button onClick={handleSettingsEdit} data-testid="button-edit-settings">
                       <Edit className="mr-2 h-4 w-4" />
-                      Edit Settings
+                      <AnimatedText translationKey="settings.save" />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-screen overflow-y-auto">
