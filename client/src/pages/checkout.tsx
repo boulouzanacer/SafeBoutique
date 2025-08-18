@@ -97,10 +97,10 @@ export default function Checkout() {
       clearCart();
       setLocation("/");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Order Failed",
-        description: "There was an error placing your order. Please try again.",
+        description: error.message || "There was an error placing your order. Please try again.",
         variant: "destructive"
       });
     }

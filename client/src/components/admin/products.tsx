@@ -134,10 +134,10 @@ export default function Products() {
         description: "Product created successfully"
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to create product",
+        description: error.message || "Failed to create product",
         variant: "destructive"
       });
     }
@@ -158,10 +158,10 @@ export default function Products() {
         description: "Product updated successfully"
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to update product",
+        description: error.message || "Failed to update product",
         variant: "destructive"
       });
     }
@@ -178,10 +178,10 @@ export default function Products() {
         description: "Product deleted successfully"
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to delete product",
+        description: error.message || "Failed to delete product",
         variant: "destructive"
       });
     }

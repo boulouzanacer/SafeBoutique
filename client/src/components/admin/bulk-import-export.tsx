@@ -111,10 +111,10 @@ export default function BulkImportExport() {
         });
       }
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Import Failed",
-        description: "An error occurred while importing products",
+        description: error.message || "An error occurred while importing products",
         variant: "destructive",
       });
     }

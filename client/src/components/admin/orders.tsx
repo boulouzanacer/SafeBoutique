@@ -77,11 +77,11 @@ export default function Orders() {
         setJustUpdatedOrderId(null);
       }, 2000);
     },
-    onError: () => {
+    onError: (error: any) => {
       setUpdatingOrderId(null);
       toast({
         title: "Error",
-        description: "Failed to update order status",
+        description: error.message || "Failed to update order status",
         variant: "destructive"
       });
     }

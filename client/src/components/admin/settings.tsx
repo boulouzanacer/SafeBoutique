@@ -168,10 +168,10 @@ export default function SiteSettings() {
         description: "Settings saved successfully"
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to save settings",
+        description: error.message || "Failed to save settings",
         variant: "destructive"
       });
     }
@@ -194,10 +194,10 @@ export default function SiteSettings() {
         description: "Slider image created successfully"
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to create slider image",
+        description: error.message || "Failed to create slider image",
         variant: "destructive"
       });
     }
