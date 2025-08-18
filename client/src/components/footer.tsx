@@ -21,24 +21,24 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a 
                 href="#" 
-                className="text-gray-400 hover:text-primary transition-colors" 
+                className="hover:scale-110 transition-transform" 
                 data-testid="link-footer-facebook"
               >
-                <SiFacebook className="h-5 w-5" />
+                <SiFacebook className="h-6 w-6 text-blue-600 hover:text-blue-700" />
               </a>
               <a 
                 href="#" 
-                className="text-gray-400 hover:text-primary transition-colors" 
+                className="hover:scale-110 transition-transform" 
                 data-testid="link-footer-instagram"
               >
-                <SiInstagram className="h-5 w-5" />
+                <SiInstagram className="h-6 w-6 text-pink-600 hover:text-pink-700" />
               </a>
               <a 
                 href="#" 
-                className="text-gray-400 hover:text-primary transition-colors" 
+                className="hover:scale-110 transition-transform" 
                 data-testid="link-footer-x"
               >
-                <SiX className="h-5 w-5" />
+                <SiX className="h-6 w-6 text-black hover:text-gray-800" />
               </a>
             </div>
           </div>

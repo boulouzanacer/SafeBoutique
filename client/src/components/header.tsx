@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,22 +80,8 @@ export default function Header({ onSearch }: HeaderProps) {
             </Link>
           </div>
 
-          {/* Center Content */}
-          <div className="hidden md:flex items-center space-x-8">
-            {/* Social Media Icons */}
-            <div className="flex items-center space-x-3">
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors" data-testid="link-facebook">
-                <SiFacebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors" data-testid="link-instagram">
-                <SiInstagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors" data-testid="link-x">
-                <SiX className="h-5 w-5" />
-              </a>
-            </div>
-            
-            {/* Search */}
+          {/* Center Content - Search */}
+          <div className="hidden md:flex items-center">
             <form onSubmit={handleSearch}>
               <div className="relative">
                 <Input
