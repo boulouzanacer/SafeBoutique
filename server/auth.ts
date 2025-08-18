@@ -51,55 +51,46 @@ export function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  console.log('Auth check - cookies received:', req.headers.cookie);
-  
-  // First try session authentication
-  if (req.session?.userId) {
-    console.log('Auth check - session valid:', req.session.userId);
-    return next();
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
   
-  // Fallback to token authentication
-  const authToken = req.cookies?.auth_token;
-  if (authToken) {
-    try {
-      const decoded = JSON.parse(Buffer.from(authToken, 'base64').toString());
-      if (decoded.expires > Date.now()) {
-        console.log('Auth check - token valid:', decoded.userId);
-        // Set session data for consistency
-        req.session.userId = decoded.userId;
-        req.session.isAdmin = decoded.isAdmin;
-        return next();
-      }
-    } catch (e) {
-      console.log('Auth check - invalid token');
+  const token = authHeader.substring(7);
+  
+  try {
+    const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
+    if (decoded.expires <= Date.now()) {
+      return res.status(401).json({ message: "Token expired" });
     }
+    
+    // Store user info in request for use in routes
+    (req as any).user = { userId: decoded.userId, isAdmin: decoded.isAdmin };
+    return next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
   }
-  
-  console.log('Auth check - unauthorized');
-  return res.status(401).json({ message: "Unauthorized" });
 };
 
 export const isAdmin: RequestHandler = async (req, res, next) => {
-  // Check session first
-  if (req.session?.userId && req.session?.isAdmin) {
-    return next();
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(403).json({ message: "Admin access required" });
   }
   
-  // Fallback to token
-  const authToken = req.cookies?.auth_token;
-  if (authToken) {
-    try {
-      const decoded = JSON.parse(Buffer.from(authToken, 'base64').toString());
-      if (decoded.expires > Date.now() && decoded.isAdmin) {
-        return next();
-      }
-    } catch (e) {
-      // Invalid token
+  const token = authHeader.substring(7);
+  
+  try {
+    const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
+    if (decoded.expires <= Date.now() || !decoded.isAdmin) {
+      return res.status(403).json({ message: "Admin access required" });
     }
+    
+    (req as any).user = { userId: decoded.userId, isAdmin: decoded.isAdmin };
+    return next();
+  } catch (error) {
+    return res.status(403).json({ message: "Admin access required" });
   }
-  
-  return res.status(403).json({ message: "Admin access required" });
 };
 
 // Extend session interface

@@ -35,18 +35,24 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginForm) => apiRequest("/api/auth/login", "POST", data),
-    onSuccess: async () => {
+    onSuccess: async (response) => {
+      const userData = await response.json();
+      
+      // Store the auth token in localStorage
+      if (userData.authToken) {
+        localStorage.setItem('authToken', userData.authToken);
+        console.log('Auth token stored in localStorage');
+      }
+      
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
         className: "border-green-200 bg-green-50 text-green-800"
       });
       
-      // Wait a moment for session cookie to be set
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Force a full page reload to ensure session is picked up
-      window.location.href = "/";
+      // Invalidate auth queries and navigate
+      queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+      setLocation("/");
     },
     onError: (error: any) => {
       toast({

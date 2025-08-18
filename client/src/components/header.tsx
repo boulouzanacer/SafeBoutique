@@ -34,6 +34,8 @@ export default function Header({ onSearch }: HeaderProps) {
   const logoutMutation = useMutation({
     mutationFn: () => apiRequest("/api/auth/logout", "POST"),
     onSuccess: () => {
+      // Clear the auth token from localStorage
+      localStorage.removeItem('authToken');
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Signed Out",
@@ -43,11 +45,15 @@ export default function Header({ onSearch }: HeaderProps) {
       setLocation("/");
     },
     onError: (error: any) => {
+      // Even if server request fails, clear local token
+      localStorage.removeItem('authToken');
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
+        title: "Signed Out",
+        description: "You have been successfully signed out.",
+        className: "border-blue-200 bg-blue-50 text-blue-800"
       });
+      setLocation("/");
     },
   });
 

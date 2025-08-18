@@ -58,31 +58,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // Set session data
-      req.session.userId = user.id;
-      req.session.isAdmin = user.isAdmin || false;
-      
-      // Also set a simple auth token cookie that works better in development
+      // Create a simple auth token to return in response (for localStorage storage)
       const authToken = Buffer.from(JSON.stringify({ 
         userId: user.id, 
         isAdmin: user.isAdmin || false,
         expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
       })).toString('base64');
       
-      res.cookie('auth_token', authToken, {
-        httpOnly: false, // Allow JS access for development
-        secure: false,
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite: 'lax',
-        path: '/'
-      });
+      console.log('Login success - token created for user:', user.id);
       
-      console.log('Login success - sessionID:', req.sessionID);
-      console.log('Login success - auth token set');
-      
-      // Don't return password in response
+      // Don't return password in response, but include auth token
       const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      res.json({ ...userWithoutPassword, authToken });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid login data", details: error.errors });
@@ -93,43 +80,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/api/auth/user', async (req: Request, res: Response) => {
-    console.log('Auth check - cookies received:', req.headers.cookie);
+    console.log('Auth check - headers:', req.headers.authorization);
     
-    let userId: string | undefined;
-    let isAdmin = false;
-    
-    // First try session authentication
-    if (req.session?.userId) {
-      console.log('Auth check - session valid:', req.session.userId);
-      userId = req.session.userId;
-      isAdmin = req.session.isAdmin || false;
-    } else {
-      // Fallback to token authentication
-      const authToken = req.cookies?.auth_token;
-      if (authToken) {
-        try {
-          const decoded = JSON.parse(Buffer.from(authToken, 'base64').toString());
-          if (decoded.expires > Date.now()) {
-            console.log('Auth check - token valid:', decoded.userId);
-            userId = decoded.userId;
-            isAdmin = decoded.isAdmin;
-            // Set session data for consistency
-            req.session.userId = decoded.userId;
-            req.session.isAdmin = decoded.isAdmin;
-          }
-        } catch (e) {
-          console.log('Auth check - invalid token');
-        }
-      }
-    }
-    
-    if (!userId) {
-      console.log('Auth check - unauthorized');
+    // Check for Authorization header with Bearer token
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('Auth check - no bearer token');
       return res.status(401).json({ message: "Unauthorized" });
     }
     
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    
     try {
-      const user = await storage.getUser(userId);
+      const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
+      if (decoded.expires <= Date.now()) {
+        console.log('Auth check - token expired');
+        return res.status(401).json({ message: "Token expired" });
+      }
+      
+      console.log('Auth check - token valid for user:', decoded.userId);
+      
+      const user = await storage.getUser(decoded.userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -138,20 +109,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+      console.error("Auth check error:", error);
+      return res.status(401).json({ message: "Invalid token" });
     }
   });
 
   app.post("/api/auth/logout", async (req: Request, res: Response) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Session destroy error:", err);
-      }
-    });
-    // Clear both session and token cookies
-    res.clearCookie("sessionid");
-    res.clearCookie("auth_token");
+    // No server-side session cleanup needed for localStorage tokens
+    // Client will remove the token from localStorage
     res.json({ message: "Logged out successfully" });
   });
   // Admin-only routes
