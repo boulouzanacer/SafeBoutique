@@ -15,6 +15,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -176,6 +177,9 @@ export default function Customers() {
             <DialogTitle data-testid="text-customer-details-title">
               Customer Details - {selectedCustomer?.firstName} {selectedCustomer?.lastName}
             </DialogTitle>
+            <DialogDescription>
+              View complete customer information and order history
+            </DialogDescription>
           </DialogHeader>
           
           {selectedCustomer && (

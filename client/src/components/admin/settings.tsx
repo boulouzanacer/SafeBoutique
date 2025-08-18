@@ -350,6 +350,9 @@ export default function SiteSettings() {
                       <DialogTitle data-testid="text-settings-dialog-title">
                         Site Settings Configuration
                       </DialogTitle>
+                      <DialogDescription>
+                        Configure your website's basic information, contact details, and branding
+                      </DialogDescription>
                     </DialogHeader>
                     <Form {...settingsForm}>
                       <form onSubmit={settingsForm.handleSubmit(onSettingsSubmit)} className="space-y-6">

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -379,6 +380,11 @@ export default function Products() {
                   <DialogTitle data-testid="text-product-dialog-title">
                     {editingProduct ? "Edit Product" : "Add New Product"}
                   </DialogTitle>
+                  <DialogDescription>
+                    {editingProduct 
+                      ? "Update product information, pricing, and inventory details"
+                      : "Create a new product by filling in the required information below"}
+                  </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

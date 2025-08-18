@@ -11,6 +11,12 @@ export function getSession() {
     ttl: sessionTtl,
     tableName: "sessions",
   });
+
+  // Handle session store errors
+  sessionStore.on('error', (error) => {
+    console.error('Session store error:', error);
+  });
+
   return session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
     store: sessionStore,

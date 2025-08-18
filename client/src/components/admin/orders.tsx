@@ -14,6 +14,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -262,6 +263,9 @@ export default function Orders() {
             <DialogTitle data-testid="text-order-details-title">
               Order Details - #{selectedOrder?.orderNumber}
             </DialogTitle>
+            <DialogDescription>
+              View complete order information, customer details, and item list
+            </DialogDescription>
           </DialogHeader>
           
           {selectedOrder && (
