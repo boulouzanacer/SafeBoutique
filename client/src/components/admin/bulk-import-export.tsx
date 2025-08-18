@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Download, Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import AnimatedText from "@/components/animated-text";
 
 interface BulkImportResult {
   success: boolean;
@@ -196,9 +197,9 @@ export default function BulkImportExport() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Bulk Import/Export</h2>
+        <h2 className="text-2xl font-bold tracking-tight"><AnimatedText translationKey="bulk.title" /></h2>
         <p className="text-muted-foreground">
-          Import products from CSV files or export your current product catalog
+          <AnimatedText translationKey="bulk.description" />
         </p>
       </div>
 
@@ -208,12 +209,12 @@ export default function BulkImportExport() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
-              Export Products
+              <AnimatedText translationKey="bulk.exportTitle" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Export all products to a CSV file for backup or external use.
+              <AnimatedText translationKey="bulk.exportDescription" />
             </p>
             
             <Button
@@ -223,11 +224,11 @@ export default function BulkImportExport() {
               data-testid="button-export"
             >
               {exportMutation.isPending ? (
-                "Exporting..."
+                <AnimatedText translationKey="bulk.exporting" />
               ) : (
                 <>
                   <Download className="mr-2 h-4 w-4" />
-                  Export to CSV
+                  <AnimatedText translationKey="bulk.exportButton" />
                 </>
               )}
             </Button>
@@ -251,7 +252,7 @@ export default function BulkImportExport() {
                         className="p-0 h-auto mt-2 text-green-600 hover:text-green-800"
                         data-testid="button-download-export"
                       >
-                        Download File
+                        <AnimatedText translationKey="bulk.downloadFile" />
                       </Button>
                     )}
                   </div>
@@ -266,17 +267,17 @@ export default function BulkImportExport() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              Import Products
+              <AnimatedText translationKey="bulk.importTitle" />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Import products from a CSV or Excel file. Existing products will be updated based on product reference or barcode.
+              <AnimatedText translationKey="bulk.importDescription" />
             </p>
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="csvFile">Select CSV or Excel File</Label>
+                <Label htmlFor="csvFile"><AnimatedText translationKey="bulk.selectFile" /></Label>
                 <Input
                   ref={fileInputRef}
                   id="csvFile"
@@ -301,11 +302,11 @@ export default function BulkImportExport() {
                   data-testid="button-import"
                 >
                   {importMutation.isPending ? (
-                    "Importing..."
+                    <AnimatedText translationKey="common.loading" />
                   ) : (
                     <>
                       <Upload className="mr-2 h-4 w-4" />
-                      Import CSV
+                      <AnimatedText translationKey="bulk.importButton" />
                     </>
                   )}
                 </Button>
@@ -317,11 +318,11 @@ export default function BulkImportExport() {
                   data-testid="button-template"
                 >
                   {templateMutation.isPending ? (
-                    "Generating..."
+                    <AnimatedText translationKey="common.loading" />
                   ) : (
                     <>
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      Get Template
+                      <AnimatedText translationKey="bulk.getTemplate" />
                     </>
                   )}
                 </Button>
@@ -381,37 +382,37 @@ export default function BulkImportExport() {
       {/* Instructions */}
       <Card>
         <CardHeader>
-          <CardTitle>Import Instructions</CardTitle>
+          <CardTitle><AnimatedText translationKey="bulk.instructions" /></CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <div>
-            <h4 className="font-medium">File Format Support:</h4>
+            <h4 className="font-medium"><AnimatedText translationKey="bulk.fileFormat" /></h4>
             <ul className="mt-2 space-y-1 list-disc list-inside text-muted-foreground">
-              <li>Supports CSV (.csv) and Excel (.xls, .xlsx) files</li>
-              <li>Uses your exact column format: Code barre, Réf produit, Désignation, etc.</li>
-              <li>First row should contain column headers</li>
-              <li>Required columns: Désignation, Réf produit</li>
-              <li>Maximum file size: 10MB</li>
+              <li><AnimatedText translationKey="bulk.supportsCsv" /></li>
+              <li><AnimatedText translationKey="bulk.columnFormat" /></li>
+              <li><AnimatedText translationKey="bulk.firstRow" /></li>
+              <li><AnimatedText translationKey="bulk.requiredColumns" /></li>
+              <li><AnimatedText translationKey="bulk.maxFileSize" /></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-medium">Import Behavior:</h4>
+            <h4 className="font-medium"><AnimatedText translationKey="bulk.importBehavior" /></h4>
             <ul className="mt-2 space-y-1 list-disc list-inside text-muted-foreground">
-              <li>Products are matched by Product Reference or Barcode</li>
-              <li>Existing products will be updated with new data</li>
-              <li>New products will be created if no match is found</li>
-              <li>Invalid rows will be skipped with error details provided</li>
+              <li><AnimatedText translationKey="bulk.matchedBy" /></li>
+              <li><AnimatedText translationKey="bulk.existingUpdate" /></li>
+              <li><AnimatedText translationKey="bulk.newProducts" /></li>
+              <li><AnimatedText translationKey="bulk.invalidRows" /></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-medium">Recommended Process:</h4>
+            <h4 className="font-medium"><AnimatedText translationKey="bulk.recommendedProcess" /></h4>
             <ol className="mt-2 space-y-1 list-decimal list-inside text-muted-foreground">
-              <li>Download the CSV template to see the correct format</li>
-              <li>Prepare your data using the template structure</li>
-              <li>Test with a small file first</li>
-              <li>Review import results and fix any errors</li>
+              <li><AnimatedText translationKey="bulk.downloadTemplate" /></li>
+              <li><AnimatedText translationKey="bulk.prepareData" /></li>
+              <li><AnimatedText translationKey="bulk.testSmallFile" /></li>
+              <li><AnimatedText translationKey="bulk.reviewResults" /></li>
             </ol>
           </div>
         </CardContent>
