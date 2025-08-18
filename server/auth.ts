@@ -20,7 +20,7 @@ export function getSession() {
       httpOnly: true,
       secure: false, // Set to true in production with HTTPS
       maxAge: sessionTtl,
-      sameSite: 'lax',
+      sameSite: 'lax', // 'none' requires secure=true
       path: '/',
     },
     rolling: true, // Reset session expiry on each request
@@ -30,6 +30,17 @@ export function getSession() {
 
 export function setupAuth(app: Express) {
   app.set("trust proxy", 1);
+  
+  // Simple CORS for session cookies in development
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.header('Access-Control-Allow-Origin', origin);
+      res.header('Access-Control-Allow-Credentials', 'true');
+    }
+    next();
+  });
+  
   app.use(getSession());
 }
 
