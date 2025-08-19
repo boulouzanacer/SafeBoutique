@@ -217,23 +217,77 @@ export default function Products() {
 
   // Photo upload handlers
   const handleGetUploadParameters = async () => {
-    const response = await apiRequest("POST", "/api/objects/upload");
-    const data = await response.json();
-    return {
-      method: "PUT" as const,
-      url: data.uploadURL,
-    };
+    try {
+      const response = await apiRequest("POST", "/api/objects/upload");
+      if (!response.ok) {
+        throw new Error(`Upload parameters request failed: ${response.status}`);
+      }
+      const data = await response.json();
+      if (!data.uploadURL) {
+        throw new Error("No upload URL received from server");
+      }
+      return {
+        method: "PUT" as const,
+        url: data.uploadURL,
+      };
+    } catch (error) {
+      console.error("Error getting upload parameters:", error);
+      toast({
+        title: "Error",
+        description: "Failed to prepare file upload. Please try again.",
+        variant: "destructive"
+      });
+      throw error;
+    }
   };
 
   const handlePhotoUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-    if (result.successful && result.successful.length > 0 && editingProduct) {
-      const uploadedFile = result.successful[0];
-      const photoURL = uploadedFile.uploadURL;
+    try {
+      console.log("Upload complete result:", result);
       
-      setIsUploadingPhoto(true);
-      updateProductPhotoMutation.mutate({
-        productId: editingProduct.recordid,
-        photoURL: photoURL
+      if (result.failed && result.failed.length > 0) {
+        console.error("Upload failed:", result.failed);
+        toast({
+          title: "Error",
+          description: "File upload failed. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (result.successful && result.successful.length > 0 && editingProduct) {
+        const uploadedFile = result.successful[0];
+        const photoURL = uploadedFile.uploadURL;
+        
+        if (!photoURL) {
+          console.error("No upload URL in successful result:", uploadedFile);
+          toast({
+            title: "Error",
+            description: "Upload completed but no file URL received.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        console.log("Updating product photo with URL:", photoURL);
+        setIsUploadingPhoto(true);
+        updateProductPhotoMutation.mutate({
+          productId: editingProduct.recordid,
+          photoURL: photoURL
+        });
+      } else {
+        console.warn("Upload completed but no files or no editing product:", {
+          successful: result.successful?.length,
+          editingProduct: !!editingProduct
+        });
+      }
+    } catch (error) {
+      console.error("Error in handlePhotoUploadComplete:", error);
+      setIsUploadingPhoto(false);
+      toast({
+        title: "Error",
+        description: "An error occurred while processing the upload.",
+        variant: "destructive"
       });
     }
   };

@@ -70,11 +70,28 @@ export function ObjectUploader({
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
-        getUploadParameters: onGetUploadParameters,
+        getUploadParameters: async (...args) => {
+          try {
+            return await onGetUploadParameters(...args);
+          } catch (error) {
+            console.error("Upload parameters error in ObjectUploader:", error);
+            throw error;
+          }
+        },
       })
       .on("complete", (result) => {
-        onComplete?.(result);
-        setShowModal(false);
+        try {
+          onComplete?.(result);
+          setShowModal(false);
+        } catch (error) {
+          console.error("Error in upload complete handler:", error);
+        }
+      })
+      .on("upload-error", (file, error) => {
+        console.error("Upload error for file:", file?.name, "Error:", error);
+      })
+      .on("error", (error) => {
+        console.error("Uppy error:", error);
       })
   );
 
