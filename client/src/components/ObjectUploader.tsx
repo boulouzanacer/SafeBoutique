@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import Uppy from "@uppy/core";
 import { DashboardModal } from "@uppy/react";
@@ -59,62 +59,113 @@ export function ObjectUploader({
   children,
 }: ObjectUploaderProps) {
   const [showModal, setShowModal] = useState(false);
-  const [uppy] = useState(() =>
-    new Uppy({
+  const [uppy, setUppy] = useState<Uppy | null>(null);
+
+  useEffect(() => {
+    const uppyInstance = new Uppy({
       restrictions: {
         maxNumberOfFiles,
         maxFileSize,
         allowedFileTypes: ['image/*'],
       },
       autoProceed: false,
-    })
+    });
+
+    // Wrap all handlers in try-catch to prevent crashes
+    const safeGetUploadParameters = async (file: any) => {
+      try {
+        console.log("Getting upload parameters for file:", file?.name);
+        const params = await onGetUploadParameters(file);
+        console.log("Upload parameters received:", params);
+        return {
+          method: params.method,
+          url: params.url,
+          fields: {},
+          headers: {}
+        };
+      } catch (error) {
+        console.error("Upload parameters error:", error);
+        throw error;
+      }
+    };
+
+    const safeCompleteHandler = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+      try {
+        console.log("Upload complete:", result);
+        if (onComplete) {
+          onComplete(result);
+        }
+        setShowModal(false);
+      } catch (error) {
+        console.error("Error in complete handler:", error);
+      }
+    };
+
+    const safeErrorHandler = (error: any) => {
+      console.error("Uppy error:", error);
+    };
+
+    const safeUploadErrorHandler = (file: any, error: any) => {
+      console.error("Upload error for file:", file?.name, "Error:", error);
+    };
+
+    // Configure the uppy instance
+    uppyInstance
       .use(AwsS3, {
         shouldUseMultipart: false,
-        getUploadParameters: async (file) => {
-          try {
-            console.log("Getting upload parameters for file:", file?.name);
-            const params = await onGetUploadParameters(file);
-            console.log("Upload parameters received:", params);
-            return {
-              method: params.method,
-              url: params.url,
-              fields: {},
-              headers: {}
-            };
-          } catch (error) {
-            console.error("Upload parameters error in ObjectUploader:", error);
-            throw error;
-          }
-        },
+        getUploadParameters: safeGetUploadParameters,
       })
-      .on("complete", (result) => {
-        try {
-          onComplete?.(result);
-          setShowModal(false);
-        } catch (error) {
-          console.error("Error in upload complete handler:", error);
-        }
-      })
-      .on("upload-error", (file, error) => {
-        console.error("Upload error for file:", file?.name, "Error:", error);
-      })
-      .on("error", (error) => {
-        console.error("Uppy error:", error);
-      })
-  );
+      .on("complete", safeCompleteHandler)
+      .on("upload-error", safeUploadErrorHandler)
+      .on("error", safeErrorHandler);
+
+    setUppy(uppyInstance);
+
+    // Cleanup function
+    return () => {
+      if (uppyInstance) {
+        uppyInstance.close();
+      }
+    };
+  }, [maxNumberOfFiles, maxFileSize, onGetUploadParameters, onComplete]);
+
+  if (!uppy) {
+    return (
+      <Button disabled className={buttonClassName}>
+        Loading...
+      </Button>
+    );
+  }
 
   return (
     <div>
-      <Button onClick={() => setShowModal(true)} className={buttonClassName}>
+      <Button 
+        onClick={() => {
+          try {
+            setShowModal(true);
+          } catch (error) {
+            console.error("Error opening modal:", error);
+          }
+        }} 
+        className={buttonClassName}
+      >
         {children}
       </Button>
 
-      <DashboardModal
-        uppy={uppy}
-        open={showModal}
-        onRequestClose={() => setShowModal(false)}
-        proudlyDisplayPoweredByUppy={false}
-      />
+      {showModal && (
+        <DashboardModal
+          uppy={uppy}
+          open={showModal}
+          onRequestClose={() => {
+            try {
+              setShowModal(false);
+            } catch (error) {
+              console.error("Error closing modal:", error);
+            }
+          }}
+          proudlyDisplayPoweredByUppy={false}
+        />
+      )}
     </div>
   );
 }

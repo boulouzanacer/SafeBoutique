@@ -97,7 +97,21 @@ export const queryClient = new QueryClient({
 // Add global error handler for unhandled promise rejections
 if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled promise rejection:', event.reason);
+    console.error('Unhandled promise rejection caught and handled:', event.reason);
+    console.error('Stack trace:', event.reason?.stack);
+    
+    // Try to show user-friendly error if possible
+    if (event.reason?.message) {
+      console.warn('Error message:', event.reason.message);
+    }
+    
+    // Prevent the default unhandled rejection error
     event.preventDefault();
+  });
+
+  window.addEventListener('error', (event) => {
+    console.error('Global error caught:', event.error);
+    console.error('Message:', event.message);
+    console.error('Stack:', event.error?.stack);
   });
 }
