@@ -216,7 +216,7 @@ export default function Products() {
   });
 
   // Photo upload handlers
-  const handleGetUploadParameters = async () => {
+  const handleGetUploadParameters = async (file?: any) => {
     try {
       const response = await apiRequest("POST", "/api/objects/upload");
       if (!response.ok) {
