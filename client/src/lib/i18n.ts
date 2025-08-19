@@ -75,6 +75,7 @@ const resources = {
       "product.inStock": "In Stock",
       "product.outOfStock": "Out of Stock",
       "product.addToCart": "Add to Cart",
+      "product.adding": "Adding...",
       "product.viewDetails": "View Details",
       "product.description": "Description",
       "product.specifications": "Specifications",
@@ -82,6 +83,9 @@ const resources = {
       "product.rating": "Rating",
       "product.noReviews": "No reviews yet",
       "product.writeReview": "Write a Review",
+      "product.save": "Save",
+      "product.lowStock": "Low Stock",
+      "product.available": "available",
       
       // Cart
       "cart.title": "Shopping Cart",
@@ -217,10 +221,6 @@ const resources = {
       "settings.branding": "Branding",
       "settings.headerMessage": "Header Message",
       
-      // Common actions
-      "common.saving": "Saving...",
-      "common.loading": "Loading...",
-      
       // Bulk Import/Export
       "bulk.title": "Bulk Import/Export",
       "bulk.description": "Import products from CSV files or export your current product catalog",
@@ -345,6 +345,7 @@ const resources = {
       "product.inStock": "En stock",
       "product.outOfStock": "Rupture de stock",
       "product.addToCart": "Ajouter au panier",
+      "product.adding": "Ajout...",
       "product.viewDetails": "Voir les détails",
       "product.description": "Description",
       "product.specifications": "Spécifications",
@@ -352,6 +353,9 @@ const resources = {
       "product.rating": "Note",
       "product.noReviews": "Aucun avis pour le moment",
       "product.writeReview": "Écrire un avis",
+      "product.save": "Économiser",
+      "product.lowStock": "Stock faible",
+      "product.available": "disponible",
       
       // Cart
       "cart.title": "Panier d'achat",
@@ -611,6 +615,7 @@ const resources = {
       "product.inStock": "متوفر",
       "product.outOfStock": "نفد المخزون",
       "product.addToCart": "أضف للسلة",
+      "product.adding": "جاري الإضافة...",
       "product.viewDetails": "عرض التفاصيل",
       "product.description": "الوصف",
       "product.specifications": "المواصفات",
@@ -618,6 +623,9 @@ const resources = {
       "product.rating": "التقييم",
       "product.noReviews": "لا توجد تقييمات بعد",
       "product.writeReview": "اكتب تقييماً",
+      "product.save": "وفر",
+      "product.lowStock": "مخزون منخفض",
+      "product.available": "متوفر",
       
       // Cart
       "cart.title": "سلة التسوق",

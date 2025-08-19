@@ -116,6 +116,28 @@
   overflow: hidden;
 }
 
+/* Professional Product Card Enhancements */
+.product-card-professional {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.product-card-professional:hover {
+  transform: translateY(-4px);
+}
+
+.product-image-professional {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.price-professional {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
 .cart-sidebar-enter {
   transform: translateX(100%);
 }
