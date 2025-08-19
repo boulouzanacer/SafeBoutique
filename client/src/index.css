@@ -138,6 +138,74 @@
   font-weight: 700;
 }
 
+/* Elegant Hover Animation Effects */
+.product-card-hover-elegant {
+  transform-origin: center;
+}
+
+.product-card-hover-elegant:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Smooth sliding information preview with bounce */
+.info-preview-slide {
+  transform: translateY(100%);
+  transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.group:hover .info-preview-slide {
+  transform: translateY(0);
+}
+
+/* Badge pulse animation for promotions */
+@keyframes subtle-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.02); }
+}
+
+.promo-badge-pulse {
+  animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+/* Enhanced shadow depth for hover states */
+.shadow-3xl {
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 10px 25px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Staggered fade-in animation for info items */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.info-item-1 { animation-delay: 100ms; }
+.info-item-2 { animation-delay: 150ms; }
+.info-item-3 { animation-delay: 200ms; }
+.info-item-4 { animation-delay: 250ms; }
+.info-item-5 { animation-delay: 300ms; }
+
+/* Floating effect for product cards */
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
+}
+
+.product-card-float:hover {
+  animation: float-subtle 3s ease-in-out infinite;
+}
+
 .cart-sidebar-enter {
   transform: translateX(100%);
 }
