@@ -125,7 +125,7 @@ export default function Products() {
 
   const createProductMutation = useMutation({
     mutationFn: async (data: InsertProduct) => {
-      const response = await apiRequest("POST", "/api/products", data);
+      const response = await apiRequest("/api/products", "POST", data);
       return response.json();
     },
     onSuccess: () => {
@@ -149,7 +149,7 @@ export default function Products() {
 
   const updateProductMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<InsertProduct> }) => {
-      const response = await apiRequest("PUT", `/api/products/${id}`, data);
+      const response = await apiRequest(`/api/products/${id}`, "PUT", data);
       return response.json();
     },
     onSuccess: () => {
@@ -173,7 +173,7 @@ export default function Products() {
 
   const deleteProductMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/products/${id}`);
+      await apiRequest(`/api/products/${id}`, "DELETE");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
@@ -194,7 +194,7 @@ export default function Products() {
   // Photo upload mutation
   const updateProductPhotoMutation = useMutation({
     mutationFn: async ({ productId, photoURL }: { productId: number; photoURL: string }) => {
-      const response = await apiRequest("PUT", `/api/products/${productId}/photo`, { photoURL });
+      const response = await apiRequest(`/api/products/${productId}/photo`, "PUT", { photoURL });
       return response.json();
     },
     onSuccess: () => {
@@ -219,7 +219,7 @@ export default function Products() {
   const handleGetUploadParameters = async (file: any) => {
     try {
       console.log("Requesting upload parameters for file:", file?.name, file?.type);
-      const response = await apiRequest("POST", "/api/objects/upload");
+      const response = await apiRequest("/api/objects/upload", "POST");
       if (!response.ok) {
         throw new Error(`Upload parameters request failed: ${response.status}`);
       }
