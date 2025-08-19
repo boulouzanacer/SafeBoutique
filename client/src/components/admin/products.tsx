@@ -216,8 +216,9 @@ export default function Products() {
   });
 
   // Photo upload handlers
-  const handleGetUploadParameters = async (file?: any) => {
+  const handleGetUploadParameters = async (file: any) => {
     try {
+      console.log("Requesting upload parameters for file:", file?.name, file?.type);
       const response = await apiRequest("POST", "/api/objects/upload");
       if (!response.ok) {
         throw new Error(`Upload parameters request failed: ${response.status}`);
@@ -226,10 +227,14 @@ export default function Products() {
       if (!data.uploadURL) {
         throw new Error("No upload URL received from server");
       }
-      return {
+      
+      const uploadParams = {
         method: "PUT" as const,
         url: data.uploadURL,
       };
+      
+      console.log("Upload parameters prepared:", uploadParams);
+      return uploadParams;
     } catch (error) {
       console.error("Error getting upload parameters:", error);
       toast({

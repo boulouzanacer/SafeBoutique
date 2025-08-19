@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 interface ObjectUploaderProps {
   maxNumberOfFiles?: number;
   maxFileSize?: number;
-  onGetUploadParameters: () => Promise<{
+  onGetUploadParameters: (file: any) => Promise<{
     method: "PUT";
     url: string;
   }>;
@@ -73,9 +73,14 @@ export function ObjectUploader({
         getUploadParameters: async (file) => {
           try {
             console.log("Getting upload parameters for file:", file?.name);
-            const params = await onGetUploadParameters();
+            const params = await onGetUploadParameters(file);
             console.log("Upload parameters received:", params);
-            return params;
+            return {
+              method: params.method,
+              url: params.url,
+              fields: {},
+              headers: {}
+            };
           } catch (error) {
             console.error("Upload parameters error in ObjectUploader:", error);
             throw error;
