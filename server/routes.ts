@@ -446,15 +446,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ error: "Object storage not configured" });
         }
         
-        // Construct the direct GCS URL
+        // Construct the direct GCS URL with proper bucket name
         const directUrl = `https://storage.googleapis.com/${bucketName}/${objectPath}`;
         console.log("Redirecting to direct GCS URL:", directUrl);
+        
+        // Set CORS headers for image access
+        res.set({
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        });
         
         // Redirect to the direct GCS URL
         return res.redirect(302, directUrl);
       }
       
       // For other paths, return not found
+      console.log("Object path not recognized:", objectPath);
       res.status(404).json({ error: "Object not found" });
     } catch (error) {
       console.error("Error serving object:", error);
