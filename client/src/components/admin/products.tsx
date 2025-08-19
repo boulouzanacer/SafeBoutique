@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Loader2, Filter, X, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Filter, X, Search, Camera, Upload } from "lucide-react";
 import { Product, InsertProduct } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency, getProductPricing } from "@/lib/utils";
@@ -43,10 +43,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 
 export default function Products() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string>("");
   const [filters, setFilters] = useState({
     famille: "",
     search: "",
@@ -187,6 +191,53 @@ export default function Products() {
     }
   });
 
+  // Photo upload mutation
+  const updateProductPhotoMutation = useMutation({
+    mutationFn: async ({ productId, photoURL }: { productId: number; photoURL: string }) => {
+      const response = await apiRequest("PUT", `/api/products/${productId}/photo`, { photoURL });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      setIsUploadingPhoto(false);
+      toast({
+        title: "Success",
+        description: t("products.photoUpdated")
+      });
+    },
+    onError: (error: any) => {
+      setIsUploadingPhoto(false);
+      toast({
+        title: "Error",
+        description: error.message || t("products.photoUpdateFailed"),
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Photo upload handlers
+  const handleGetUploadParameters = async () => {
+    const response = await apiRequest("POST", "/api/objects/upload");
+    const data = await response.json();
+    return {
+      method: "PUT" as const,
+      url: data.uploadURL,
+    };
+  };
+
+  const handlePhotoUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    if (result.successful && result.successful.length > 0 && editingProduct) {
+      const uploadedFile = result.successful[0];
+      const photoURL = uploadedFile.uploadURL;
+      
+      setIsUploadingPhoto(true);
+      updateProductPhotoMutation.mutate({
+        productId: editingProduct.recordid,
+        photoURL: photoURL
+      });
+    }
+  };
+
   const onSubmit = (data: InsertProduct) => {
     if (editingProduct) {
       updateProductMutation.mutate({ id: editingProduct.recordid, data });
@@ -197,6 +248,7 @@ export default function Products() {
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
+    setCurrentPhotoUrl(product.photo || "");
     form.reset({
       codeBarre: product.codeBarre,
       cbColis: product.cbColis || "",
@@ -245,6 +297,7 @@ export default function Products() {
 
   const handleNewProduct = () => {
     setEditingProduct(null);
+    setCurrentPhotoUrl("");
     form.reset();
     setIsDialogOpen(true);
   };
@@ -647,6 +700,77 @@ export default function Products() {
                           </FormItem>
                         )}
                       />
+
+                      {/* Product Photo Upload Section */}
+                      <div className="col-span-2 space-y-4 border rounded-lg p-4 bg-gray-50">
+                        <div className="flex items-center gap-2">
+                          <Camera className="h-5 w-5 text-gray-600" />
+                          <h4 className="font-medium text-gray-900">Product Photo</h4>
+                        </div>
+                        
+                        {/* Current Photo Display */}
+                        {editingProduct?.photo && (
+                          <div className="space-y-2">
+                            <Label className="text-sm text-gray-600">Current Photo:</Label>
+                            <div className="relative w-32 h-32 border rounded-lg overflow-hidden bg-white">
+                              <img
+                                src={editingProduct.photo.startsWith('data:') 
+                                  ? editingProduct.photo 
+                                  : editingProduct.photo.startsWith('/objects/') 
+                                    ? editingProduct.photo
+                                    : `data:image/jpeg;base64,${editingProduct.photo}`
+                                }
+                                alt="Current product photo"
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200";
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Photo Upload Button */}
+                        {editingProduct && (
+                          <div className="space-y-2">
+                            <Label className="text-sm text-gray-600">
+                              {editingProduct.photo ? "Change Photo:" : "Add Photo:"}
+                            </Label>
+                            <ObjectUploader
+                              maxNumberOfFiles={1}
+                              maxFileSize={5242880} // 5MB
+                              onGetUploadParameters={handleGetUploadParameters}
+                              onComplete={handlePhotoUploadComplete}
+                              buttonClassName="w-full"
+                            >
+                              <div className="flex items-center justify-center gap-2 py-2">
+                                {isUploadingPhoto ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span>Uploading...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="h-4 w-4" />
+                                    <span>{editingProduct.photo ? "Change Photo" : "Upload Photo"}</span>
+                                  </>
+                                )}
+                              </div>
+                            </ObjectUploader>
+                            <p className="text-xs text-gray-500">
+                              Supported: JPG, PNG, GIF. Max size: 5MB
+                            </p>
+                          </div>
+                        )}
+                        
+                        {!editingProduct && (
+                          <div className="text-center py-8 text-gray-500">
+                            <Camera className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">Save the product first to upload a photo</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="flex gap-2 justify-end">

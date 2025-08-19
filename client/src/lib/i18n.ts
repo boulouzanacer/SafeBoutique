@@ -146,6 +146,8 @@ const resources = {
       "products.success": "Product saved successfully",
       "products.noResults": "No products found",
       "products.noPromotion": "No promotion",
+      "products.photoUpdated": "Product photo updated successfully",
+      "products.photoUpdateFailed": "Failed to update product photo",
       
       // Orders
       "orders.title": "Order Management",

@@ -268,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Production admin fix error:", error);
       res.status(500).json({ 
         message: "Failed to fix admin",
-        error: error.message
+        error: error instanceof Error ? error.message : "Unknown error"
       });
     }
   });
@@ -363,6 +363,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(families);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch families" });
+    }
+  });
+
+  // Object storage routes for product image uploads
+  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+    try {
+      const { ObjectStorageService } = await import("./objectStorage");
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  app.put("/api/products/:id/photo", isAuthenticated, async (req, res) => {
+    try {
+      const { ObjectStorageService } = await import("./objectStorage");
+      const objectStorageService = new ObjectStorageService();
+      const productId = parseInt(req.params.id);
+      const { photoURL } = req.body;
+
+      if (!photoURL) {
+        return res.status(400).json({ error: "Photo URL is required" });
+      }
+
+      // Set object ACL policy for public access (product images should be public)
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        photoURL,
+        {
+          owner: "admin", // For product images, admin is the owner
+          visibility: "public", // Product images should be publicly accessible
+        }
+      );
+
+      // Update the product with the new photo path
+      const products = await storage.getProducts();
+      const product = products.find(p => p.recordid === productId);
+      
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      // Convert object path to accessible URL format
+      const photoPath = objectPath.startsWith('/objects/') ? objectPath : `/objects/${objectPath}`;
+      
+      await storage.updateProduct(productId, {
+        ...product,
+        photo: photoPath,
+      });
+
+      res.json({ 
+        success: true, 
+        objectPath: photoPath,
+        message: "Product photo updated successfully"
+      });
+    } catch (error) {
+      console.error("Error updating product photo:", error);
+      res.status(500).json({ error: "Failed to update product photo" });
+    }
+  });
+
+  // Serve uploaded objects
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    try {
+      const { ObjectStorageService } = await import("./objectStorage");
+      const objectStorageService = new ObjectStorageService();
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      res.status(404).json({ error: "Object not found" });
     }
   });
 
