@@ -187,7 +187,13 @@ export default function ProductDetail() {
             <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
               {currentImage ? (
                 <img
-                  src={currentImage.startsWith('data:') ? currentImage : `data:image/jpeg;base64,${currentImage}`}
+                  src={
+                    currentImage.startsWith('data:') 
+                      ? currentImage 
+                      : currentImage.startsWith('/objects/') 
+                        ? currentImage
+                        : `data:image/jpeg;base64,${currentImage}`
+                  }
                   alt={product.produit || "Product"}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -236,7 +242,13 @@ export default function ProductDetail() {
                     }`}
                   >
                     <img
-                      src={image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`}
+                      src={
+                        image.startsWith('data:') 
+                          ? image 
+                          : image.startsWith('/objects/') 
+                            ? image
+                            : `data:image/jpeg;base64,${image}`
+                      }
                       alt={`${product.produit} ${index + 1}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {

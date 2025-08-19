@@ -39,7 +39,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
           {product.photo ? (
             <img
-              src={product.photo.startsWith('data:') ? product.photo : `data:image/jpeg;base64,${product.photo}`}
+              src={
+                product.photo.startsWith('data:') 
+                  ? product.photo 
+                  : product.photo.startsWith('/objects/') 
+                    ? product.photo
+                    : `data:image/jpeg;base64,${product.photo}`
+              }
               alt={product.produit || 'Product'}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
               onError={(e) => {
