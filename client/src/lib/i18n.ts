@@ -418,6 +418,8 @@ const resources = {
       "products.success": "Produit enregistré avec succès",
       "products.noResults": "Aucun produit trouvé",
       "products.noPromotion": "Aucune promotion",
+      "products.photoUpdated": "Photo du produit mise à jour avec succès",
+      "products.photoUpdateFailed": "Échec de la mise à jour de la photo du produit",
       
       // Orders
       "orders.title": "Gestion des Commandes",
@@ -688,6 +690,8 @@ const resources = {
       "products.success": "تم حفظ المنتج بنجاح",
       "products.noResults": "لم يتم العثور على منتجات",
       "products.noPromotion": "لا يوجد ترويج",
+      "products.photoUpdated": "تم تحديث صورة المنتج بنجاح",
+      "products.photoUpdateFailed": "فشل في تحديث صورة المنتج",
       
       // Orders
       "orders.title": "إدارة الطلبات",
