@@ -432,13 +432,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded objects
+  // Serve uploaded objects - redirect to actual GCS URLs
   app.get("/objects/:objectPath(*)", async (req, res) => {
     try {
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
-      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
-      objectStorageService.downloadObject(objectFile, res);
+      // Extract the object path from the URL
+      const objectPath = req.params.objectPath;
+      console.log("Serving object with path:", objectPath);
+      
+      // For objects stored in .private/uploads/, construct the direct GCS URL
+      if (objectPath.startsWith('.private/uploads/')) {
+        const bucketName = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+        if (!bucketName) {
+          return res.status(500).json({ error: "Object storage not configured" });
+        }
+        
+        // Construct the direct GCS URL
+        const directUrl = `https://storage.googleapis.com/${bucketName}/${objectPath}`;
+        console.log("Redirecting to direct GCS URL:", directUrl);
+        
+        // Redirect to the direct GCS URL
+        return res.redirect(302, directUrl);
+      }
+      
+      // For other paths, return not found
+      res.status(404).json({ error: "Object not found" });
     } catch (error) {
       console.error("Error serving object:", error);
       res.status(404).json({ error: "Object not found" });
