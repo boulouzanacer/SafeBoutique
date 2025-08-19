@@ -124,7 +124,12 @@ export function ObjectUploader({
     // Cleanup function
     return () => {
       if (uppyInstance) {
-        uppyInstance.close();
+        try {
+          uppyInstance.cancelAll();
+          uppyInstance.destroy();
+        } catch (error) {
+          console.error("Error cleaning up Uppy instance:", error);
+        }
       }
     };
   }, [maxNumberOfFiles, maxFileSize, onGetUploadParameters, onComplete]);
