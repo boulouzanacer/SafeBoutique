@@ -62,77 +62,111 @@ export function ObjectUploader({
   const [uppy, setUppy] = useState<Uppy | null>(null);
 
   useEffect(() => {
-    const uppyInstance = new Uppy({
-      restrictions: {
-        maxNumberOfFiles,
-        maxFileSize,
-        allowedFileTypes: ['image/*'],
-      },
-      autoProceed: false,
-    });
+    let mounted = true;
+    
+    const createUppyInstance = () => {
+      const uppyInstance = new Uppy({
+        restrictions: {
+          maxNumberOfFiles,
+          maxFileSize,
+          allowedFileTypes: ['image/*'],
+        },
+        autoProceed: false,
+      });
 
-    // Wrap all handlers in try-catch to prevent crashes
-    const safeGetUploadParameters = async (file: any) => {
-      try {
-        console.log("Getting upload parameters for file:", file?.name);
-        const params = await onGetUploadParameters(file);
-        console.log("Upload parameters received:", params);
-        return {
-          method: params.method,
-          url: params.url,
-          fields: {},
-          headers: {}
-        };
-      } catch (error) {
-        console.error("Upload parameters error:", error);
-        throw error;
-      }
-    };
-
-    const safeCompleteHandler = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-      try {
-        console.log("Upload complete:", result);
-        if (onComplete) {
-          onComplete(result);
+      // Safe wrapper for upload parameters
+      const handleGetUploadParameters = async (file: any) => {
+        try {
+          console.log("Getting upload parameters for file:", file?.name);
+          const params = await onGetUploadParameters(file);
+          console.log("Upload parameters received:", params);
+          return {
+            method: params.method,
+            url: params.url,
+            fields: {},
+            headers: {}
+          };
+        } catch (error) {
+          console.error("Upload parameters error:", error);
+          throw error;
         }
-        setShowModal(false);
-      } catch (error) {
-        console.error("Error in complete handler:", error);
-      }
+      };
+
+      // Safe wrapper for completion handler
+      const handleComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+        try {
+          console.log("Upload complete:", result);
+          if (onComplete && mounted) {
+            onComplete(result);
+          }
+          if (mounted) {
+            setShowModal(false);
+          }
+        } catch (error) {
+          console.error("Error in complete handler:", error);
+        }
+      };
+
+      // Safe error handlers
+      const handleError = (error: any) => {
+        console.error("Uppy error:", error);
+      };
+
+      const handleUploadError = (file: any, error: any) => {
+        console.error("Upload error for file:", file?.name, "Error:", error);
+      };
+
+      // Configure uppy
+      uppyInstance
+        .use(AwsS3, {
+          shouldUseMultipart: false,
+          getUploadParameters: handleGetUploadParameters,
+        })
+        .on("complete", handleComplete)
+        .on("upload-error", handleUploadError)
+        .on("error", handleError);
+
+      return uppyInstance;
     };
 
-    const safeErrorHandler = (error: any) => {
-      console.error("Uppy error:", error);
-    };
-
-    const safeUploadErrorHandler = (file: any, error: any) => {
-      console.error("Upload error for file:", file?.name, "Error:", error);
-    };
-
-    // Configure the uppy instance
-    uppyInstance
-      .use(AwsS3, {
-        shouldUseMultipart: false,
-        getUploadParameters: safeGetUploadParameters,
-      })
-      .on("complete", safeCompleteHandler)
-      .on("upload-error", safeUploadErrorHandler)
-      .on("error", safeErrorHandler);
-
-    setUppy(uppyInstance);
+    const uppyInstance = createUppyInstance();
+    
+    if (mounted) {
+      setUppy(uppyInstance);
+    }
 
     // Cleanup function
     return () => {
+      mounted = false;
       if (uppyInstance) {
         try {
+          // Use proper Uppy cleanup methods
           uppyInstance.cancelAll();
-          uppyInstance.destroy();
+          if (typeof uppyInstance.destroy === 'function') {
+            uppyInstance.destroy();
+          }
         } catch (error) {
           console.error("Error cleaning up Uppy instance:", error);
         }
       }
     };
   }, [maxNumberOfFiles, maxFileSize, onGetUploadParameters, onComplete]);
+
+  const handleOpenModal = () => {
+    try {
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error opening modal:", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    try {
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error closing modal:", error);
+    }
+  };
 
   if (!uppy) {
     return (
@@ -144,16 +178,7 @@ export function ObjectUploader({
 
   return (
     <div>
-      <Button 
-        onClick={() => {
-          try {
-            setShowModal(true);
-          } catch (error) {
-            console.error("Error opening modal:", error);
-          }
-        }} 
-        className={buttonClassName}
-      >
+      <Button onClick={handleOpenModal} className={buttonClassName}>
         {children}
       </Button>
 
@@ -161,13 +186,7 @@ export function ObjectUploader({
         <DashboardModal
           uppy={uppy}
           open={showModal}
-          onRequestClose={() => {
-            try {
-              setShowModal(false);
-            } catch (error) {
-              console.error("Error closing modal:", error);
-            }
-          }}
+          onRequestClose={handleCloseModal}
           proudlyDisplayPoweredByUppy={false}
         />
       )}
