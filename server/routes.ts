@@ -381,8 +381,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/products/:id/photo", isAuthenticated, async (req, res) => {
     try {
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
       const productId = parseInt(req.params.id);
       const { photoURL } = req.body;
 
@@ -390,15 +388,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Photo URL is required" });
       }
 
-      // Set object ACL policy for public access (product images should be public)
-      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-        photoURL,
-        {
-          owner: "admin", // For product images, admin is the owner
-          visibility: "public", // Product images should be publicly accessible
-        }
-      );
+      console.log("Updating product photo for product", productId, "with URL:", photoURL);
 
+      // Extract the object path from the GCS URL for the database storage
+      // photoURL format: https://storage.googleapis.com/bucket-name/.private/uploads/file-id
+      let normalizedPath;
+      
+      try {
+        const url = new URL(photoURL);
+        const bucketName = url.pathname.split('/')[1]; // Extract bucket name
+        const objectPath = url.pathname.substring(bucketName.length + 2); // Remove /bucket-name/ prefix
+        normalizedPath = `/objects/${objectPath}`;
+        console.log("Extracted object path:", normalizedPath);
+      } catch (urlError) {
+        console.error("Error parsing photo URL:", urlError);
+        return res.status(400).json({ error: "Invalid photo URL format" });
+      }
+      
       // Update the product with the new photo path
       const products = await storage.getProducts();
       const product = products.find(p => p.recordid === productId);
@@ -406,18 +412,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!product) {
         return res.status(404).json({ error: "Product not found" });
       }
-
-      // Convert object path to accessible URL format
-      const photoPath = objectPath.startsWith('/objects/') ? objectPath : `/objects/${objectPath}`;
       
-      await storage.updateProduct(productId, {
+      console.log("Updating product in database with photo path:", normalizedPath);
+      const updatedProduct = await storage.updateProduct(productId, {
         ...product,
-        photo: photoPath,
+        photo: normalizedPath,
       });
+      
+      console.log("Product updated successfully:", updatedProduct?.recordid);
 
       res.json({ 
         success: true, 
-        objectPath: photoPath,
+        objectPath: normalizedPath,
         message: "Product photo updated successfully"
       });
     } catch (error) {

@@ -262,17 +262,27 @@ export default function Products() {
       
       if (result.successful && result.successful.length > 0 && editingProduct) {
         const uploadedFile = result.successful[0];
-        const photoURL = uploadedFile.uploadURL;
         
-        if (!photoURL) {
+        // The upload URL from Uppy contains the full GCS URL
+        // We need to extract the object path part for the backend
+        const fullUploadURL = uploadedFile.uploadURL;
+        
+        if (!fullUploadURL) {
           console.error("No upload URL in successful result:", uploadedFile);
           toast({
-            title: "Error",
+            title: "Error", 
             description: "Upload completed but no file URL received.",
             variant: "destructive"
           });
           return;
         }
+        
+        console.log("Full upload URL:", fullUploadURL);
+        
+        // Extract the object path from the URL
+        // URL format: https://storage.googleapis.com/bucket-name/.private/uploads/file-id
+        // We want: https://storage.googleapis.com/bucket-name/.private/uploads/file-id (keep the full URL)
+        const photoURL = fullUploadURL;
         
         console.log("Updating product photo with URL:", photoURL);
         setIsUploadingPhoto(true);
