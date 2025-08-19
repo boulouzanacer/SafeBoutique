@@ -170,7 +170,7 @@ export function ObjectUploader({
 
   if (!uppy) {
     return (
-      <Button disabled className={buttonClassName}>
+      <Button type="button" disabled className={buttonClassName}>
         Loading...
       </Button>
     );
@@ -178,7 +178,7 @@ export function ObjectUploader({
 
   return (
     <div>
-      <Button onClick={handleOpenModal} className={buttonClassName}>
+      <Button type="button" onClick={handleOpenModal} className={buttonClassName}>
         {children}
       </Button>
 
