@@ -194,10 +194,16 @@ export default function Products() {
   // Photo upload mutation
   const updateProductPhotoMutation = useMutation({
     mutationFn: async ({ productId, photoURL }: { productId: number; photoURL: string }) => {
+      console.log("Making API request to update photo for product:", productId);
+      console.log("Photo URL being sent:", photoURL);
       const response = await apiRequest(`/api/products/${productId}/photo`, "PUT", { photoURL });
-      return response.json();
+      console.log("API response status:", response.status);
+      const result = await response.json();
+      console.log("API response data:", result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Photo update mutation succeeded:", data);
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       setIsUploadingPhoto(false);
       toast({
@@ -206,6 +212,7 @@ export default function Products() {
       });
     },
     onError: (error: any) => {
+      console.error("Photo update mutation failed:", error);
       setIsUploadingPhoto(false);
       toast({
         title: "Error",
@@ -285,6 +292,8 @@ export default function Products() {
         const photoURL = fullUploadURL;
         
         console.log("Updating product photo with URL:", photoURL);
+        console.log("Product ID to update:", editingProduct.recordid);
+        console.log("About to call updateProductPhotoMutation.mutate");
         setIsUploadingPhoto(true);
         updateProductPhotoMutation.mutate({
           productId: editingProduct.recordid,
