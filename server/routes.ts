@@ -437,6 +437,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // This endpoint is used to serve public assets from the object storage.
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    console.log("Serving public object with path:", req.params.filePath);
+    const filePath = req.params.filePath;
+    try {
+      const { ObjectStorageService } = await import("./objectStorage");
+      const objectStorageService = new ObjectStorageService();
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        console.log("Public object not found:", filePath);
+        return res.status(404).json({ error: "File not found" });
+      }
+      console.log("Found public object, serving:", filePath);
+      await objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Serve uploaded objects - use object storage service
   app.get("/objects/:objectPath(*)", async (req, res) => {
     try {
