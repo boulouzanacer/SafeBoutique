@@ -204,6 +204,13 @@ export default function Products() {
     },
     onSuccess: (data) => {
       console.log("Photo update mutation succeeded:", data);
+      
+      // Update the current editing product with the new photo path
+      if (editingProduct && data.objectPath) {
+        setEditingProduct(prev => prev ? { ...prev, photo: data.objectPath } : prev);
+        console.log("Updated editingProduct with new photo path:", data.objectPath);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       setIsUploadingPhoto(false);
       toast({
