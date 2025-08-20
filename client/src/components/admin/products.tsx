@@ -328,11 +328,10 @@ export default function Products() {
         return;
       }
       
-      if (result.successful && result.successful.length > 0 && editingProduct) {
+      if (result.successful && result.successful.length > 0) {
         const uploadedFile = result.successful[0];
         
         // The upload URL from Uppy contains the full GCS URL
-        // We need to extract the object path part for the backend
         const fullUploadURL = uploadedFile.uploadURL;
         
         if (!fullUploadURL) {
@@ -347,23 +346,48 @@ export default function Products() {
         
         console.log("Full upload URL:", fullUploadURL);
         
-        // Extract the object path from the URL
-        // URL format: https://storage.googleapis.com/bucket-name/.private/uploads/file-id
-        // We want: https://storage.googleapis.com/bucket-name/.private/uploads/file-id (keep the full URL)
-        const photoURL = fullUploadURL;
-        
-        console.log("Updating product photo with URL:", photoURL);
-        console.log("Product ID to update:", editingProduct.recordid);
-        console.log("About to call updateProductPhotoMutation.mutate");
-        setIsUploadingPhoto(true);
-        updateProductPhotoMutation.mutate({
-          productId: editingProduct.recordid,
-          photoURL: photoURL
-        });
+        // For editing existing products - update via API
+        if (editingProduct) {
+          console.log("Updating existing product photo with URL:", fullUploadURL);
+          console.log("Product ID to update:", editingProduct.recordid);
+          setIsUploadingPhoto(true);
+          updateProductPhotoMutation.mutate({
+            productId: editingProduct.recordid,
+            photoURL: fullUploadURL
+          });
+        } else {
+          // For new products - normalize URL to public path and update form
+          console.log("Handling photo upload for new product");
+          
+          // Convert GCS URL to normalized public path
+          // https://storage.googleapis.com/bucket-name/public/products/file-id
+          // becomes: /public-objects/products/file-id
+          const url = new URL(fullUploadURL);
+          const pathParts = url.pathname.split('/');
+          if (pathParts.length >= 4 && pathParts[2] === 'public' && pathParts[3] === 'products') {
+            const normalizedPath = `/public-objects/products/${pathParts[4]}`;
+            console.log("Normalized photo path for new product:", normalizedPath);
+            
+            // Update the form field with the normalized path
+            form.setValue('photo', normalizedPath);
+            setCurrentPhotoUrl(normalizedPath);
+            
+            toast({
+              title: "Success",
+              description: "Photo uploaded successfully!"
+            });
+          } else {
+            console.error("Unexpected URL format:", fullUploadURL);
+            toast({
+              title: "Warning",
+              description: "Photo uploaded but path format unexpected",
+              variant: "destructive"
+            });
+          }
+        }
       } else {
-        console.warn("Upload completed but no files or no editing product:", {
-          successful: result.successful?.length,
-          editingProduct: !!editingProduct
+        console.warn("Upload completed but no successful files:", {
+          successful: result.successful?.length
         });
       }
     } catch (error) {
