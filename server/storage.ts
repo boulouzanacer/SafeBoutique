@@ -183,7 +183,7 @@ export class DatabaseStorage implements IStorage {
         acc[key as keyof typeof product] = product[key as keyof typeof product];
       }
       return acc;
-    }, {} as Partial<InsertProduct>);
+    }, {} as Record<string, any>);
     
     console.log(`Clean data for product ${id}:`, JSON.stringify(cleanProduct));
     

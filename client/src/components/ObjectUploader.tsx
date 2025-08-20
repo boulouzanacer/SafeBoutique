@@ -96,6 +96,14 @@ export function ObjectUploader({
       const handleComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
         try {
           console.log("Upload complete:", result);
+          console.log("Upload complete result:", result);
+          
+          if (result.successful && result.successful.length > 0) {
+            const uploadedFile = result.successful[0];
+            console.log("Full upload URL:", uploadedFile.uploadURL);
+            console.log("Updating product photo with URL:", uploadedFile.uploadURL);
+          }
+          
           if (onComplete && mounted) {
             onComplete(result);
           }

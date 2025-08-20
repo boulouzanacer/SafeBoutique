@@ -410,11 +410,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // since they're uploaded to the private directory but we'll serve them publicly
       console.log("Skipping ACL policy for direct serving approach");
       
-      // Update the product with the new photo path
-      const products = await storage.getProducts();
-      const product = products.find(p => p.recordid === productId);
-      
-      if (!product) {
+      // Verify product exists before attempting update
+      const existingProduct = await storage.getProduct(productId);
+      if (!existingProduct) {
         return res.status(404).json({ error: "Product not found" });
       }
       
@@ -428,7 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Product updated successfully:", updatedProduct?.recordid);
         console.log("Updated product photo field:", updatedProduct?.photo);
         
-        // Verify the update actually worked
+        // Verify the update actually worked with a fresh database query
         const verification = await storage.getProduct(productId);
         console.log("Database verification - photo field:", verification?.photo);
         
@@ -436,7 +434,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error("CRITICAL ERROR: Database update didn't persist!");
           console.error("Expected:", normalizedPath);
           console.error("Actual:", verification?.photo);
-          throw new Error("Database update failed to persist");
+          
+          // Force direct SQL update as fallback
+          console.log("Attempting direct SQL update as fallback...");
+          const { db } = await import("./db");
+          const { products } = await import("../shared/schema");
+          const { eq } = await import("drizzle-orm");
+          await db.update(products).set({ photo: normalizedPath, updatedAt: new Date() }).where(eq(products.recordid, productId));
+          
+          // Verify the fallback worked
+          const finalVerification = await storage.getProduct(productId);
+          if (finalVerification?.photo !== normalizedPath) {
+            throw new Error("Both ORM and direct SQL update failed - critical database issue");
+          }
+          console.log("Fallback SQL update succeeded!");
         }
         
       } catch (updateError) {
