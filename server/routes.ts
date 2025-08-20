@@ -419,12 +419,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("Updating product in database with photo path:", normalizedPath);
-      const updatedProduct = await storage.updateProduct(productId, {
-        photo: normalizedPath,
-      });
       
-      console.log("Product updated successfully:", updatedProduct?.recordid);
-      console.log("Updated product photo field:", updatedProduct?.photo);
+      try {
+        const updatedProduct = await storage.updateProduct(productId, {
+          photo: normalizedPath,
+        });
+        
+        console.log("Product updated successfully:", updatedProduct?.recordid);
+        console.log("Updated product photo field:", updatedProduct?.photo);
+        
+        // Verify the update actually worked
+        const verification = await storage.getProduct(productId);
+        console.log("Database verification - photo field:", verification?.photo);
+        
+        if (verification?.photo !== normalizedPath) {
+          console.error("CRITICAL ERROR: Database update didn't persist!");
+          console.error("Expected:", normalizedPath);
+          console.error("Actual:", verification?.photo);
+          throw new Error("Database update failed to persist");
+        }
+        
+      } catch (updateError) {
+        console.error("Error during product update:", updateError);
+        throw updateError;
+      }
 
       res.json({ 
         success: true, 

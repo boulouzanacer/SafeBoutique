@@ -175,16 +175,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product> {
-    console.log(`Updating product ${id} with data:`, product);
+    console.log(`Updating product ${id} with data:`, JSON.stringify(product));
+    
+    // Ensure we have clean data without undefined values
+    const cleanProduct = Object.keys(product).reduce((acc, key) => {
+      if (product[key] !== undefined) {
+        acc[key] = product[key];
+      }
+      return acc;
+    }, {} as any);
+    
+    console.log(`Clean data for product ${id}:`, JSON.stringify(cleanProduct));
+    
     const [updated] = await db
       .update(products)
-      .set({ ...product, updatedAt: new Date() })
+      .set({ ...cleanProduct, updatedAt: new Date() })
       .where(eq(products.recordid, id))
       .returning();
+      
     console.log(`Product ${id} updated result:`, updated ? 'SUCCESS' : 'FAILED');
-    if (updated && product.photo) {
-      console.log(`Product ${id} photo field after update:`, updated.photo);
+    
+    if (!updated) {
+      console.error(`ERROR: Product ${id} update returned null/undefined!`);
+      throw new Error(`Failed to update product ${id}`);
     }
+    
+    if (product.photo) {
+      console.log(`Product ${id} photo field after update:`, updated.photo);
+      console.log(`Expected photo:`, product.photo);
+      console.log(`Photo update success:`, updated.photo === product.photo);
+    }
+    
     return updated;
   }
 
