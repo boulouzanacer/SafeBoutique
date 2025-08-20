@@ -166,11 +166,31 @@ export class ObjectStorageService {
     }
 
     const entityId = parts.slice(1).join("/");
-    let entityDir = this.getPrivateObjectDir();
-    if (!entityDir.endsWith("/")) {
-      entityDir = `${entityDir}/`;
+    
+    // Handle both old format (/objects/.private/uploads/...) and new format (/objects/uploads/...)
+    let objectEntityPath;
+    if (entityId.startsWith('.private/uploads/')) {
+      // Old format - use as is
+      let entityDir = this.getPrivateObjectDir();
+      if (!entityDir.endsWith("/")) {
+        entityDir = `${entityDir}/`;
+      }
+      objectEntityPath = `${entityDir}${entityId.substring('.private/uploads/'.length)}`;
+    } else if (entityId.startsWith('uploads/')) {
+      // New format - add the private directory
+      let entityDir = this.getPrivateObjectDir();
+      if (!entityDir.endsWith("/")) {
+        entityDir = `${entityDir}/`;
+      }
+      objectEntityPath = `${entityDir}${entityId}`;
+    } else {
+      // Fallback for other formats
+      let entityDir = this.getPrivateObjectDir();
+      if (!entityDir.endsWith("/")) {
+        entityDir = `${entityDir}/`;
+      }
+      objectEntityPath = `${entityDir}${entityId}`;
     }
-    const objectEntityPath = `${entityDir}${entityId}`;
     const { bucketName, objectName } = parseObjectPath(objectEntityPath);
     const bucket = objectStorageClient.bucket(bucketName);
     const objectFile = bucket.file(objectName);
@@ -201,9 +221,9 @@ export class ObjectStorageService {
       return rawObjectPath;
     }
   
-    // Extract the entity ID from the path
+    // Extract the entity ID from the path and preserve the .private/ directory structure
     const entityId = rawObjectPath.slice(objectEntityDir.length);
-    return `/objects/${entityId}`;
+    return `/objects/.private/uploads/${entityId}`;
   }
 
   // Tries to set the ACL policy for the object entity and return the normalized path.
