@@ -783,16 +783,20 @@ export default function Products() {
                             <Label className="text-sm text-gray-600">Current Photo:</Label>
                             <div className="relative w-32 h-32 border rounded-lg overflow-hidden bg-white">
                               <img
-                                src={editingProduct.photo.startsWith('data:') 
-                                  ? editingProduct.photo 
-                                  : editingProduct.photo.startsWith('/objects/') 
-                                    ? editingProduct.photo
-                                    : `data:image/jpeg;base64,${editingProduct.photo}`
+                                src={
+                                  editingProduct.photo.startsWith('data:') 
+                                    ? editingProduct.photo 
+                                    : editingProduct.photo.startsWith('https://storage.googleapis.com/') 
+                                      ? editingProduct.photo
+                                      : editingProduct.photo.startsWith('/objects/') || editingProduct.photo.startsWith('/public-objects/')
+                                        ? editingProduct.photo
+                                        : `data:image/jpeg;base64,${editingProduct.photo}`
                                 }
                                 alt="Current product photo"
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
+                                  console.log("Image failed to load in admin panel:", target.src);
                                   target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200";
                                 }}
                               />
