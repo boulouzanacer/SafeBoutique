@@ -369,36 +369,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Object storage routes for product image uploads
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
     try {
-      const bucketName = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-      if (!bucketName) {
-        return res.status(500).json({ error: "Object storage not configured" });
-      }
-
-      // Use public directory for product photos instead of private uploads
-      const photoId = require("crypto").randomUUID();
-      const publicPath = `public/products/${photoId}`;
-      
-      // Create a signed URL for uploading to the public directory
-      const request = {
-        bucket_name: bucketName,
-        object_name: publicPath,
-        method: "PUT",
-        expires_at: new Date(Date.now() + 900 * 1000).toISOString(), // 15 minutes
-      };
-      
-      const response = await fetch("http://127.0.0.1:1106/object-storage/signed-object-url", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to get signed URL: ${response.status}`);
-      }
-      
-      const { signed_url: uploadURL } = await response.json();
+      console.log("Getting upload URL for authenticated user:", req.user?.claims?.sub);
+      const { ObjectStorageService } = await import("./objectStorage");
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      console.log("Upload URL generated successfully");
       res.json({ uploadURL });
     } catch (error) {
       console.error("Error getting upload URL:", error);
@@ -418,29 +393,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Updating product photo for product", productId, "with URL:", photoURL);
 
       // Extract the object path from the GCS URL for the database storage
-      // photoURL format: https://storage.googleapis.com/bucket-name/public/products/file-id
+      // photoURL format: https://storage.googleapis.com/bucket-name/.private/uploads/file-id
       let normalizedPath;
       
       try {
-        const url = new URL(photoURL);
-        const bucketName = url.pathname.split('/')[1]; // Extract bucket name
-        const objectPath = url.pathname.substring(bucketName.length + 2); // Remove /bucket-name/ prefix
-        
-        // For public photos, store direct GCS URL for easier access
-        if (objectPath.startsWith('public/products/')) {
-          normalizedPath = photoURL; // Store the full GCS URL directly
-          console.log("Using direct GCS URL for public photo:", normalizedPath);
-        } else {
-          // Fallback for private uploads
-          normalizedPath = `/objects/${objectPath}`;
-          console.log("Extracted object path:", normalizedPath);
-        }
+        const { ObjectStorageService } = await import("./objectStorage");
+        const objectStorageService = new ObjectStorageService();
+        normalizedPath = objectStorageService.normalizeObjectEntityPath(photoURL);
+        console.log("Extracted object path:", normalizedPath);
       } catch (urlError) {
         console.error("Error parsing photo URL:", urlError);
         return res.status(400).json({ error: "Invalid photo URL format" });
       }
       
-      // No ACL policy needed for public photos - they're directly accessible
+      // Set ACL policy to make the photo publicly accessible
+      try {
+        const { ObjectStorageService } = await import("./objectStorage");
+        const objectStorageService = new ObjectStorageService();
+        
+        const aclPolicy = {
+          owner: req.user?.claims?.sub || 'admin',
+          visibility: 'public' as const,
+        };
+        
+        console.log("Setting ACL policy for photo:", photoURL);
+        const finalObjectPath = await objectStorageService.trySetObjectEntityAclPolicy(photoURL, aclPolicy);
+        normalizedPath = finalObjectPath;
+        console.log("ACL policy set successfully, final path:", finalObjectPath);
+      } catch (aclError) {
+        console.error("Warning: Could not set ACL policy:", aclError);
+        // Continue with the update even if ACL fails
+      }
       
       // Update the product with the new photo path
       const products = await storage.getProducts();
