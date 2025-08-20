@@ -369,7 +369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Object storage routes for product image uploads
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
     try {
-      console.log("Getting upload URL for authenticated user:", req.user?.claims?.sub);
+      console.log("Getting upload URL for authenticated user:", req.user?.id);
       const { ObjectStorageService } = await import("./objectStorage");
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();

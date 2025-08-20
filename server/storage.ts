@@ -179,11 +179,11 @@ export class DatabaseStorage implements IStorage {
     
     // Ensure we have clean data without undefined values
     const cleanProduct = Object.keys(product).reduce((acc, key) => {
-      if (product[key] !== undefined) {
-        acc[key] = product[key];
+      if (product[key as keyof typeof product] !== undefined) {
+        acc[key as keyof typeof product] = product[key as keyof typeof product];
       }
       return acc;
-    }, {} as any);
+    }, {} as Partial<InsertProduct>);
     
     console.log(`Clean data for product ${id}:`, JSON.stringify(cleanProduct));
     
