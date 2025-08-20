@@ -44,7 +44,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   ? product.photo 
                   : product.photo.startsWith('https://storage.googleapis.com/') 
                     ? product.photo
-                    : product.photo.startsWith('/objects/') 
+                    : product.photo.startsWith('/objects/') || product.photo.startsWith('/public-objects/')
                       ? product.photo
                       : `data:image/jpeg;base64,${product.photo}`
               }

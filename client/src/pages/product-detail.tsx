@@ -192,7 +192,7 @@ export default function ProductDetail() {
                       ? currentImage 
                       : currentImage.startsWith('https://storage.googleapis.com/') 
                         ? currentImage
-                        : currentImage.startsWith('/objects/') 
+                        : currentImage.startsWith('/objects/') || currentImage.startsWith('/public-objects/')
                           ? currentImage
                           : `data:image/jpeg;base64,${currentImage}`
                   }
@@ -249,7 +249,7 @@ export default function ProductDetail() {
                           ? image 
                           : image.startsWith('https://storage.googleapis.com/') 
                             ? image
-                            : image.startsWith('/objects/') 
+                            : image.startsWith('/objects/') || image.startsWith('/public-objects/')
                               ? image
                               : `data:image/jpeg;base64,${image}`
                       }
