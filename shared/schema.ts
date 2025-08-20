@@ -173,7 +173,7 @@ export const insertProductSchema = createInsertSchema(products).omit({
   codeBarre: z.string().min(1, "Barcode is required"),
   refProduit: z.string().min(1, "Product Reference is required"),
   produit: z.string().min(1, "Product Name is required"),
-  pv1Ht: z.number().min(0.01, "Price (PV1) is required and must be greater than 0"),
+  pv1Ht: z.number().min(0, "Price (PV1) is required and must be 0 or greater"),
   famille: z.string().min(1, "Family is required"),
 });
 
