@@ -1,181 +1,81 @@
 # Overview
-
-SafeSoft Boutique is a full-stack e-commerce web application built with React and Express.js. The application provides an online storefront for product browsing and purchasing, with a comprehensive admin panel for inventory and order management. It features a modern, responsive design using shadcn/ui components and Tailwind CSS, with PostgreSQL database integration via Drizzle ORM. The application includes dynamic slider functionality for showcasing promotional content, configurable site settings through the admin panel, comprehensive product review system, custom email/password authentication system for secure account creation and login functionality, role-based admin access control restricting admin panel to boulouza.nacer@gmail.com only, and animated loading skeletons throughout the application for smooth user experience.
+SafeSoft Boutique is a full-stack e-commerce web application enabling online product browsing and purchasing, complemented by a comprehensive admin panel for inventory and order management. It features a modern, responsive design with dynamic content showcases, configurable site settings, a robust product review system, and secure custom authentication with role-based access control. The application aims to provide a smooth user experience with animated loading skeletons and a focus on intuitive management for business owners.
 
 # User Preferences
-
 Preferred communication style: Simple, everyday language.
 Authentication preference: Custom email/password authentication without third-party dependencies.
-
-# Recent Changes (August 20, 2025)
-
-## Photo Upload System Complete Resolution ✅ PRODUCTION-READY
-- **Final Achievement**: Complete photo upload system with full end-to-end functionality and race condition elimination
-- **Technical Implementation**: 
-  - Upload URLs point to public directory: `/public/products/` for immediate public access
-  - Database correctly stores paths as `/public-objects/products/file-id`
-  - Added missing `/public-objects/` server route for serving new uploads
-  - Enhanced frontend components to handle all photo path formats (base64, private, public)
-  - Comprehensive path normalization for legacy and new upload compatibility
-- **Race Condition Fix**: 
-  - Fixed critical issue where form submissions would overwrite newly uploaded photos
-  - Enhanced photo upload completion handler to update both editing product state and form field values
-  - Eliminated timing conflicts between photo upload API and product update API
-  - Form now properly maintains new photo path after upload completion
-- **Server Architecture**:
-  - New uploads: Served through `/public-objects/products/` endpoint with HTTP 200 responses
-  - Old uploads: Served through `/objects/` endpoint with fallback redirect mechanisms
-  - Object storage service properly configured with public directory access
-  - Complete debugging and logging for upload and serving processes
-- **User Verification Complete**: 
-  - Database query confirms new photos stored with correct `/public-objects/` paths
-  - Server logs show "Found public object, serving" for new uploads
-  - HTTP tests return proper image content-type headers
-  - Upload process from frontend to database fully functional
-  - User confirmed: "system work perfectly now"
-- **Status**: FULLY OPERATIONAL - Complete photo management system with confirmed user success and zero race conditions
-
-# Previous Changes (August 19, 2025)
-
-## Photo Upload System Critical Bug Fixes ✅ COMPLETED
-- **Issue**: Upload system was experiencing crashes with "method is not valid HHT" errors and unhandled promise rejections
-- **Root Cause**: Multiple JavaScript errors including improper Uppy cleanup methods and parameter handling issues
-- **Solution**: Complete ObjectUploader component rewrite with comprehensive error handling
-- **Implementation**:
-  - Fixed upload parameter format for AwsS3 plugin compatibility (added proper fields and headers structure)
-  - Replaced incorrect `uppyInstance.close()` with proper `cancelAll()` and `destroy()` methods
-  - Added comprehensive try-catch blocks throughout all upload handlers
-  - Enhanced global error handlers to catch and prevent application crashes
-  - Implemented proper React component lifecycle management for Uppy instances
-- **Result**: Photo upload system now works flawlessly without any crashes or promise rejections
-- **Final Fix**: Corrected API parameter ordering issues in all mutation calls (url, method, data format)
-- **Status**: PRODUCTION-READY - Upload functionality is completely stable and crash-free
-
-## Photo Upload Functionality Implementation ✅ COMPLETED
-- **Achievement**: Complete photo upload system for admin product management
-- **Infrastructure**: Set up object storage with Google Cloud Storage backend and secure presigned URL generation
-- **Components**: 
-  - ObjectUploader component with Uppy integration for drag-and-drop file uploads
-  - Professional upload interface with file type validation and size limits (5MB max)
-  - Real-time upload progress tracking and error handling
-- **Backend Integration**: 
-  - Object storage routes for upload URL generation and photo updates
-  - ACL policies for public product image access
-  - Seamless integration with existing product management API
-- **Multilingual Support**: Complete Arabic and French translations for photo upload features
-- **User Experience**: 
-  - Current photo preview with fallback handling
-  - Upload button integrated into product edit forms
-  - Professional styling with proper loading states and user feedback
-- **Status**: FULLY FUNCTIONAL - Admin can now easily upload and change product photos through the admin panel
-
-# Previous Changes (August 18, 2025)
-
-## Authentication System Complete Overhaul ✅ RESOLVED
-- **Issue**: Browser cookie handling problems preventing authentication persistence in development environment
-- **Solution**: Implemented localStorage-based JWT token authentication system completely eliminating cookie dependencies
-- **Implementation**: 
-  - Login creates Base64-encoded JWT tokens returned in API response and stored in localStorage
-  - All API requests include Bearer tokens in Authorization headers 
-  - Authentication middleware validates tokens server-side
-  - Admin routing moved outside conditional authentication checks to prevent 404 errors
-- **Result**: Authentication now works perfectly across all browsers and development environments
-- **Admin credentials**: boulouza.nacer@gmail.com / 123456
-- **Status**: FULLY FUNCTIONAL - Admin panel accessible with complete functionality
-
-## Production Authentication Enhancement ✅ COMPLETED
-- **Issue**: Admin login works in development but fails in production environments
-- **Root Cause**: Development and production databases are separate - admin user existed in development but not production
-- **Solution**: Enhanced authentication system with production-compatible CORS, debugging capabilities, and database synchronization
-- **Implementation**:
-  - Added production-compatible CORS configuration supporting .replit.app and .replit.dev domains
-  - Enhanced cookie security settings with environment-specific configurations
-  - Added comprehensive authentication debugging endpoint at `/api/auth/debug`
-  - Implemented detailed server-side logging for login attempts and token validation
-  - Added credentials: 'include' to all client-side requests for proper CORS handling
-  - Enhanced error handling and token validation with production environment detection
-  - **Database Fix**: Synchronized admin user between development and production databases
-  - **Password Security**: Updated admin user with proper bcrypt hash for consistent authentication
-  - **Admin Creation Endpoint**: Added `/api/auth/create-admin` for production user management
-- **Status**: PRODUCTION-READY - Authentication system now works reliably in both development and production environments with synchronized databases
-
-## Comprehensive Multilingual Translation System ✅ COMPLETED
-- **Achievement**: Complete multilingual implementation across entire admin panel interface
-- **Languages**: Full support for English, French, and Arabic with RTL text direction for Arabic
-- **Implementation**: 
-  - Added 100+ translation keys covering all admin components and UI elements
-  - Implemented AnimatedText components with react-spring for smooth language transitions
-  - Created LanguageTransition component for seamless animated language switching
-  - Added persistent language preference storage across browser sessions
-- **Coverage**: Complete translation of Products, Orders, Customers, Settings, Bulk Import/Export, and API Documentation sections
-- **User Experience**: Professional animated transitions, RTL support, and consistent multilingual interface
-- **Status**: FULLY FUNCTIONAL - Admin panel now features complete multilingual support with smooth animated language switching
 
 # System Architecture
 
 ## Frontend Architecture
-The client is built with React and TypeScript using Vite as the build tool. The application follows a component-based architecture with:
-- **State Management**: TanStack Query for server state and React Context for cart functionality
-- **Routing**: Wouter for client-side routing with pages for home, admin, checkout, and 404
-- **UI Framework**: shadcn/ui components built on Radix UI primitives with Tailwind CSS for styling
-- **Form Handling**: React Hook Form with Zod validation for type-safe form management
+The client is built with React and TypeScript using Vite, following a component-based architecture.
+- **State Management**: TanStack Query for server state and React Context for cart functionality.
+- **Routing**: Wouter for client-side routing, covering home, admin, checkout, and 404 pages.
+- **UI Framework**: shadcn/ui components built on Radix UI primitives, styled with Tailwind CSS.
+- **Form Handling**: React Hook Form with Zod validation for type-safe form management.
+- **Multilingual Support**: Comprehensive multilingual implementation across the admin panel, supporting English, French, and Arabic (with RTL support), including animated transitions and persistent language preferences.
+- **UI/UX Decisions**: Responsive design, professional styling, animated loading skeletons, and a consistent icon library (Lucide React) for a smooth user experience.
 
 ## Backend Architecture
-The server uses Express.js with TypeScript in ESM format:
-- **Database Layer**: Drizzle ORM with PostgreSQL for type-safe database operations
-- **API Design**: RESTful endpoints for products, customers, orders, and statistics
-- **Development Setup**: Vite middleware integration for hot reloading in development
-- **Error Handling**: Centralized error middleware with structured JSON responses
+The server uses Express.js with TypeScript in ESM format.
+- **Database Layer**: Drizzle ORM with PostgreSQL for type-safe database operations.
+- **API Design**: RESTful endpoints for products, customers, orders, and statistics.
+- **Development Setup**: Vite middleware integration for hot reloading.
+- **Error Handling**: Centralized error middleware with structured JSON responses.
+- **Authentication**: localStorage-based JWT token authentication system with bcrypt hashing for passwords, role-based access control, and production-compatible CORS configurations.
+- **Object Storage**: Integration with Google Cloud Storage for product image uploads, including secure presigned URL generation and handling of public/private access.
 
 ## Database Schema
-The application uses a comprehensive PostgreSQL schema with:
-- **Products Table**: Detailed product information including pricing tiers, stock levels, categories, base64 encoded images, and rating system
-- **Orders & Order Items**: Complete order management with customer relationships and line items
-- **Customers Table**: Customer information for order tracking and management
-- **Users Table**: Custom authentication with email, password (bcrypt hashed), profile information, and isAdmin field for role-based access control
-- **Sessions Table**: Secure session storage for user authentication
-- **Product Reviews**: Customer feedback and rating system with duplicate prevention
-- **Site Settings**: Dynamic site configuration and branding
-- **Slider Images**: Homepage promotional content management
+The application uses a comprehensive PostgreSQL schema including:
+- **Products**: Detailed product information (pricing tiers, stock, categories, images, ratings).
+- **Orders & Order Items**: Complete order management.
+- **Customers**: Customer information for tracking.
+- **Users**: Custom authentication with email, hashed password, profile, and `isAdmin` field.
+- **Sessions**: Secure session storage.
+- **Product Reviews**: Customer feedback system.
+- **Site Settings**: Dynamic site configuration.
+- **Slider Images**: Homepage promotional content.
 
 ## Component Architecture
-The application is organized into logical component directories:
-- **UI Components**: Reusable shadcn/ui components for consistent design
-- **Page Components**: Top-level route components (Home, Landing, Admin, Checkout, Product Detail)
-- **Feature Components**: Business logic components (ProductCard, CartSidebar, Admin modules, ImageSlider, Reviews, Star Rating)
-- **Layout Components**: Structural components (Header with authentication) for consistent page layout
-- **Admin Management**: Complete settings management system with site configuration, slider images, logo/favicon uploads
-- **Authentication**: Custom email/password authentication with signup/login pages for unauthenticated users
-- **Skeleton Components**: Comprehensive loading skeleton system (ProductCard, ProductGrid, AdminTable, StatsCard, ProductDetail, Slider, Header, Form) for smooth user experience during data loading
+Organized into logical directories:
+- **UI Components**: Reusable shadcn/ui components.
+- **Page Components**: Top-level route components.
+- **Feature Components**: Business logic components (e.g., ProductCard, CartSidebar, Admin modules).
+- **Layout Components**: Structural components (e.g., Header).
+- **Admin Management**: Settings, slider images, logo/favicon uploads, and bulk import/export with selective update options.
+- **Authentication**: Custom signup/login pages.
+- **Skeleton Components**: Comprehensive loading skeletons for various UI elements.
 
 ## Development Tooling
-- **TypeScript**: Full type safety across client, server, and shared code
-- **Path Aliases**: Organized imports with @ aliases for clean code structure
-- **Hot Reloading**: Vite integration provides fast development feedback
-- **Database Migrations**: Drizzle Kit for schema management and migrations
+- **TypeScript**: Full type safety.
+- **Path Aliases**: Organized imports.
+- **Hot Reloading**: Fast development feedback via Vite.
+- **Database Migrations**: Drizzle Kit for schema management.
 
 # External Dependencies
 
 ## Database
-- **Neon Serverless PostgreSQL**: Cloud-hosted PostgreSQL database accessed via connection pooling
-- **Drizzle ORM**: Type-safe database operations with automatic TypeScript integration
-- **Connection Management**: WebSocket support for serverless database connections
+- **Neon Serverless PostgreSQL**: Cloud-hosted PostgreSQL.
+- **Drizzle ORM**: Type-safe database operations.
 
 ## UI Framework
-- **Radix UI**: Accessible, unstyled component primitives for complex UI elements
-- **Tailwind CSS**: Utility-first CSS framework with custom design tokens
-- **Lucide React**: Consistent icon library for UI elements
+- **Radix UI**: Accessible component primitives.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **Lucide React**: Icon library.
 
 ## Build & Development Tools
-- **Vite**: Fast build tool with HMR and optimized production builds
-- **esbuild**: Fast JavaScript bundler for server-side code compilation
-- **PostCSS**: CSS processing with Tailwind and Autoprefixer
+- **Vite**: Fast build tool.
+- **esbuild**: Fast JavaScript bundler.
+- **PostCSS**: CSS processing.
 
 ## Form & Validation
-- **React Hook Form**: Performant form library with minimal re-renders
-- **Zod**: Schema validation for runtime type checking and form validation
-- **Hookform Resolvers**: Integration between React Hook Form and Zod
+- **React Hook Form**: Performant form library.
+- **Zod**: Schema validation.
+- **Hookform Resolvers**: Integration with Zod.
 
 ## State Management
-- **TanStack Query**: Server state management with caching and background updates
-- **React Context**: Client-side cart state management with local storage persistence
+- **TanStack Query**: Server state management.
+- **React Context**: Client-side cart state management.
+
+## Object Storage
+- **Google Cloud Storage**: For product image storage.
