@@ -132,16 +132,17 @@ export class ObjectStorageService {
 
   // Gets the upload URL for an object entity.
   async getObjectEntityUploadURL(): Promise<string> {
-    const privateObjectDir = this.getPrivateObjectDir();
-    if (!privateObjectDir) {
+    const publicObjectSearchPaths = this.getPublicObjectSearchPaths();
+    if (!publicObjectSearchPaths.length) {
       throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
+        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
+          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var."
       );
     }
 
     const objectId = randomUUID();
-    const fullPath = `${privateObjectDir}/uploads/${objectId}`;
+    // Use the first public search path and add products subdirectory
+    const fullPath = `${publicObjectSearchPaths[0]}/products/${objectId}`;
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
@@ -212,6 +213,17 @@ export class ObjectStorageService {
     const url = new URL(rawPath);
     const rawObjectPath = url.pathname;
   
+    // Check if this is a public upload (new format)
+    const publicObjectSearchPaths = this.getPublicObjectSearchPaths();
+    for (const searchPath of publicObjectSearchPaths) {
+      if (rawObjectPath.startsWith(searchPath)) {
+        // For public uploads, we'll serve them through the public-objects endpoint
+        const relativePath = rawObjectPath.slice(searchPath.length + 1); // Remove leading slash
+        return `/public-objects/${relativePath}`;
+      }
+    }
+
+    // Handle legacy private uploads
     let objectEntityDir = this.getPrivateObjectDir();
     if (!objectEntityDir.endsWith("/")) {
       objectEntityDir = `${objectEntityDir}/`;
@@ -223,8 +235,6 @@ export class ObjectStorageService {
   
     // Extract the entity ID from the path and preserve the .private/ directory structure
     const entityId = rawObjectPath.slice(objectEntityDir.length);
-    // The entityId includes the uploads/ subdirectory, e.g. "uploads/file-id"
-    // So we return: /objects/.private/uploads/file-id (not /objects/.private/uploads/uploads/file-id)
     return `/objects/.private/${entityId}`;
   }
 
