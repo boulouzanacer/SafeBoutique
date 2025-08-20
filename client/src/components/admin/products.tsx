@@ -899,6 +899,7 @@ export default function Products() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
+                  <TableHead>Photo</TableHead>
                   <TableHead><AnimatedText translationKey="products.barcode" /></TableHead>
                   <TableHead><AnimatedText translationKey="products.reference" /></TableHead>
                   <TableHead><AnimatedText translationKey="products.name" /></TableHead>
@@ -913,7 +914,7 @@ export default function Products() {
               <TableBody>
                 {products.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-8 text-gray-500" data-testid="text-no-products">
+                    <TableCell colSpan={11} className="text-center py-8 text-gray-500" data-testid="text-no-products">
                       {t("products.noResults", "No products found")}
                     </TableCell>
                   </TableRow>
@@ -922,6 +923,35 @@ export default function Products() {
                     <TableRow key={product.recordid} data-testid={`row-product-${product.recordid}`}>
                       <TableCell data-testid={`text-id-${product.recordid}`}>
                         {product.recordid}
+                      </TableCell>
+                      <TableCell data-testid={`cell-photo-${product.recordid}`}>
+                        <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden">
+                          {product.photo ? (
+                            <img
+                              src={
+                                product.photo.startsWith('data:') 
+                                  ? product.photo 
+                                  : product.photo.startsWith('https://storage.googleapis.com/') 
+                                    ? product.photo
+                                    : product.photo.startsWith('/objects/') || product.photo.startsWith('/public-objects/')
+                                      ? product.photo
+                                      : `data:image/jpeg;base64,${product.photo}`
+                              }
+                              alt={product.produit || 'Product'}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                console.log("Admin table image failed to load:", target.src);
+                                target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=48&h=48";
+                              }}
+                              data-testid={`img-admin-${product.recordid}`}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                              No Photo
+                            </div>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell data-testid={`text-barcode-${product.recordid}`}>
                         {product.codeBarre}
