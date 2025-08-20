@@ -223,7 +223,9 @@ export class ObjectStorageService {
   
     // Extract the entity ID from the path and preserve the .private/ directory structure
     const entityId = rawObjectPath.slice(objectEntityDir.length);
-    return `/objects/.private/uploads/${entityId}`;
+    // The entityId includes the uploads/ subdirectory, e.g. "uploads/file-id"
+    // So we return: /objects/.private/uploads/file-id (not /objects/.private/uploads/uploads/file-id)
+    return `/objects/.private/${entityId}`;
   }
 
   // Tries to set the ACL policy for the object entity and return the normalized path.
