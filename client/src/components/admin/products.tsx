@@ -209,6 +209,12 @@ export default function Products() {
       if (editingProduct && data.objectPath) {
         setEditingProduct(prev => prev ? { ...prev, photo: data.objectPath } : prev);
         console.log("Updated editingProduct with new photo path:", data.objectPath);
+        
+        // Also update the form's photo field value
+        if (form) {
+          form.setValue('photo', data.objectPath);
+          console.log("Updated form photo field with:", data.objectPath);
+        }
       }
       
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
