@@ -92,7 +92,7 @@ export default function Products() {
       detaille: "",
       codeFrs: "",
       promo: 0,
-      pp1Ht: 0,
+      pp1Ht: 0, // Promotional price default = 0
       qtePromo: 0,
       fid: 0,
       marque: "",
@@ -101,6 +101,54 @@ export default function Products() {
       utilisateur: ""
     }
   });
+
+  // Generate unique barcode (13 digits)
+  const generateUniqueBarcode = async (): Promise<string> => {
+    const generateBarcode = (): string => {
+      // Generate 13-digit barcode starting with 2 (internal products)
+      let barcode = "2";
+      for (let i = 0; i < 12; i++) {
+        barcode += Math.floor(Math.random() * 10).toString();
+      }
+      return barcode;
+    };
+
+    // Keep trying until we find a unique barcode
+    let attempts = 0;
+    while (attempts < 100) {
+      const barcode = generateBarcode();
+      const exists = products.some(p => p.codeBarre === barcode);
+      if (!exists) {
+        return barcode;
+      }
+      attempts++;
+    }
+    
+    // Fallback if somehow we can't generate unique barcode
+    return generateBarcode();
+  };
+
+  // Generate unique product reference
+  const generateUniqueReference = async (): Promise<string> => {
+    const generateRef = (): string => {
+      const prefix = "REF";
+      const timestamp = Date.now().toString().slice(-8);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
+      return `${prefix}${timestamp}${random}`;
+    };
+
+    let attempts = 0;
+    while (attempts < 100) {
+      const ref = generateRef();
+      const exists = products.some(p => p.refProduit === ref);
+      if (!exists) {
+        return ref;
+      }
+      attempts++;
+    }
+    
+    return generateRef();
+  };
 
   const { data: products = [], isLoading } = useQuery<Product[]>({
     queryKey: ["/api/products", filters],
@@ -389,7 +437,43 @@ export default function Products() {
   const handleNewProduct = () => {
     setEditingProduct(null);
     setCurrentPhotoUrl("");
-    form.reset();
+    form.reset({
+      codeBarre: "",
+      cbColis: "",
+      refProduit: "",
+      produit: "",
+      paHt: 0,
+      tva: 0,
+      pampHt: 0,
+      pv1Ht: 0,
+      pv2Ht: 0,
+      pv3Ht: 0,
+      pv4Ht: 0,
+      pv5Ht: 0,
+      pv6Ht: 0,
+      pvLimite: 0,
+      ppa: 0,
+      stock: 0,
+      colissage: 0,
+      stockIni: 0,
+      prixIni: 0,
+      blocage: 0,
+      gerPoids: 0,
+      sup: 0,
+      famille: "",
+      sousFamille: "",
+      photo: "",
+      detaille: "",
+      codeFrs: "",
+      promo: 0,
+      pp1Ht: 0, // Promotional price default = 0
+      qtePromo: 0,
+      fid: 0,
+      marque: "",
+      um: "",
+      poids: 0,
+      utilisateur: ""
+    });
     setIsDialogOpen(true);
   };
 
@@ -544,7 +628,21 @@ export default function Products() {
                         name="codeBarre"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Barcode *</FormLabel>
+                            <FormLabel>
+                              Barcode *
+                              {!editingProduct && (
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const barcode = await generateUniqueBarcode();
+                                    field.onChange(barcode);
+                                  }}
+                                  className="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium underline"
+                                >
+                                  Generate Barcode
+                                </button>
+                              )}
+                            </FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-barcode" />
                             </FormControl>
@@ -558,7 +656,21 @@ export default function Products() {
                         name="refProduit"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Product Reference *</FormLabel>
+                            <FormLabel>
+                              Product Reference *
+                              {!editingProduct && (
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const reference = await generateUniqueReference();
+                                    field.onChange(reference);
+                                  }}
+                                  className="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium underline"
+                                >
+                                  Generate Reference
+                                </button>
+                              )}
+                            </FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-ref-produit" />
                             </FormControl>
@@ -628,8 +740,42 @@ export default function Products() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Family</FormLabel>
+                            <Select 
+                              value={field.value || ""} 
+                              onValueChange={(value) => {
+                                if (value === "custom") {
+                                  // Allow custom input
+                                  field.onChange("");
+                                } else {
+                                  field.onChange(value);
+                                }
+                              }}
+                            >
+                              <FormControl>
+                                <SelectTrigger data-testid="select-family">
+                                  <SelectValue placeholder="Select or type family">
+                                    {field.value || "Select or type family"}
+                                  </SelectValue>
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {families.map((family) => (
+                                  <SelectItem key={family} value={family}>
+                                    {family}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem value="custom">Custom...</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {/* Custom input when no predefined family is selected */}
                             <FormControl>
-                              <Input {...field} value={field.value || ""} data-testid="input-family" />
+                              <Input 
+                                {...field} 
+                                value={field.value || ""} 
+                                placeholder="Enter custom family or select above"
+                                data-testid="input-family-custom"
+                                className="mt-2"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -777,6 +923,74 @@ export default function Products() {
                           />
                         </>
                       )}
+                      
+                      <div className="col-span-2">
+                        <div className="border-t pt-4">
+                          <h3 className="text-lg font-medium mb-4">Product Photo</h3>
+                        
+                        {/* Current Photo Display */}
+                        {(editingProduct?.photo || currentPhotoUrl) && (
+                          <div className="space-y-2">
+                            <Label className="text-sm text-gray-600">Current Photo:</Label>
+                            <div className="relative w-32 h-32 border rounded-lg overflow-hidden bg-white">
+                              <img
+                                src={
+                                  (editingProduct?.photo || currentPhotoUrl)?.startsWith('data:') 
+                                    ? (editingProduct?.photo || currentPhotoUrl) 
+                                    : (editingProduct?.photo || currentPhotoUrl)?.startsWith('https://storage.googleapis.com/') 
+                                      ? (editingProduct?.photo || currentPhotoUrl)
+                                      : (editingProduct?.photo || currentPhotoUrl)?.startsWith('/objects/') || (editingProduct?.photo || currentPhotoUrl)?.startsWith('/public-objects/')
+                                        ? (editingProduct?.photo || currentPhotoUrl)
+                                        : `data:image/jpeg;base64,${editingProduct?.photo || currentPhotoUrl}`
+                                }
+                                alt="Current product photo"
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  console.log("Image failed to load in admin panel:", target.src);
+                                  target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200";
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Photo Upload Button - Available for both new and edit */}
+                        <div className="space-y-2">
+                          <Label className="text-sm text-gray-600">
+                            {(editingProduct?.photo || currentPhotoUrl) ? "Change Photo:" : "Add Photo:"}
+                          </Label>
+                          <ObjectUploader
+                            maxNumberOfFiles={1}
+                            maxFileSize={5242880} // 5MB
+                            onGetUploadParameters={handleGetUploadParameters}
+                            onComplete={handlePhotoUploadComplete}
+                            buttonClassName="w-full"
+                          >
+                            <div className="flex items-center justify-center gap-2 py-2">
+                              {isUploadingPhoto ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                  <span>Uploading...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Camera className="h-4 w-4" />
+                                  <span>{(editingProduct?.photo || currentPhotoUrl) ? "Change Photo" : "Upload Photo"}</span>
+                                </>
+                              )}
+                            </div>
+                          </ObjectUploader>
+                        </div>
+                        
+                        {!editingProduct && !currentPhotoUrl && (
+                          <div className="text-center py-4 text-gray-500">
+                            <Camera className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">Upload a photo to showcase your product</p>
+                          </div>
+                        )}
+                        </div>
+                      </div>
                       
                       <FormField
                         control={form.control}
