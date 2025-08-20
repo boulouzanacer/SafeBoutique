@@ -62,11 +62,20 @@ export default function CartSidebar() {
                     <div className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                       {item.product.photo ? (
                         <img
-                          src={item.product.photo.startsWith('data:') ? item.product.photo : `data:image/jpeg;base64,${item.product.photo}`}
+                          src={
+                            item.product.photo.startsWith('data:') 
+                              ? item.product.photo 
+                              : item.product.photo.startsWith('https://storage.googleapis.com/') 
+                                ? item.product.photo
+                                : item.product.photo.startsWith('/objects/') || item.product.photo.startsWith('/public-objects/')
+                                  ? item.product.photo
+                                  : `data:image/jpeg;base64,${item.product.photo}`
+                          }
                           alt={item.product.produit || 'Product'}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
+                            console.log("Cart item image failed to load:", target.src);
                             target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80";
                           }}
                           data-testid={`img-cart-${item.product.recordid}`}
