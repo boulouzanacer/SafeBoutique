@@ -369,9 +369,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Object storage routes for product image uploads
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
     try {
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const bucketName = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+      if (!bucketName) {
+        return res.status(500).json({ error: "Object storage not configured" });
+      }
+
+      // Use public directory for product photos instead of private uploads
+      const photoId = require("crypto").randomUUID();
+      const publicPath = `public/products/${photoId}`;
+      
+      // Create a signed URL for uploading to the public directory
+      const request = {
+        bucket_name: bucketName,
+        object_name: publicPath,
+        method: "PUT",
+        expires_at: new Date(Date.now() + 900 * 1000).toISOString(), // 15 minutes
+      };
+      
+      const response = await fetch("http://127.0.0.1:1106/object-storage/signed-object-url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to get signed URL: ${response.status}`);
+      }
+      
+      const { signed_url: uploadURL } = await response.json();
       res.json({ uploadURL });
     } catch (error) {
       console.error("Error getting upload URL:", error);
@@ -391,19 +418,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Updating product photo for product", productId, "with URL:", photoURL);
 
       // Extract the object path from the GCS URL for the database storage
-      // photoURL format: https://storage.googleapis.com/bucket-name/.private/uploads/file-id
+      // photoURL format: https://storage.googleapis.com/bucket-name/public/products/file-id
       let normalizedPath;
       
       try {
         const url = new URL(photoURL);
         const bucketName = url.pathname.split('/')[1]; // Extract bucket name
         const objectPath = url.pathname.substring(bucketName.length + 2); // Remove /bucket-name/ prefix
-        normalizedPath = `/objects/${objectPath}`;
-        console.log("Extracted object path:", normalizedPath);
+        
+        // For public photos, store direct GCS URL for easier access
+        if (objectPath.startsWith('public/products/')) {
+          normalizedPath = photoURL; // Store the full GCS URL directly
+          console.log("Using direct GCS URL for public photo:", normalizedPath);
+        } else {
+          // Fallback for private uploads
+          normalizedPath = `/objects/${objectPath}`;
+          console.log("Extracted object path:", normalizedPath);
+        }
       } catch (urlError) {
         console.error("Error parsing photo URL:", urlError);
         return res.status(400).json({ error: "Invalid photo URL format" });
       }
+      
+      // No ACL policy needed for public photos - they're directly accessible
       
       // Update the product with the new photo path
       const products = await storage.getProducts();
@@ -432,40 +469,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded objects - redirect to actual GCS URLs
+  // Serve uploaded objects - use object storage service
   app.get("/objects/:objectPath(*)", async (req, res) => {
     try {
-      // Extract the object path from the URL
       const objectPath = req.params.objectPath;
       console.log("Serving object with path:", objectPath);
       
-      // For objects stored in .private/uploads/, construct the direct GCS URL
-      if (objectPath.startsWith('.private/uploads/')) {
+      // Use the ObjectStorageService to handle the file serving
+      const { ObjectStorageService } = await import("./objectStorage");
+      const { ObjectPermission } = await import("./objectAcl");
+      const objectStorageService = new ObjectStorageService();
+      
+      // Try to get the object file and serve it
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      
+      // Check if the object is publicly accessible
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        requestedPermission: ObjectPermission.READ,
+      });
+      
+      if (!canAccess) {
+        // If not accessible via ACL, try direct GCS URL as fallback
         const bucketName = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-        if (!bucketName) {
-          return res.status(500).json({ error: "Object storage not configured" });
+        if (bucketName && objectPath.startsWith('.private/uploads/')) {
+          const directUrl = `https://storage.googleapis.com/${bucketName}/${objectPath}`;
+          console.log("Fallback: Redirecting to direct GCS URL:", directUrl);
+          
+          res.set({
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          });
+          
+          return res.redirect(302, directUrl);
         }
-        
-        // Construct the direct GCS URL with proper bucket name
-        const directUrl = `https://storage.googleapis.com/${bucketName}/${objectPath}`;
-        console.log("Redirecting to direct GCS URL:", directUrl);
-        
-        // Set CORS headers for image access
-        res.set({
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET',
-          'Access-Control-Allow-Headers': 'Content-Type',
-        });
-        
-        // Redirect to the direct GCS URL
-        return res.redirect(302, directUrl);
+        return res.status(403).json({ error: "Access denied" });
       }
       
-      // For other paths, return not found
-      console.log("Object path not recognized:", objectPath);
-      res.status(404).json({ error: "Object not found" });
+      // Serve the file through object storage service
+      await objectStorageService.downloadObject(objectFile, res);
+      
     } catch (error) {
       console.error("Error serving object:", error);
+      
+      // Fallback for .private/uploads/ files
+      if (req.params.objectPath.startsWith('.private/uploads/')) {
+        const bucketName = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+        if (bucketName) {
+          const directUrl = `https://storage.googleapis.com/${bucketName}/${req.params.objectPath}`;
+          console.log("Error fallback: Redirecting to direct GCS URL:", directUrl);
+          
+          res.set({
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          });
+          
+          return res.redirect(302, directUrl);
+        }
+      }
+      
       res.status(404).json({ error: "Object not found" });
     }
   });

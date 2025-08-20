@@ -42,9 +42,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               src={
                 product.photo.startsWith('data:') 
                   ? product.photo 
-                  : product.photo.startsWith('/objects/') 
+                  : product.photo.startsWith('https://storage.googleapis.com/') 
                     ? product.photo
-                    : `data:image/jpeg;base64,${product.photo}`
+                    : product.photo.startsWith('/objects/') 
+                      ? product.photo
+                      : `data:image/jpeg;base64,${product.photo}`
               }
               alt={product.produit || 'Product'}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"

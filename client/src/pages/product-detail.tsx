@@ -190,9 +190,11 @@ export default function ProductDetail() {
                   src={
                     currentImage.startsWith('data:') 
                       ? currentImage 
-                      : currentImage.startsWith('/objects/') 
+                      : currentImage.startsWith('https://storage.googleapis.com/') 
                         ? currentImage
-                        : `data:image/jpeg;base64,${currentImage}`
+                        : currentImage.startsWith('/objects/') 
+                          ? currentImage
+                          : `data:image/jpeg;base64,${currentImage}`
                   }
                   alt={product.produit || "Product"}
                   className="w-full h-full object-cover"
@@ -245,9 +247,11 @@ export default function ProductDetail() {
                       src={
                         image.startsWith('data:') 
                           ? image 
-                          : image.startsWith('/objects/') 
+                          : image.startsWith('https://storage.googleapis.com/') 
                             ? image
-                            : `data:image/jpeg;base64,${image}`
+                            : image.startsWith('/objects/') 
+                              ? image
+                              : `data:image/jpeg;base64,${image}`
                       }
                       alt={`${product.produit} ${index + 1}`}
                       className="w-full h-full object-cover"
