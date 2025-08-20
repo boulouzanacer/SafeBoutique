@@ -565,11 +565,20 @@ export default function ProductDetail() {
                       <div className="aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
                         {relatedProduct.photo ? (
                           <img
-                            src={relatedProduct.photo.startsWith('data:') ? relatedProduct.photo : `data:image/jpeg;base64,${relatedProduct.photo}`}
+                            src={
+                              relatedProduct.photo.startsWith('data:') 
+                                ? relatedProduct.photo 
+                                : relatedProduct.photo.startsWith('https://storage.googleapis.com/') 
+                                  ? relatedProduct.photo
+                                  : relatedProduct.photo.startsWith('/objects/') || relatedProduct.photo.startsWith('/public-objects/')
+                                    ? relatedProduct.photo
+                                    : `data:image/jpeg;base64,${relatedProduct.photo}`
+                            }
                             alt={relatedProduct.produit || "Product"}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
+                              console.log("Related product image failed to load:", relatedProduct.photo);
                               target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400";
                             }}
                           />
