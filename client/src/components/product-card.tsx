@@ -52,6 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
+                console.log("Image failed to load:", target.src);
                 target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=400";
               }}
               data-testid={`img-product-${product.recordid}`}

@@ -420,11 +420,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Updating product in database with photo path:", normalizedPath);
       const updatedProduct = await storage.updateProduct(productId, {
-        ...product,
         photo: normalizedPath,
       });
       
       console.log("Product updated successfully:", updatedProduct?.recordid);
+      console.log("Updated product photo field:", updatedProduct?.photo);
 
       res.json({ 
         success: true, 
