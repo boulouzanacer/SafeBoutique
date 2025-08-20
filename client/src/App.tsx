@@ -28,9 +28,7 @@ function Router() {
       <Route path="/signup" component={Signup} />
       {/* Admin route - check authentication within component to avoid 404 */}
       <Route path="/admin" component={Admin} />
-      {isAuthenticated && (
-        <Route path="/checkout" component={Checkout} />
-      )}
+      <Route path="/checkout" component={Checkout} />
       <Route component={NotFound} />
     </Switch>
   );

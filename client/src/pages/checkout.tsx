@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -16,7 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/lib/cart";
 import { formatCurrency } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { ArrowLeft, CreditCard, User } from "lucide-react";
 
 const checkoutSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -38,6 +39,8 @@ export default function Checkout() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { items, getTotalPrice, clearCart } = useCart();
+  const { isAuthenticated, user } = useAuth();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -156,6 +159,39 @@ export default function Checkout() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Guest Checkout Notice */}
+                {!isAuthenticated && (
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <User className="h-5 w-5 text-blue-600 mr-2" />
+                      <h4 className="font-medium text-blue-900">Guest Checkout</h4>
+                    </div>
+                    <p className="text-blue-700 text-sm mb-3">
+                      You're checking out as a guest. Your order will be processed via Cash on Delivery (COD).
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLocation("/login")}
+                        data-testid="button-login-checkout"
+                      >
+                        Login to Account
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLocation("/signup")}
+                        data-testid="button-signup-checkout"
+                      >
+                        Create Account
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     {/* Customer Information */}
