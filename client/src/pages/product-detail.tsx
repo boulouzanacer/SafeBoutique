@@ -43,6 +43,11 @@ export default function ProductDetail() {
   const { addToCart } = useCart();
   const { toast } = useToast();
 
+  // Scroll to top when component loads or product changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [productId]);
+
   // Fetch product details
   const { data: product, isLoading, error } = useQuery<Product>({
     queryKey: ["/api/products", productId],

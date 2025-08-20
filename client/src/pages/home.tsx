@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import ProductCard from "@/components/product-card";
@@ -19,6 +19,11 @@ export default function Home() {
     inStock: false,
     promo: false
   });
+
+  // Scroll to top when home page loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Fetch products
   const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
