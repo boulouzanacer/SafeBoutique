@@ -406,24 +406,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid photo URL format" });
       }
       
-      // Set ACL policy to make the photo publicly accessible
-      try {
-        const { ObjectStorageService } = await import("./objectStorage");
-        const objectStorageService = new ObjectStorageService();
-        
-        const aclPolicy = {
-          owner: req.user?.claims?.sub || 'admin',
-          visibility: 'public' as const,
-        };
-        
-        console.log("Setting ACL policy for photo:", photoURL);
-        const finalObjectPath = await objectStorageService.trySetObjectEntityAclPolicy(photoURL, aclPolicy);
-        normalizedPath = finalObjectPath;
-        console.log("ACL policy set successfully, final path:", finalObjectPath);
-      } catch (aclError) {
-        console.error("Warning: Could not set ACL policy:", aclError);
-        // Continue with the update even if ACL fails
-      }
+      // For new uploads, we'll serve them directly without ACL policies
+      // since they're uploaded to the private directory but we'll serve them publicly
+      console.log("Skipping ACL policy for direct serving approach");
       
       // Update the product with the new photo path
       const products = await storage.getProducts();
