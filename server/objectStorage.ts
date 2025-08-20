@@ -205,7 +205,10 @@ export class ObjectStorageService {
   normalizeObjectEntityPath(
     rawPath: string,
   ): string {
+    console.log("Normalizing object path:", rawPath);
+    
     if (!rawPath.startsWith("https://storage.googleapis.com/")) {
+      console.log("Not a GCS URL, returning as-is");
       return rawPath;
     }
   
@@ -214,12 +217,24 @@ export class ObjectStorageService {
     const rawObjectPath = url.pathname;
   
     // Check if this is a public upload (new format)
+    console.log("Raw object path from URL:", rawObjectPath);
+    
+    // Handle new public uploads (format: /bucket-name/public/products/file-id)
+    if (rawObjectPath.includes("/public/products/")) {
+      const fileId = rawObjectPath.split("/public/products/")[1];
+      const normalizedPath = `/public-objects/products/${fileId}`;
+      console.log("Public directory upload detected, normalized to:", normalizedPath);
+      return normalizedPath;
+    }
+    
     const publicObjectSearchPaths = this.getPublicObjectSearchPaths();
     for (const searchPath of publicObjectSearchPaths) {
       if (rawObjectPath.startsWith(searchPath)) {
         // For public uploads, we'll serve them through the public-objects endpoint
         const relativePath = rawObjectPath.slice(searchPath.length + 1); // Remove leading slash
-        return `/public-objects/${relativePath}`;
+        const normalizedPath = `/public-objects/${relativePath}`;
+        console.log("Public search path match, normalized to:", normalizedPath);
+        return normalizedPath;
       }
     }
 
