@@ -168,6 +168,13 @@ export const insertProductSchema = createInsertSchema(products).omit({
   recordid: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  // Required fields validation
+  codeBarre: z.string().min(1, "Barcode is required"),
+  refProduit: z.string().min(1, "Product Reference is required"),
+  produit: z.string().min(1, "Product Name is required"),
+  pv1Ht: z.number().min(0.01, "Price (PV1) is required and must be greater than 0"),
+  famille: z.string().min(1, "Family is required"),
 });
 
 export const insertCustomerSchema = createInsertSchema(customers).omit({
