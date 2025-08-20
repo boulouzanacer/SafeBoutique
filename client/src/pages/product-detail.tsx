@@ -262,6 +262,7 @@ export default function ProductDetail() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
+                        console.log("Thumbnail image failed to load:", target.src);
                         target.src = "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=160&h=160";
                       }}
                     />
