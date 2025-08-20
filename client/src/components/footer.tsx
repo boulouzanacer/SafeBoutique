@@ -55,22 +55,22 @@ export default function Footer() {
             <ul className="space-y-3 font-light">
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-about">
-                  {t('nav.about')}
+                  <AnimatedText translationKey="footer.about" />
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-products">
-                  {t('nav.products')}
+                  <AnimatedText translationKey="footer.products" />
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-contact">
-                  {t('nav.contact')}
+                  <AnimatedText translationKey="footer.contact" />
                 </a>
               </li>
               <li>
                 <a href="/admin" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-footer-admin">
-                  {t('header.admin')}
+                  <AnimatedText translationKey="footer.admin" />
                 </a>
               </li>
             </ul>
@@ -79,27 +79,27 @@ export default function Footer() {
           {/* Customer Service */}
           <div>
             <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase mb-4" data-testid="text-customer-service">
-              {t('footer.customerService')}
+              <AnimatedText translationKey="footer.customerService" className="inline-block" />
             </h4>
             <ul className="space-y-3 font-light">
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-shipping">
-                  {t('footer.shipping')}
+                  <AnimatedText translationKey="footer.shipping" />
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-returns">
-                  {t('footer.returns')}
+                  <AnimatedText translationKey="footer.returns" />
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-faq">
-                  FAQ
+                  <AnimatedText translationKey="footer.faq" />
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-support">
-                  {t('footer.support')}
+                  <AnimatedText translationKey="footer.support" />
                 </a>
               </li>
             </ul>
@@ -110,14 +110,14 @@ export default function Footer() {
         <div className="border-t border-gray-200 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 font-light text-sm" data-testid="text-copyright">
-              {t('footer.copyright')}
+              <AnimatedText translationKey="footer.copyright" />
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-privacy">
-                {t('footer.privacy')}
+                <AnimatedText translationKey="footer.privacy" />
               </a>
               <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-terms">
-                {t('footer.terms')}
+                <AnimatedText translationKey="footer.terms" />
               </a>
             </div>
           </div>
