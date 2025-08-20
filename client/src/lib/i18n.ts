@@ -87,6 +87,13 @@ const resources = {
       "product.lowStock": "Low Stock",
       "product.available": "available",
       
+      // Website Product Listing
+      "website.ourProducts": "Our Products",
+      "website.productsSubtitle": "Discover our carefully curated collection of premium products designed for professionals.",
+      "website.allFamilies": "All Families",
+      "website.inStockOnly": "In Stock Only",
+      "website.onPromotion": "On Promotion",
+      
       // Cart
       "cart.title": "Shopping Cart",
       "cart.empty": "Your cart is empty",
@@ -359,6 +366,13 @@ const resources = {
       "product.lowStock": "Stock faible",
       "product.available": "disponible",
       
+      // Website Product Listing
+      "website.ourProducts": "Nos Produits",
+      "website.productsSubtitle": "Découvrez notre collection soigneusement sélectionnée de produits premium conçus pour les professionnels.",
+      "website.allFamilies": "Toutes les Familles",
+      "website.inStockOnly": "En Stock Seulement",
+      "website.onPromotion": "En Promotion",
+      
       // Cart
       "cart.title": "Panier d'achat",
       "cart.empty": "Votre panier est vide",
@@ -630,6 +644,13 @@ const resources = {
       "product.save": "وفر",
       "product.lowStock": "مخزون منخفض",
       "product.available": "متوفر",
+      
+      // Website Product Listing
+      "website.ourProducts": "منتجاتنا",
+      "website.productsSubtitle": "اكتشف مجموعتنا المختارة بعناية من المنتجات المتميزة المصممة للمحترفين.",
+      "website.allFamilies": "جميع العائلات",
+      "website.inStockOnly": "المتوفر في المخزون فقط",
+      "website.onPromotion": "في العروض الترويجية",
       
       // Cart
       "cart.title": "سلة التسوق",

@@ -5,6 +5,7 @@ import ProductCard from "@/components/product-card";
 import CartSidebar from "@/components/cart-sidebar";
 import ImageSlider from "@/components/image-slider";
 import Footer from "@/components/footer";
+import AnimatedText from "@/components/animated-text";
 import { ProductGridSkeleton } from "@/components/skeletons/product-grid-skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -63,11 +64,11 @@ export default function Home() {
         {/* Section Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl font-light tracking-wide text-gray-900 mb-4" data-testid="text-products-title">
-            Our Products
+            <AnimatedText translationKey="website.ourProducts" />
           </h2>
           <div className="w-20 h-px bg-gray-300 mx-auto mb-6"></div>
           <p className="text-gray-600 font-light max-w-2xl mx-auto" data-testid="text-products-subtitle">
-            Discover our carefully curated collection of premium products designed for professionals.
+            <AnimatedText translationKey="website.productsSubtitle" />
           </p>
         </div>
 
@@ -86,7 +87,7 @@ export default function Home() {
                   <SelectValue placeholder="Filter by Family" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Families</SelectItem>
+                  <SelectItem value="all"><AnimatedText translationKey="website.allFamilies" /></SelectItem>
                   {families.map((family) => (
                     <SelectItem key={family} value={family}>
                       {family}
@@ -105,7 +106,7 @@ export default function Home() {
                 data-testid="filter-in-stock"
                 className="font-light tracking-wide"
               >
-                In Stock Only
+                <AnimatedText translationKey="website.inStockOnly" />
               </Button>
               
               <Button
@@ -115,7 +116,7 @@ export default function Home() {
                 data-testid="filter-promotions"
                 className="font-light tracking-wide"
               >
-                On Promotion
+                <AnimatedText translationKey="website.onPromotion" />
               </Button>
             </div>
 
