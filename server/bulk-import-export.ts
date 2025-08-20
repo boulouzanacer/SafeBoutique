@@ -126,7 +126,11 @@ class BulkImportExportService {
   /**
    * Import products from CSV or Excel buffer using your format
    */
-  async importProductsFromCSV(buffer: Buffer): Promise<BulkImportResult> {
+  async importProductsFromCSV(buffer: Buffer, updateOptions?: {
+    updatePhoto: boolean;
+    updatePrice: boolean; 
+    updateStock: boolean;
+  }): Promise<BulkImportResult> {
     try {
       let data: any[] = [];
       
@@ -189,8 +193,9 @@ class BulkImportExportService {
           );
 
           if (existingProduct) {
-            // Update existing product
-            await storage.updateProduct(existingProduct.recordid!, validatedProduct);
+            // Update existing product with selective field updates
+            const updateData = this.applyUpdateOptions(validatedProduct, existingProduct, updateOptions);
+            await storage.updateProduct(existingProduct.recordid!, updateData);
           } else {
             // Create new product
             await storage.createProduct(validatedProduct);
@@ -400,6 +405,48 @@ class BulkImportExportService {
     }
 
     return transformed;
+  }
+
+  private applyUpdateOptions(newProduct: any, existingProduct: any, updateOptions?: {
+    updatePhoto: boolean;
+    updatePrice: boolean;
+    updateStock: boolean;
+  }): any {
+    if (!updateOptions) {
+      return newProduct; // Update all fields if no options provided
+    }
+
+    const updateData = { ...newProduct };
+
+    // If updatePhoto is false, preserve existing photo
+    if (!updateOptions.updatePhoto) {
+      updateData.photo = existingProduct.photo;
+    }
+
+    // If updatePrice is false, preserve existing pricing fields
+    if (!updateOptions.updatePrice) {
+      updateData.paHt = existingProduct.paHt;
+      updateData.pampHt = existingProduct.pampHt;
+      updateData.pv1Ht = existingProduct.pv1Ht;
+      updateData.pv2Ht = existingProduct.pv2Ht;
+      updateData.pv3Ht = existingProduct.pv3Ht;
+      updateData.pv4Ht = existingProduct.pv4Ht;
+      updateData.pv5Ht = existingProduct.pv5Ht;
+      updateData.pv6Ht = existingProduct.pv6Ht;
+      updateData.pp1Ht = existingProduct.pp1Ht;
+      updateData.pvLimite = existingProduct.pvLimite;
+      updateData.ppa = existingProduct.ppa;
+      updateData.prixIni = existingProduct.prixIni;
+    }
+
+    // If updateStock is false, preserve existing stock fields
+    if (!updateOptions.updateStock) {
+      updateData.stock = existingProduct.stock;
+      updateData.stockIni = existingProduct.stockIni;
+      updateData.colissage = existingProduct.colissage;
+    }
+
+    return updateData;
   }
 
   private async findExistingProduct(refProduit?: string, codeBarre?: string): Promise<Product | null> {

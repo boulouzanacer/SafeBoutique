@@ -802,9 +802,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No CSV file uploaded" });
       }
 
-      const result = await bulkImportExportService.importProductsFromCSV(req.file.buffer);
+      // Parse update options from form data
+      const updateOptions = {
+        updatePhoto: req.body.updatePhoto === 'true',
+        updatePrice: req.body.updatePrice === 'true',
+        updateStock: req.body.updateStock === 'true'
+      };
+
+      console.log('Import options:', updateOptions);
+
+      const result = await bulkImportExportService.importProductsFromCSV(req.file.buffer, updateOptions);
       res.json(result);
     } catch (error) {
+      console.error('Import error:', error);
       res.status(500).json({ error: "Failed to import products" });
     }
   });

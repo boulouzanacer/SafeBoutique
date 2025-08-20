@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Download, Upload, FileSpreadsheet, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -33,6 +34,11 @@ export default function BulkImportExport() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importResult, setImportResult] = useState<BulkImportResult | null>(null);
   const [exportResult, setExportResult] = useState<BulkExportResult | null>(null);
+  const [updateOptions, setUpdateOptions] = useState({
+    updatePhoto: false,
+    updatePrice: false,
+    updateStock: false
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -79,9 +85,12 @@ export default function BulkImportExport() {
 
   // Import Products Mutation
   const importMutation = useMutation({
-    mutationFn: async (file: File): Promise<BulkImportResult> => {
+    mutationFn: async (data: { file: File; options: typeof updateOptions }): Promise<BulkImportResult> => {
       const formData = new FormData();
-      formData.append('csvFile', file);
+      formData.append('csvFile', data.file);
+      formData.append('updatePhoto', data.options.updatePhoto.toString());
+      formData.append('updatePrice', data.options.updatePrice.toString());
+      formData.append('updateStock', data.options.updateStock.toString());
       
       const response = await fetch('/api/products/import', {
         method: 'POST',
@@ -181,7 +190,7 @@ export default function BulkImportExport() {
       });
       return;
     }
-    importMutation.mutate(selectedFile);
+    importMutation.mutate({ file: selectedFile, options: updateOptions });
   };
 
   const handleDownloadExport = () => {
@@ -292,6 +301,57 @@ export default function BulkImportExport() {
                     Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
                   </p>
                 )}
+              </div>
+
+              {/* Update Options */}
+              <div className="space-y-3 p-4 border rounded-lg bg-gray-50">
+                <Label className="text-sm font-medium">Import Update Options</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="updatePhoto"
+                      checked={updateOptions.updatePhoto}
+                      onCheckedChange={(checked) => 
+                        setUpdateOptions(prev => ({ ...prev, updatePhoto: !!checked }))
+                      }
+                      data-testid="checkbox-update-photo"
+                    />
+                    <Label htmlFor="updatePhoto" className="text-sm">
+                      Update Photo - Replace existing product photos with new ones from CSV
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="updatePrice"
+                      checked={updateOptions.updatePrice}
+                      onCheckedChange={(checked) => 
+                        setUpdateOptions(prev => ({ ...prev, updatePrice: !!checked }))
+                      }
+                      data-testid="checkbox-update-price"
+                    />
+                    <Label htmlFor="updatePrice" className="text-sm">
+                      Update Price - Replace existing product prices with new ones from CSV
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="updateStock"
+                      checked={updateOptions.updateStock}
+                      onCheckedChange={(checked) => 
+                        setUpdateOptions(prev => ({ ...prev, updateStock: !!checked }))
+                      }
+                      data-testid="checkbox-update-stock"
+                    />
+                    <Label htmlFor="updateStock" className="text-sm">
+                      Update Stock - Replace existing product stock levels with new ones from CSV
+                    </Label>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Note: Unchecked options will preserve existing values when updating products
+                </p>
               </div>
 
               <div className="flex gap-2">
