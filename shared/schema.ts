@@ -7,7 +7,7 @@ import { z } from "zod";
 // Products table matching the exact PRODUIT structure
 export const products = pgTable("products", {
   recordid: serial("recordid").primaryKey(),
-  codeBarre: varchar("code_barre", { length: 20 }).notNull(),
+  codeBarre: varchar("code_barre", { length: 20 }).notNull().unique(),
   cbColis: varchar("cb_colis", { length: 20 }),
   refProduit: varchar("ref_produit", { length: 20 }).notNull(),
   produit: varchar("produit", { length: 100 }),

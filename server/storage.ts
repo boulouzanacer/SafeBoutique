@@ -40,8 +40,10 @@ export interface IStorage {
     promo?: boolean;
   }): Promise<Product[]>;
   getProduct(id: number): Promise<Product | undefined>;
+  getProductByCodeBarre(codeBarre: string): Promise<Product | undefined>;
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product>;
+  upsertProduct(product: InsertProduct): Promise<Product>;
   deleteProduct(id: number): Promise<void>;
   getFamilies(): Promise<string[]>;
 
@@ -169,6 +171,11 @@ export class DatabaseStorage implements IStorage {
     return product || undefined;
   }
 
+  async getProductByCodeBarre(codeBarre: string): Promise<Product | undefined> {
+    const [product] = await db.select().from(products).where(eq(products.codeBarre, codeBarre));
+    return product || undefined;
+  }
+
   async createProduct(product: InsertProduct): Promise<Product> {
     const [created] = await db.insert(products).values(product).returning();
     return created;
@@ -207,6 +214,21 @@ export class DatabaseStorage implements IStorage {
     }
     
     return updated;
+  }
+
+  async upsertProduct(product: InsertProduct): Promise<Product> {
+    // Check if product exists by codeBarre
+    const existingProduct = await this.getProductByCodeBarre(product.codeBarre);
+    
+    if (existingProduct) {
+      // Update existing product
+      console.log(`Product with codeBarre ${product.codeBarre} exists, updating...`);
+      return this.updateProduct(existingProduct.recordid, product);
+    } else {
+      // Create new product
+      console.log(`Product with codeBarre ${product.codeBarre} doesn't exist, creating...`);
+      return this.createProduct(product);
+    }
   }
 
   async deleteProduct(id: number): Promise<void> {
