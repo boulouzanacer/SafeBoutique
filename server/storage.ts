@@ -28,6 +28,7 @@ import {
 import { db } from "./db";
 import { eq, desc, like, and, isNull, or, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
 
 export interface IStorage {
   // Products
@@ -44,6 +45,7 @@ export interface IStorage {
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product>;
   upsertProduct(product: InsertProduct): Promise<Product>;
+  processProductPhoto(base64Data: string): Promise<string>;
   deleteProduct(id: number): Promise<void>;
   getFamilies(): Promise<string[]>;
 
@@ -216,18 +218,82 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async processProductPhoto(base64Data: string): Promise<string> {
+    if (!base64Data || !base64Data.startsWith('data:image/')) {
+      throw new Error('Invalid base64 image data');
+    }
+
+    try {
+      // Extract image data and format
+      const matches = base64Data.match(/^data:image\/([a-zA-Z]*);base64,(.*)$/);
+      if (!matches || matches.length !== 3) {
+        throw new Error('Invalid base64 format');
+      }
+
+      const imageFormat = matches[1]; // jpeg, png, etc.
+      const imageData = matches[2];
+      
+      // Generate unique filename
+      const fileName = `${randomUUID()}.${imageFormat}`;
+      const publicPath = `/replit-objstore-3b59a6d1-5dc4-47d7-9e4e-c36889216e29/public/products/${fileName}`;
+      
+      // Import object storage dynamically
+      const { objectStorageClient } = await import("./objectStorage");
+      const bucketName = 'replit-objstore-3b59a6d1-5dc4-47d7-9e4e-c36889216e29';
+      const objectName = `public/products/${fileName}`;
+      
+      // Convert base64 to buffer
+      const imageBuffer = Buffer.from(imageData, 'base64');
+      
+      // Upload to object storage
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+      
+      await file.save(imageBuffer, {
+        metadata: {
+          contentType: `image/${imageFormat}`,
+        }
+      });
+      
+      console.log(`Photo uploaded successfully to: ${publicPath}`);
+      
+      // Return the public URL path that the frontend can use
+      return `/public-objects/products/${fileName}`;
+      
+    } catch (error) {
+      console.error('Error processing photo:', error);
+      throw new Error('Failed to process and upload photo');
+    }
+  }
+
   async upsertProduct(product: InsertProduct): Promise<Product> {
+    // Process photo if provided
+    let processedProduct = { ...product };
+    
+    if (product.photo && product.photo.startsWith('data:image/')) {
+      console.log('Processing base64 photo for product:', product.codeBarre);
+      try {
+        const photoPath = await this.processProductPhoto(product.photo);
+        processedProduct.photo = photoPath;
+        console.log('Photo processed successfully, saved as:', photoPath);
+      } catch (error) {
+        console.error('Photo processing failed:', error);
+        // You can choose to either fail the request or continue without photo
+        processedProduct.photo = null; // Continue without photo
+      }
+    }
+    
     // Check if product exists by codeBarre
-    const existingProduct = await this.getProductByCodeBarre(product.codeBarre);
+    const existingProduct = await this.getProductByCodeBarre(processedProduct.codeBarre);
     
     if (existingProduct) {
       // Update existing product
-      console.log(`Product with codeBarre ${product.codeBarre} exists, updating...`);
-      return this.updateProduct(existingProduct.recordid, product);
+      console.log(`Product with codeBarre ${processedProduct.codeBarre} exists, updating...`);
+      return this.updateProduct(existingProduct.recordid, processedProduct);
     } else {
       // Create new product
-      console.log(`Product with codeBarre ${product.codeBarre} doesn't exist, creating...`);
-      return this.createProduct(product);
+      console.log(`Product with codeBarre ${processedProduct.codeBarre} doesn't exist, creating...`);
+      return this.createProduct(processedProduct);
     }
   }
 
