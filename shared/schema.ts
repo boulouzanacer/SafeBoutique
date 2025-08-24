@@ -175,6 +175,10 @@ export const insertProductSchema = createInsertSchema(products).omit({
   produit: z.string().min(1, "Product Name is required"),
   pv1Ht: z.number().min(0, "Price (PV1) is required and must be 0 or greater"),
   famille: z.string().min(1, "Family is required"),
+  paHt: z.number().min(0, "Purchase price (PA HT) is required and must be 0 or greater"),
+  tva: z.number().min(0, "VAT (TVA) is required and must be 0 or greater"),
+  pampHt: z.number().min(0, "Average purchase price (PAMP HT) is required and must be 0 or greater"),
+  stock: z.number().min(0, "Stock quantity is required and must be 0 or greater"),
 });
 
 export const insertCustomerSchema = createInsertSchema(customers).omit({
