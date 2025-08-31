@@ -63,6 +63,17 @@ export default function Orders() {
       setUpdatingOrderId(null);
       setJustUpdatedOrderId(variables.orderId);
       
+      // Optimistically update the cache immediately
+      queryClient.setQueryData(["/api/orders"], (oldData: OrderWithDetails[] | undefined) => {
+        if (!oldData) return oldData;
+        return oldData.map(order => 
+          order.id === variables.orderId 
+            ? { ...order, status: variables.status }
+            : order
+        );
+      });
+      
+      // Still invalidate to ensure consistency
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       
@@ -242,7 +253,9 @@ export default function Orders() {
                               ) : (
                                 <Package className="h-4 w-4 mr-2" />
                               )}
-                              <SelectValue placeholder="Select status" />
+                              <span className="capitalize">
+                                {order.status || 'pending'}
+                              </span>
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">Pending</SelectItem>
