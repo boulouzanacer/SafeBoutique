@@ -224,6 +224,7 @@ export default function Orders() {
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Select
+                            key={`${order.id}-${order.status}`}
                             value={order.status || 'pending'}
                             onValueChange={(status) => handleStatusChange(order.id, status)}
                             disabled={updatingOrderId === order.id}
@@ -241,7 +242,7 @@ export default function Orders() {
                               ) : (
                                 <Package className="h-4 w-4 mr-2" />
                               )}
-                              <SelectValue />
+                              <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">Pending</SelectItem>
