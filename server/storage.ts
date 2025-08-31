@@ -188,12 +188,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProduct(product: InsertProduct): Promise<Product> {
+    // Ensure family exists in families table
+    await this.ensureFamilyExists(product.famille);
+    
     const [created] = await db.insert(products).values(product).returning();
     return created;
   }
 
   async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product> {
     console.log(`Updating product ${id} with data:`, JSON.stringify(product));
+    
+    // Ensure family exists in families table if family is being updated
+    if (product.famille !== undefined) {
+      await this.ensureFamilyExists(product.famille);
+    }
     
     // Ensure we have clean data without undefined values
     const cleanProduct = Object.keys(product).reduce((acc, key) => {
@@ -276,6 +284,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertProduct(product: InsertProduct): Promise<Product> {
+    // Ensure family exists in families table early in the process
+    await this.ensureFamilyExists(product.famille);
+    
     // Process photo if provided
     let processedProduct = { ...product };
     
@@ -364,6 +375,34 @@ export class DatabaseStorage implements IStorage {
       .where(eq(products.famille, family.name));
     
     return Number(result[0].count);
+  }
+
+  // Helper function to ensure family exists
+  async ensureFamilyExists(familyName: string | null): Promise<void> {
+    if (!familyName || familyName.trim() === '') {
+      return;
+    }
+
+    const trimmedName = familyName.trim();
+    
+    // Check if family already exists
+    const existingFamily = await db.select()
+      .from(families)
+      .where(eq(families.name, trimmedName))
+      .limit(1);
+    
+    if (existingFamily.length === 0) {
+      // Family doesn't exist, create it
+      try {
+        await db.insert(families).values({ name: trimmedName });
+        console.log(`Auto-created family: ${trimmedName}`);
+      } catch (error: any) {
+        // Ignore duplicate key errors (race condition)
+        if (error.code !== '23505') {
+          console.error('Error creating family:', error);
+        }
+      }
+    }
   }
 
   async getCustomers(): Promise<(Customer & { totalOrders: number })[]> {
