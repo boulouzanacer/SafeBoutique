@@ -83,9 +83,7 @@ export default function Families() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest(`/api/families-management/${id}`, {
-        method: "DELETE",
-      });
+      const response = await apiRequest(`/api/families-management/${id}`, "DELETE");
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to delete family");
@@ -128,13 +126,7 @@ export default function Families() {
         : "/api/families-management";
       const method = editingFamily ? "PUT" : "POST";
       
-      const response = await apiRequest(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await apiRequest(url, method, data);
       
       if (!response.ok) {
         const error = await response.json();
