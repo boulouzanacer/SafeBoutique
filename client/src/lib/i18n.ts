@@ -127,6 +127,7 @@ const resources = {
       "admin.products": "Products",
       "admin.orders": "Orders",
       "admin.customers": "Customers",
+      "admin.families": "Families",
       "admin.settings": "Settings",
       "admin.api": "API",
       "admin.importExport": "Import/Export",
@@ -193,6 +194,21 @@ const resources = {
       "customers.contact": "Contact",
       "customers.status": "Status",
       "customers.ordersText": "orders",
+      
+      // Families
+      "families.title": "Family Management",
+      "families.add": "Add Family",
+      "families.edit": "Edit Family",
+      "families.name": "Family Name",
+      "families.actions": "Actions",
+      "families.search": "Search families...",
+      "families.success": "Family saved successfully",
+      "families.deleteSuccess": "Family deleted successfully",
+      "families.noResults": "No families found",
+      "families.deleteConfirm": "Are you sure you want to delete this family?",
+      "families.deleteError": "Cannot delete family - it is being used in products",
+      "families.enterName": "Enter family name",
+      "families.required": "Family name is required",
       
       // Settings
       "settings.title": "Settings",

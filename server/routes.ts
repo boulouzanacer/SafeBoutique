@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { storage } from "./storage";
-import { insertProductSchema, insertCustomerSchema, insertOrderSchema, insertSiteSettingsSchema, insertSliderImageSchema, insertProductReviewSchema, signupUserSchema, loginUserSchema } from "@shared/schema";
+import { insertProductSchema, insertCustomerSchema, insertOrderSchema, insertSiteSettingsSchema, insertSliderImageSchema, insertProductReviewSchema, insertFamilySchema, signupUserSchema, loginUserSchema } from "@shared/schema";
 import { z } from "zod";
 import { bulkImportExportService } from "./bulk-import-export";
 import { setupAuth, isAuthenticated, isAdmin } from "./auth";
@@ -366,10 +366,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // New Families Management API
+  app.get("/api/families-management", async (req: Request, res: Response) => {
+    try {
+      const families = await storage.getAllFamilies();
+      // Add products count to each family
+      const familiesWithCounts = await Promise.all(
+        families.map(async (family) => ({
+          ...family,
+          productsCount: await storage.getFamilyProductsCount(family.id),
+        }))
+      );
+      res.json(familiesWithCounts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch families" });
+    }
+  });
+
+  app.post("/api/families-management", async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertFamilySchema.parse(req.body);
+      const family = await storage.createFamily(validatedData);
+      res.json(family);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid family data", details: error.errors });
+      }
+      if (error.code === '23505') {
+        res.status(400).json({ error: "Family name already exists" });
+      } else {
+        res.status(500).json({ error: "Failed to create family" });
+      }
+    }
+  });
+
+  app.put("/api/families-management/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertFamilySchema.partial().parse(req.body);
+      const family = await storage.updateFamily(id, validatedData);
+      if (!family) {
+        res.status(404).json({ error: "Family not found" });
+      } else {
+        res.json(family);
+      }
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid family data", details: error.errors });
+      }
+      if (error.code === '23505') {
+        res.status(400).json({ error: "Family name already exists" });
+      } else {
+        res.status(500).json({ error: "Failed to update family" });
+      }
+    }
+  });
+
+  app.delete("/api/families-management/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteFamily(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      if (error.message.includes("Cannot delete family")) {
+        res.status(400).json({ error: "Cannot delete family: it is being used by products" });
+      } else {
+        res.status(500).json({ error: "Failed to delete family" });
+      }
+    }
+  });
+
   // Object storage routes for product image uploads
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
     try {
-      console.log("Getting upload URL for authenticated user:", req.user?.id);
+      console.log("Getting upload URL for authenticated user:", (req.user as any)?.userId);
       const { ObjectStorageService } = await import("./objectStorage");
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();

@@ -8,6 +8,7 @@ import Dashboard from "@/components/admin/dashboard";
 import Products from "@/components/admin/products";
 import Orders from "@/components/admin/orders";
 import Customers from "@/components/admin/customers";
+import Families from "@/components/admin/families";
 import API from "@/components/admin/api";
 import Settings from "@/components/admin/settings";
 import BulkImportExport from "@/components/admin/bulk-import-export";
@@ -55,7 +56,7 @@ export default function Admin() {
 
       <div className="p-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7" data-testid="admin-tabs">
+          <TabsList className="grid w-full grid-cols-8" data-testid="admin-tabs">
             <TabsTrigger value="dashboard" data-testid="tab-dashboard">
               <AnimatedText translationKey="admin.dashboard" />
             </TabsTrigger>
@@ -67,6 +68,9 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="customers" data-testid="tab-customers">
               <AnimatedText translationKey="admin.customers" />
+            </TabsTrigger>
+            <TabsTrigger value="families" data-testid="tab-families">
+              <AnimatedText translationKey="admin.families" />
             </TabsTrigger>
             <TabsTrigger value="bulk" data-testid="tab-bulk">
               <AnimatedText translationKey="admin.importExport" />
@@ -93,6 +97,10 @@ export default function Admin() {
 
           <TabsContent value="customers">
             <Customers />
+          </TabsContent>
+
+          <TabsContent value="families">
+            <Families />
           </TabsContent>
 
           <TabsContent value="bulk">

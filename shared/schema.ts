@@ -217,6 +217,14 @@ export const loginUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+// Families table
+export const families = pgTable("families", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 50 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
 export const siteSettings = pgTable("site_settings", {
   id: serial("id").primaryKey(),
   siteName: varchar("site_name", { length: 200 }).notNull(),
@@ -263,6 +271,12 @@ export const insertSliderImageSchema = createInsertSchema(sliderImages).omit({
   updatedAt: true,
 });
 
+export const insertFamilySchema = createInsertSchema(families).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
@@ -280,6 +294,8 @@ export type SiteSettings = typeof siteSettings.$inferSelect;
 export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
 export type SliderImage = typeof sliderImages.$inferSelect;
 export type InsertSliderImage = z.infer<typeof insertSliderImageSchema>;
+export type Family = typeof families.$inferSelect;
+export type InsertFamily = z.infer<typeof insertFamilySchema>;
 
 export const insertProductReviewSchema = createInsertSchema(productReviews).omit({
   id: true,

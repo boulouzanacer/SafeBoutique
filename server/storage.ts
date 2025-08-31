@@ -7,6 +7,7 @@ import {
   siteSettings,
   sliderImages,
   productReviews,
+  families,
   type Product, 
   type InsertProduct,
   type Customer,
@@ -23,7 +24,9 @@ import {
   type SliderImage,
   type InsertSliderImage,
   type ProductReview,
-  type InsertProductReview
+  type InsertProductReview,
+  type Family,
+  type InsertFamily
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, and, isNull, or, sql } from "drizzle-orm";
@@ -48,6 +51,12 @@ export interface IStorage {
   processProductPhoto(base64Data: string): Promise<string>;
   deleteProduct(id: number): Promise<void>;
   getFamilies(): Promise<string[]>;
+  getAllFamilies(): Promise<Family[]>;
+  getFamilyById(id: number): Promise<Family | undefined>;
+  createFamily(data: InsertFamily): Promise<Family>;
+  updateFamily(id: number, data: Partial<InsertFamily>): Promise<Family | undefined>;
+  deleteFamily(id: number): Promise<boolean>;
+  getFamilyProductsCount(id: number): Promise<number>;
 
   // Customers
   getCustomers(): Promise<(Customer & { totalOrders: number })[]>;
@@ -304,6 +313,57 @@ export class DatabaseStorage implements IStorage {
   async getFamilies(): Promise<string[]> {
     const families = await db.selectDistinct({ famille: products.famille }).from(products);
     return families.map(f => f.famille).filter(Boolean) as string[];
+  }
+
+  // New Families CRUD methods
+  async getAllFamilies(): Promise<Family[]> {
+    return await db.select().from(families).orderBy(families.name);
+  }
+
+  async getFamilyById(id: number): Promise<Family | undefined> {
+    const result = await db.select().from(families).where(eq(families.id, id));
+    return result[0];
+  }
+
+  async createFamily(data: InsertFamily): Promise<Family> {
+    const result = await db.insert(families).values(data).returning();
+    return result[0];
+  }
+
+  async updateFamily(id: number, data: Partial<InsertFamily>): Promise<Family | undefined> {
+    const result = await db.update(families)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(families.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteFamily(id: number): Promise<boolean> {
+    // Check if family is being used by products
+    const productsUsingFamily = await db.select()
+      .from(products)
+      .where(eq(products.famille, 
+        sql`(SELECT name FROM ${families} WHERE ${families.id} = ${id})`
+      ))
+      .limit(1);
+    
+    if (productsUsingFamily.length > 0) {
+      throw new Error("Cannot delete family: it is being used by products");
+    }
+
+    const result = await db.delete(families).where(eq(families.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getFamilyProductsCount(id: number): Promise<number> {
+    const family = await this.getFamilyById(id);
+    if (!family) return 0;
+    
+    const result = await db.select({ count: sql`count(*)` })
+      .from(products)
+      .where(eq(products.famille, family.name));
+    
+    return Number(result[0].count);
   }
 
   async getCustomers(): Promise<(Customer & { totalOrders: number })[]> {

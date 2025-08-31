@@ -766,20 +766,11 @@ export default function Products() {
                             <FormLabel>Family</FormLabel>
                             <Select 
                               value={field.value || ""} 
-                              onValueChange={(value) => {
-                                if (value === "custom") {
-                                  // Allow custom input
-                                  field.onChange("");
-                                } else {
-                                  field.onChange(value);
-                                }
-                              }}
+                              onValueChange={field.onChange}
                             >
                               <FormControl>
                                 <SelectTrigger data-testid="select-family">
-                                  <SelectValue placeholder="Select or type family">
-                                    {field.value || "Select or type family"}
-                                  </SelectValue>
+                                  <SelectValue placeholder="Select family" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -788,19 +779,8 @@ export default function Products() {
                                     {family}
                                   </SelectItem>
                                 ))}
-                                <SelectItem value="custom">Custom...</SelectItem>
                               </SelectContent>
                             </Select>
-                            {/* Custom input when no predefined family is selected */}
-                            <FormControl>
-                              <Input 
-                                {...field} 
-                                value={field.value || ""} 
-                                placeholder="Enter custom family or select above"
-                                data-testid="input-family-custom"
-                                className="mt-2"
-                              />
-                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
