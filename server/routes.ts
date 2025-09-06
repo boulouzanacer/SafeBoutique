@@ -962,6 +962,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Route pour envoyer un email de contact
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const { sendContactEmail } = await import("./emailService.js");
+      const formData = req.body;
+
+      // Validation basique
+      if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Tous les champs obligatoires doivent être remplis" 
+        });
+      }
+
+      // Envoyer l'email
+      await sendContactEmail(formData);
+      
+      res.json({ 
+        success: true, 
+        message: "Email envoyé avec succès" 
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de l'email:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Erreur lors de l'envoi de l'email. Vérifiez la configuration Gmail." 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

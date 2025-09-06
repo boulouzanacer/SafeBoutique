@@ -34,28 +34,40 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      // Here you would typically send the form data to your backend
-      // For now, we'll just simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Message envoyé!",
-        description: "Nous vous répondrons dans les plus brefs délais.",
-        className: "border-green-200 bg-green-50 text-green-800"
+      // Send the form data to the backend API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
-      
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: ""
-      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast({
+          title: "Message envoyé!",
+          description: "Nous vous répondrons dans les plus brefs délais. Un email de confirmation vous a été envoyé.",
+          className: "border-green-200 bg-green-50 text-green-800"
+        });
+        
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: ""
+        });
+      } else {
+        throw new Error(result.error || "Erreur lors de l'envoi du message");
+      }
     } catch (error) {
+      console.error("Contact form error:", error);
       toast({
         title: "Erreur",
-        description: "Erreur lors de l'envoi du message. Veuillez réessayer.",
+        description: error instanceof Error ? error.message : "Erreur lors de l'envoi du message. Vérifiez la configuration email.",
         variant: "destructive"
       });
     } finally {
