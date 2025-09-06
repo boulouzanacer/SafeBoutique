@@ -83,7 +83,7 @@ export default function Header({ onSearch }: HeaderProps) {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" data-testid="link-home">
-              <div className="flex-shrink-0 cursor-pointer flex items-center space-x-3">
+              <div className="flex-shrink-0 cursor-pointer">
                 {settings?.logo ? (
                   <img 
                     src={settings.logo} 
@@ -92,27 +92,8 @@ export default function Header({ onSearch }: HeaderProps) {
                     data-testid="img-logo"
                   />
                 ) : (
-                  <div>
-                    <h1 className="text-3xl font-light tracking-wide text-primary">
-                      {settings?.siteName || "SafeSoft Boutique"}
-                    </h1>
-                    {settings?.headerMessage && (
-                      <p className="text-sm text-gray-400 font-light tracking-widest uppercase">
-                        {settings.headerMessage}
-                      </p>
-                    )}
-                  </div>
-                )}
-                {settings?.logo && (
-                  <div>
-                    <h1 className="text-2xl font-light tracking-wide text-primary">
-                      {settings?.siteName || "SafeSoft Boutique"}
-                    </h1>
-                    {settings?.headerMessage && (
-                      <p className="text-xs text-gray-400 font-light tracking-widest uppercase">
-                        {settings.headerMessage}
-                      </p>
-                    )}
+                  <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">S</span>
                   </div>
                 )}
               </div>
