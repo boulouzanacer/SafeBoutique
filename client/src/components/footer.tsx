@@ -122,10 +122,10 @@ export default function Footer() {
               {settings?.footerText || "© 2024 SafeSoft Boutique. All rights reserved."}
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-privacy">
+              <a href="/privacy-policy" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-privacy">
                 <AnimatedText translationKey="footer.privacy" />
               </a>
-              <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-terms">
+              <a href="/terms-of-service" className="text-gray-500 hover:text-primary transition-colors text-sm font-light" data-testid="link-terms">
                 <AnimatedText translationKey="footer.terms" />
               </a>
             </div>
