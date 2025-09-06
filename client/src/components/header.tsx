@@ -13,6 +13,8 @@ import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from "@/components/language-selector";
 import AnimatedText from "@/components/animated-text";
+import { useQuery } from "@tanstack/react-query";
+import { SiteSettings } from "@shared/schema";
 
 import {
   DropdownMenu,
@@ -34,6 +36,10 @@ export default function Header({ onSearch }: HeaderProps) {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
+
+  const { data: settings } = useQuery<SiteSettings>({
+    queryKey: ["/api/settings"],
+  });
 
   const logoutMutation = useMutation({
     mutationFn: () => apiRequest("/api/auth/logout", "POST"),
@@ -78,8 +84,14 @@ export default function Header({ onSearch }: HeaderProps) {
           <div className="flex items-center">
             <Link href="/" data-testid="link-home">
               <div className="flex-shrink-0 cursor-pointer">
-                <h1 className="text-3xl font-light tracking-wide text-primary">SafeSoft</h1>
-                <p className="text-sm text-gray-400 font-light tracking-widest uppercase">Boutique</p>
+                <h1 className="text-3xl font-light tracking-wide text-primary">
+                  {settings?.siteName || "SafeSoft Boutique"}
+                </h1>
+                {settings?.headerMessage && (
+                  <p className="text-sm text-gray-400 font-light tracking-widest uppercase">
+                    {settings.headerMessage}
+                  </p>
+                )}
               </div>
             </Link>
           </div>
