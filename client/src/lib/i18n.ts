@@ -785,6 +785,7 @@ const resources = {
       "footer.about": "من نحن",
       "footer.products": "المنتجات",
       "footer.contact": "اتصل بنا",
+      "footer.contactUs": "اتصل بنا",
       "footer.admin": "لوحة الإدارة",
       "footer.customerService": "خدمة العملاء",
       "footer.support": "الدعم",
@@ -958,7 +959,51 @@ const resources = {
       "language.select": "اللغة",
       "language.english": "English",
       "language.french": "Français",
-      "language.arabic": "العربية"
+      "language.arabic": "العربية",
+      
+      // Contact Page
+      "contact.title": "اتصل بنا",
+      "contact.subtitle": "نحن هنا لمساعدتك. لا تتردد في الاتصال بنا لأي أسئلة أو طلبات معلومات.",
+      "contact.info": "معلومات الاتصال",
+      "contact.phone": "الهاتف",
+      "contact.email": "البريد الإلكتروني",
+      "contact.address": "العنوان",
+      "contact.hours": "ساعات العمل",
+      "contact.sendMessage": "أرسل لنا رسالة",
+      "contact.name": "الاسم الكامل",
+      "contact.nameRequired": "الاسم الكامل *",
+      "contact.emailRequired": "البريد الإلكتروني *",
+      "contact.phoneLabel": "الهاتف",
+      "contact.subject": "الموضوع",
+      "contact.subjectRequired": "الموضوع *",
+      "contact.message": "الرسالة",
+      "contact.messageRequired": "الرسالة *",
+      "contact.namePlaceholder": "اسمك الكامل",
+      "contact.emailPlaceholder": "your.email@example.com",
+      "contact.phonePlaceholder": "رقم هاتفك",
+      "contact.subjectPlaceholder": "موضوع رسالتك",
+      "contact.messagePlaceholder": "رسالتك التفصيلية...",
+      "contact.send": "إرسال الرسالة",
+      "contact.sending": "جاري الإرسال...",
+      "contact.whyChoose": "لماذا تختارنا؟",
+      "contact.whyChooseText": "نحن نقدم منتجات عالية الجودة مع خدمة عملاء استثنائية. فريق الخبراء لدينا هنا لدعمك في جميع مشاريعك.",
+      "contact.hoursWeekdays": "الاثنين - الجمعة: 8:00 صباحاً - 6:00 مساءً",
+      "contact.hoursSaturday": "السبت: 8:00 صباحاً - 2:00 مساءً",
+      "contact.hoursSunday": "الأحد: مغلق",
+      "contact.success": "تم إرسال الرسالة!",
+      "contact.successMessage": "سنقوم بالرد عليك في أقرب وقت ممكن. تم إرسال بريد إلكتروني تأكيدي إليك.",
+      "contact.error": "خطأ",
+      "contact.errorMessage": "خطأ في إرسال الرسالة. يرجى التحقق من إعدادات البريد الإلكتروني.",
+      
+      // Privacy Policy
+      "privacy.title": "سياسة الخصوصية",
+      "privacy.lastUpdated": "آخر تحديث",
+      "privacy.loading": "جاري تحميل سياسة الخصوصية...",
+      
+      // Terms of Service
+      "terms.title": "شروط الخدمة",
+      "terms.lastUpdated": "آخر تحديث",
+      "terms.loading": "جاري تحميل شروط الخدمة..."
     }
   }
 };
