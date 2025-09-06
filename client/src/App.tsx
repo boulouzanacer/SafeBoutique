@@ -15,6 +15,7 @@ import Checkout from "@/pages/checkout";
 import ProductDetail from "@/pages/product-detail";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
+import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 import "./lib/i18n"; // Initialize i18n
 
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
+      <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>
   );

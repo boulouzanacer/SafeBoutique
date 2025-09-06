@@ -73,8 +73,8 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3 font-light">
               <li>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-contact">
-                  <AnimatedText translationKey="footer.contactUs" />
+                <a href="/contact" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-contact">
+                  Contact Nous
                 </a>
               </li>
             </ul>
