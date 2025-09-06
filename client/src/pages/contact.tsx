@@ -102,7 +102,9 @@ export default function Contact() {
           
           {/* Contact Information */}
           <div className="lg:col-span-1">
-            <h2 className="text-2xl font-light text-primary mb-8">Informations de contact</h2>
+            <h2 className="text-2xl font-light text-primary mb-8">
+              <AnimatedText translationKey="contact.info" />
+            </h2>
             
             <div className="space-y-6">
               {settings?.contactPhone && (
@@ -111,7 +113,9 @@ export default function Contact() {
                     <Phone className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-1">Téléphone</h3>
+                    <h3 className="font-medium text-gray-900 mb-1">
+                      <AnimatedText translationKey="contact.phone" />
+                    </h3>
                     <p className="text-gray-600">{settings.contactPhone}</p>
                   </div>
                 </div>
@@ -123,7 +127,9 @@ export default function Contact() {
                     <Mail className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-1">Email</h3>
+                    <h3 className="font-medium text-gray-900 mb-1">
+                      <AnimatedText translationKey="contact.email" />
+                    </h3>
                     <p className="text-gray-600">{settings.contactEmail}</p>
                   </div>
                 </div>
@@ -135,7 +141,9 @@ export default function Contact() {
                     <MapPin className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900 mb-1">Adresse</h3>
+                    <h3 className="font-medium text-gray-900 mb-1">
+                      <AnimatedText translationKey="contact.address" />
+                    </h3>
                     <p className="text-gray-600 leading-relaxed">{settings.contactAddress}</p>
                   </div>
                 </div>
@@ -146,11 +154,13 @@ export default function Contact() {
                   <Clock className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-1">Horaires d'ouverture</h3>
+                  <h3 className="font-medium text-gray-900 mb-1">
+                    <AnimatedText translationKey="contact.hours" />
+                  </h3>
                   <div className="text-gray-600 space-y-1">
-                    <p>Lundi - Vendredi: 8h00 - 18h00</p>
-                    <p>Samedi: 8h00 - 14h00</p>
-                    <p>Dimanche: Fermé</p>
+                    <p><AnimatedText translationKey="contact.hoursWeekdays" /></p>
+                    <p><AnimatedText translationKey="contact.hoursSaturday" /></p>
+                    <p><AnimatedText translationKey="contact.hoursSunday" /></p>
                   </div>
                 </div>
               </div>
@@ -160,13 +170,15 @@ export default function Contact() {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-lg border p-8">
-              <h2 className="text-2xl font-light text-primary mb-8">Envoyez-nous un message</h2>
+              <h2 className="text-2xl font-light text-primary mb-8">
+                <AnimatedText translationKey="contact.sendMessage" />
+              </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6" data-testid="contact-form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Nom complet *
+                      <AnimatedText translationKey="contact.nameRequired" />
                     </label>
                     <Input
                       id="name"
@@ -176,14 +188,14 @@ export default function Contact() {
                       value={formData.name}
                       onChange={handleInputChange}
                       className="h-12"
-                      placeholder="Votre nom complet"
+                      placeholder={t("contact.namePlaceholder")}
                       data-testid="input-name"
                     />
                   </div>
                   
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email *
+                      <AnimatedText translationKey="contact.emailRequired" />
                     </label>
                     <Input
                       id="email"
@@ -193,7 +205,7 @@ export default function Contact() {
                       value={formData.email}
                       onChange={handleInputChange}
                       className="h-12"
-                      placeholder="votre.email@exemple.com"
+                      placeholder={t("contact.emailPlaceholder")}
                       data-testid="input-email"
                     />
                   </div>
@@ -202,7 +214,7 @@ export default function Contact() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                      Téléphone
+                      <AnimatedText translationKey="contact.phoneLabel" />
                     </label>
                     <Input
                       id="phone"
@@ -211,14 +223,14 @@ export default function Contact() {
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="h-12"
-                      placeholder="Votre numéro de téléphone"
+                      placeholder={t("contact.phonePlaceholder")}
                       data-testid="input-phone"
                     />
                   </div>
                   
                   <div>
                     <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                      Sujet *
+                      <AnimatedText translationKey="contact.subjectRequired" />
                     </label>
                     <Input
                       id="subject"
@@ -228,7 +240,7 @@ export default function Contact() {
                       value={formData.subject}
                       onChange={handleInputChange}
                       className="h-12"
-                      placeholder="Sujet de votre message"
+                      placeholder={t("contact.subjectPlaceholder")}
                       data-testid="input-subject"
                     />
                   </div>
@@ -236,7 +248,7 @@ export default function Contact() {
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Message *
+                    <AnimatedText translationKey="contact.messageRequired" />
                   </label>
                   <Textarea
                     id="message"
@@ -245,7 +257,7 @@ export default function Contact() {
                     rows={6}
                     value={formData.message}
                     onChange={handleInputChange}
-                    placeholder="Votre message détaillé..."
+                    placeholder={t("contact.messagePlaceholder")}
                     className="resize-none"
                     data-testid="input-message"
                   />
@@ -258,7 +270,7 @@ export default function Contact() {
                     className="w-full md:w-auto px-8 py-3 h-12 bg-primary hover:bg-primary/90 text-white font-medium"
                     data-testid="button-submit"
                   >
-                    {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
+                    {isSubmitting ? t("contact.sending") : t("contact.send")}
                   </Button>
                 </div>
               </form>
