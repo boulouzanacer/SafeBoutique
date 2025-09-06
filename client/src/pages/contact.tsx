@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { SiteSettings } from "@shared/schema";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
@@ -8,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import AnimatedText from "@/components/animated-text";
 
 export default function Contact() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -47,8 +50,8 @@ export default function Contact() {
 
       if (response.ok && result.success) {
         toast({
-          title: "Message envoyé!",
-          description: "Nous vous répondrons dans les plus brefs délais. Un email de confirmation vous a été envoyé.",
+          title: t("contact.success"),
+          description: t("contact.successMessage"),
           className: "border-green-200 bg-green-50 text-green-800"
         });
         
@@ -66,8 +69,8 @@ export default function Contact() {
     } catch (error) {
       console.error("Contact form error:", error);
       toast({
-        title: "Erreur",
-        description: error instanceof Error ? error.message : "Erreur lors de l'envoi du message. Vérifiez la configuration email.",
+        title: t("contact.error"),
+        description: error instanceof Error ? error.message : t("contact.errorMessage"),
         variant: "destructive"
       });
     } finally {
