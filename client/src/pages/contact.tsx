@@ -87,10 +87,10 @@ export default function Contact() {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-light tracking-wide text-primary mb-4" data-testid="contact-title">
-              Contactez-nous
+              <AnimatedText translationKey="contact.title" />
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Nous sommes là pour vous aider. N'hésitez pas à nous contacter pour toute question ou demande d'information.
+              <AnimatedText translationKey="contact.subtitle" />
             </p>
           </div>
         </div>
@@ -269,9 +269,11 @@ export default function Contact() {
         {/* Additional Information */}
         <div className="mt-16 bg-gray-50 rounded-lg p-8">
           <div className="text-center max-w-3xl mx-auto">
-            <h3 className="text-xl font-medium text-gray-900 mb-4">Pourquoi nous choisir ?</h3>
+            <h3 className="text-xl font-medium text-gray-900 mb-4">
+              <AnimatedText translationKey="contact.whyChoose" />
+            </h3>
             <p className="text-gray-600 leading-relaxed">
-              {settings?.siteDescription || "Nous offrons des produits de qualité premium avec un service client exceptionnel. Notre équipe d'experts est là pour vous accompagner dans tous vos projets."}
+              <AnimatedText translationKey="contact.whyChooseText" />
             </p>
           </div>
         </div>
