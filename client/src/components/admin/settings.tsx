@@ -157,7 +157,7 @@ export default function SiteSettings() {
 
   const saveSettingsMutation = useMutation({
     mutationFn: async (data: SiteSettings) => {
-      const response = await apiRequest("POST", "/api/settings", data);
+      const response = await apiRequest("/api/settings", "POST", data);
       return response.json();
     },
     onSuccess: () => {
@@ -179,7 +179,7 @@ export default function SiteSettings() {
 
   const createSliderMutation = useMutation({
     mutationFn: async (data: SliderImage) => {
-      const response = await apiRequest("POST", "/api/slider-images", data);
+      const response = await apiRequest("/api/slider-images", "POST", data);
       return response.json();
     },
     onSuccess: () => {
@@ -205,7 +205,7 @@ export default function SiteSettings() {
 
   const updateSliderMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<SliderImage> }) => {
-      const response = await apiRequest("PUT", `/api/slider-images/${id}`, data);
+      const response = await apiRequest(`/api/slider-images/${id}`, "PUT", data);
       return response.json();
     },
     onSuccess: () => {
@@ -231,7 +231,7 @@ export default function SiteSettings() {
 
   const deleteSliderMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/slider-images/${id}`);
+      await apiRequest(`/api/slider-images/${id}`, "DELETE");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/slider-images"] });

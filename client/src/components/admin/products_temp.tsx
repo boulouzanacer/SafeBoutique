@@ -91,7 +91,7 @@ export default function Products() {
 
   const createProductMutation = useMutation({
     mutationFn: async (data: InsertProduct) => {
-      const response = await apiRequest("POST", "/api/products", data);
+      const response = await apiRequest("/api/products", "POST", data);
       return response.json();
     },
     onSuccess: () => {
@@ -115,7 +115,7 @@ export default function Products() {
 
   const updateProductMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<InsertProduct> }) => {
-      const response = await apiRequest("PUT", `/api/products/${id}`, data);
+      const response = await apiRequest(`/api/products/${id}`, "PUT", data);
       return response.json();
     },
     onSuccess: () => {
@@ -139,7 +139,7 @@ export default function Products() {
 
   const deleteProductMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/products/${id}`);
+      await apiRequest(`/api/products/${id}`, "DELETE");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
