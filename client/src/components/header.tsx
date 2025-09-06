@@ -120,18 +120,32 @@ export default function Header({ onSearch }: HeaderProps) {
           </div>
 
           {/* Center Content - Search */}
-          <div className="hidden md:flex items-center">
-            <form onSubmit={handleSearch}>
-              <div className="relative">
+          <div className="hidden lg:flex items-center flex-1 max-w-lg mx-8">
+            <form onSubmit={handleSearch} className="w-full">
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                </div>
                 <Input
                   type="text"
-                  placeholder="Search products, brands, categories..."
+                  placeholder="Search for products, brands, or categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-48 border-0 border-b border-gray-200 rounded-none bg-transparent focus:border-primary focus:ring-0 px-0 font-light"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
                   data-testid="input-search"
                 />
-                <Search className="absolute right-0 top-3 h-4 w-4 text-gray-400" />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <span className="sr-only">Clear search</span>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </form>
           </div>
