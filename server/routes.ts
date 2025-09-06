@@ -436,6 +436,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to populate families table from existing products
+  app.post("/api/admin/populate-families", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await storage.populateFamiliesFromProducts();
+      res.json({ 
+        message: "Families populated successfully", 
+        familiesAdded: result.familiesAdded,
+        families: result.families
+      });
+    } catch (error) {
+      console.error("Error populating families:", error);
+      res.status(500).json({ error: "Failed to populate families" });
+    }
+  });
+
   // Object storage routes for product image uploads
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
     try {

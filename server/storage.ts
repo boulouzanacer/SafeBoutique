@@ -405,6 +405,51 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // Admin function to populate families table from existing products
+  async populateFamiliesFromProducts(): Promise<{ familiesAdded: number, families: string[] }> {
+    console.log('Starting to populate families from products...');
+    
+    // Get all distinct families from products
+    const distinctFamilies = await db.selectDistinct({ famille: products.famille })
+      .from(products)
+      .where(sql`famille IS NOT NULL AND famille != ''`);
+    
+    const familyNames = distinctFamilies.map(f => f.famille).filter(Boolean) as string[];
+    console.log(`Found ${familyNames.length} distinct families in products:`, familyNames);
+    
+    let familiesAdded = 0;
+    const addedFamilies: string[] = [];
+    
+    for (const familyName of familyNames) {
+      const trimmedName = familyName.trim();
+      
+      // Check if family already exists in families table
+      const existingFamily = await db.select()
+        .from(families)
+        .where(eq(families.name, trimmedName))
+        .limit(1);
+      
+      if (existingFamily.length === 0) {
+        try {
+          await db.insert(families).values({ name: trimmedName });
+          familiesAdded++;
+          addedFamilies.push(trimmedName);
+          console.log(`Added family to families table: ${trimmedName}`);
+        } catch (error: any) {
+          // Ignore duplicate key errors (race condition)
+          if (error.code !== '23505') {
+            console.error(`Error adding family ${trimmedName}:`, error);
+          }
+        }
+      } else {
+        console.log(`Family already exists: ${trimmedName}`);
+      }
+    }
+    
+    console.log(`Population complete. Added ${familiesAdded} new families.`);
+    return { familiesAdded, families: addedFamilies };
+  }
+
   async getCustomers(): Promise<(Customer & { totalOrders: number })[]> {
     const result = await db
       .select({
