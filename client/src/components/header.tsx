@@ -83,14 +83,37 @@ export default function Header({ onSearch }: HeaderProps) {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" data-testid="link-home">
-              <div className="flex-shrink-0 cursor-pointer">
-                <h1 className="text-3xl font-light tracking-wide text-primary">
-                  {settings?.siteName || "SafeSoft Boutique"}
-                </h1>
-                {settings?.headerMessage && (
-                  <p className="text-sm text-gray-400 font-light tracking-widest uppercase">
-                    {settings.headerMessage}
-                  </p>
+              <div className="flex-shrink-0 cursor-pointer flex items-center space-x-3">
+                {settings?.logo ? (
+                  <img 
+                    src={settings.logo} 
+                    alt={settings.siteName || "SafeSoft Boutique"} 
+                    className="h-12 w-auto object-contain"
+                    data-testid="img-logo"
+                  />
+                ) : (
+                  <div>
+                    <h1 className="text-3xl font-light tracking-wide text-primary">
+                      {settings?.siteName || "SafeSoft Boutique"}
+                    </h1>
+                    {settings?.headerMessage && (
+                      <p className="text-sm text-gray-400 font-light tracking-widest uppercase">
+                        {settings.headerMessage}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {settings?.logo && (
+                  <div>
+                    <h1 className="text-2xl font-light tracking-wide text-primary">
+                      {settings?.siteName || "SafeSoft Boutique"}
+                    </h1>
+                    {settings?.headerMessage && (
+                      <p className="text-xs text-gray-400 font-light tracking-widest uppercase">
+                        {settings.headerMessage}
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
             </Link>
