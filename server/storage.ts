@@ -342,11 +342,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateFamily(id: number, data: Partial<InsertFamily>): Promise<Family | undefined> {
+    // Get the current family to check for name changes
+    const currentFamily = await this.getFamilyById(id);
+    if (!currentFamily) {
+      return undefined;
+    }
+
+    // Update the family
     const result = await db.update(families)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(families.id, id))
       .returning();
-    return result[0];
+    
+    const updatedFamily = result[0];
+    
+    // If family name changed, update all products that use this family
+    if (data.name && data.name !== currentFamily.name) {
+      console.log(`Updating all products from family "${currentFamily.name}" to "${data.name}"`);
+      
+      const updateResult = await db.update(products)
+        .set({ famille: data.name, updatedAt: new Date() })
+        .where(eq(products.famille, currentFamily.name));
+      
+      console.log(`Updated ${updateResult.rowCount || 0} products with new family name`);
+    }
+    
+    return updatedFamily;
   }
 
   async deleteFamily(id: number): Promise<boolean> {

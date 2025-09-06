@@ -4,6 +4,14 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Families table - must be defined before products since products references it
+export const families = pgTable("families", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 50 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
 // Products table matching the exact PRODUIT structure
 export const products = pgTable("products", {
   recordid: serial("recordid").primaryKey(),
@@ -217,13 +225,6 @@ export const loginUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-// Families table
-export const families = pgTable("families", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 50 }).notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
-});
 
 export const siteSettings = pgTable("site_settings", {
   id: serial("id").primaryKey(),
