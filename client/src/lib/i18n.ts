@@ -111,6 +111,7 @@ const resources = {
       "footer.about": "About Us",
       "footer.products": "Products",
       "footer.contact": "Contact",
+      "footer.contactUs": "Contact Us",
       "footer.admin": "Admin Panel",
       "footer.customerService": "Customer Service",
       "footer.support": "Support",
@@ -300,7 +301,51 @@ const resources = {
       "language.select": "Language",
       "language.english": "English",
       "language.french": "Français",
-      "language.arabic": "العربية"
+      "language.arabic": "العربية",
+      
+      // Contact Page
+      "contact.title": "Contact Us",
+      "contact.subtitle": "We're here to help. Don't hesitate to contact us for any questions or information requests.",
+      "contact.info": "Contact Information",
+      "contact.phone": "Phone",
+      "contact.email": "Email",
+      "contact.address": "Address",
+      "contact.hours": "Opening Hours",
+      "contact.sendMessage": "Send us a message",
+      "contact.name": "Full Name",
+      "contact.nameRequired": "Full name *",
+      "contact.emailRequired": "Email *",
+      "contact.phoneLabel": "Phone",
+      "contact.subject": "Subject",
+      "contact.subjectRequired": "Subject *",
+      "contact.message": "Message",
+      "contact.messageRequired": "Message *",
+      "contact.namePlaceholder": "Your full name",
+      "contact.emailPlaceholder": "your.email@example.com",
+      "contact.phonePlaceholder": "Your phone number",
+      "contact.subjectPlaceholder": "Subject of your message",
+      "contact.messagePlaceholder": "Your detailed message...",
+      "contact.send": "Send Message",
+      "contact.sending": "Sending...",
+      "contact.whyChoose": "Why choose us?",
+      "contact.whyChooseText": "We offer premium quality products with exceptional customer service. Our team of experts is here to support you in all your projects.",
+      "contact.hoursWeekdays": "Monday - Friday: 8:00 AM - 6:00 PM",
+      "contact.hoursSaturday": "Saturday: 8:00 AM - 2:00 PM",
+      "contact.hoursSunday": "Sunday: Closed",
+      "contact.success": "Message sent!",
+      "contact.successMessage": "We will respond to you as soon as possible. A confirmation email has been sent to you.",
+      "contact.error": "Error",
+      "contact.errorMessage": "Error sending message. Please check the email configuration.",
+      
+      // Privacy Policy
+      "privacy.title": "Privacy Policy",
+      "privacy.lastUpdated": "Last updated",
+      "privacy.loading": "Loading privacy policy...",
+      
+      // Terms of Service
+      "terms.title": "Terms of Service",
+      "terms.lastUpdated": "Last updated",
+      "terms.loading": "Loading terms of service..."
     }
   },
   fr: {
@@ -411,6 +456,7 @@ const resources = {
       "footer.about": "À propos",
       "footer.products": "Produits",
       "footer.contact": "Contact",
+      "footer.contactUs": "Contactez-nous",
       "footer.admin": "Panneau Admin",
       "footer.customerService": "Service client",
       "footer.support": "Support",
@@ -584,7 +630,51 @@ const resources = {
       "language.select": "Langue",
       "language.english": "English",
       "language.french": "Français",
-      "language.arabic": "العربية"
+      "language.arabic": "العربية",
+      
+      // Contact Page
+      "contact.title": "Contactez-nous",
+      "contact.subtitle": "Nous sommes là pour vous aider. N'hésitez pas à nous contacter pour toute question ou demande d'information.",
+      "contact.info": "Informations de contact",
+      "contact.phone": "Téléphone",
+      "contact.email": "Email",
+      "contact.address": "Adresse",
+      "contact.hours": "Horaires d'ouverture",
+      "contact.sendMessage": "Envoyez-nous un message",
+      "contact.name": "Nom complet",
+      "contact.nameRequired": "Nom complet *",
+      "contact.emailRequired": "Email *",
+      "contact.phoneLabel": "Téléphone",
+      "contact.subject": "Sujet",
+      "contact.subjectRequired": "Sujet *",
+      "contact.message": "Message",
+      "contact.messageRequired": "Message *",
+      "contact.namePlaceholder": "Votre nom complet",
+      "contact.emailPlaceholder": "votre.email@exemple.com",
+      "contact.phonePlaceholder": "Votre numéro de téléphone",
+      "contact.subjectPlaceholder": "Sujet de votre message",
+      "contact.messagePlaceholder": "Votre message détaillé...",
+      "contact.send": "Envoyer le message",
+      "contact.sending": "Envoi en cours...",
+      "contact.whyChoose": "Pourquoi nous choisir ?",
+      "contact.whyChooseText": "Nous offrons des produits de qualité premium avec un service client exceptionnel. Notre équipe d'experts est là pour vous accompagner dans tous vos projets.",
+      "contact.hoursWeekdays": "Lundi - Vendredi: 8h00 - 18h00",
+      "contact.hoursSaturday": "Samedi: 8h00 - 14h00",
+      "contact.hoursSunday": "Dimanche: Fermé",
+      "contact.success": "Message envoyé!",
+      "contact.successMessage": "Nous vous répondrons dans les plus brefs délais. Un email de confirmation vous a été envoyé.",
+      "contact.error": "Erreur",
+      "contact.errorMessage": "Erreur lors de l'envoi du message. Vérifiez la configuration email.",
+      
+      // Privacy Policy
+      "privacy.title": "Politique de confidentialité",
+      "privacy.lastUpdated": "Dernière mise à jour",
+      "privacy.loading": "Chargement de la politique de confidentialité...",
+      
+      // Terms of Service
+      "terms.title": "Conditions de service",
+      "terms.lastUpdated": "Dernière mise à jour",
+      "terms.loading": "Chargement des conditions de service..."
     }
   },
   ar: {

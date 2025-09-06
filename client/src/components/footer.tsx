@@ -74,7 +74,7 @@ export default function Footer() {
             <ul className="space-y-3 font-light">
               <li>
                 <a href="/contact" className="text-gray-600 hover:text-primary transition-colors" data-testid="link-contact">
-                  Contact Nous
+                  <AnimatedText translationKey="footer.contactUs" />
                 </a>
               </li>
             </ul>
