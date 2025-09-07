@@ -83,15 +83,50 @@ export default function Footer() {
           {/* Contact Info */}
           <div>
             <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase mb-4" data-testid="text-contact-info">
-              Contact Info
+              <AnimatedText translationKey="contact.contactInfo" />
             </h4>
             <div className="space-y-3 font-light text-gray-600">
               {settings?.contactPhone && (
-                <div className="flex items-center space-x-2" data-testid="contact-phone">
-                  <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  <span className="text-sm">{settings.contactPhone}</span>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2" data-testid="contact-phone">
+                    <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span className="text-sm">{settings.contactPhone}</span>
+                  </div>
+                  {/* Mobile phones */}
+                  {settings.contactMobile1 && (
+                    <div className="flex items-center space-x-2 ml-6" data-testid="contact-mobile1">
+                      <svg className="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs text-gray-500">{settings.contactMobile1}</span>
+                    </div>
+                  )}
+                  {settings.contactMobile2 && (
+                    <div className="flex items-center space-x-2 ml-6" data-testid="contact-mobile2">
+                      <svg className="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs text-gray-500">{settings.contactMobile2}</span>
+                    </div>
+                  )}
+                  {settings.contactMobile3 && (
+                    <div className="flex items-center space-x-2 ml-6" data-testid="contact-mobile3">
+                      <svg className="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs text-gray-500">{settings.contactMobile3}</span>
+                    </div>
+                  )}
+                  {settings.contactMobile4 && (
+                    <div className="flex items-center space-x-2 ml-6" data-testid="contact-mobile4">
+                      <svg className="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs text-gray-500">{settings.contactMobile4}</span>
+                    </div>
+                  )}
                 </div>
               )}
               {settings?.contactEmail && (
