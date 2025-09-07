@@ -117,6 +117,19 @@ export default function Contact() {
                       <AnimatedText translationKey="contact.phone" />
                     </h3>
                     <p className="text-gray-600">{settings.contactPhone}</p>
+                    {/* Mobile phones */}
+                    {settings.contactMobile1 && (
+                      <p className="text-gray-600 mt-1">{settings.contactMobile1}</p>
+                    )}
+                    {settings.contactMobile2 && (
+                      <p className="text-gray-600 mt-1">{settings.contactMobile2}</p>
+                    )}
+                    {settings.contactMobile3 && (
+                      <p className="text-gray-600 mt-1">{settings.contactMobile3}</p>
+                    )}
+                    {settings.contactMobile4 && (
+                      <p className="text-gray-600 mt-1">{settings.contactMobile4}</p>
+                    )}
                   </div>
                 </div>
               )}
