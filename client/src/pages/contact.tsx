@@ -27,6 +27,9 @@ export default function Contact() {
     queryKey: ["/api/settings"],
   });
 
+  // Debug: Log settings to see mobile fields
+  console.log("Settings data:", settings);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
