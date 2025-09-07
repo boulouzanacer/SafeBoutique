@@ -54,6 +54,10 @@ interface SiteSettings {
   favicon: string;
   contactEmail: string;
   contactPhone: string;
+  contactMobile1?: string;
+  contactMobile2?: string;
+  contactMobile3?: string;
+  contactMobile4?: string;
   contactAddress: string;
   socialFacebook?: string;
   socialInstagram?: string;
@@ -83,6 +87,10 @@ const settingsSchema = z.object({
   favicon: z.string().optional(),
   contactEmail: z.string().email("Invalid email address"),
   contactPhone: z.string().min(1, "Phone number is required"),
+  contactMobile1: z.string().optional(),
+  contactMobile2: z.string().optional(),
+  contactMobile3: z.string().optional(),
+  contactMobile4: z.string().optional(),
   contactAddress: z.string().min(1, "Address is required"),
   socialFacebook: z.string().optional(),
   socialInstagram: z.string().optional(),
@@ -122,6 +130,10 @@ export default function SiteSettings() {
       favicon: "",
       contactEmail: "contact@safesoft.com",
       contactPhone: "+1 (555) 123-4567",
+      contactMobile1: "",
+      contactMobile2: "",
+      contactMobile3: "",
+      contactMobile4: "",
       contactAddress: "123 Business Street, City, State 12345",
       socialFacebook: "",
       socialInstagram: "",
@@ -456,6 +468,62 @@ export default function SiteSettings() {
                                     <FormLabel><AnimatedText translationKey="settings.phone" /> *</FormLabel>
                                     <FormControl>
                                       <Input {...field} data-testid="input-contact-phone" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={settingsForm.control}
+                                name="contactMobile1"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel><AnimatedText translationKey="settings.mobile1" /></FormLabel>
+                                    <FormControl>
+                                      <Input {...field} value={field.value || ""} data-testid="input-contact-mobile1" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={settingsForm.control}
+                                name="contactMobile2"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel><AnimatedText translationKey="settings.mobile2" /></FormLabel>
+                                    <FormControl>
+                                      <Input {...field} value={field.value || ""} data-testid="input-contact-mobile2" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={settingsForm.control}
+                                name="contactMobile3"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel><AnimatedText translationKey="settings.mobile3" /></FormLabel>
+                                    <FormControl>
+                                      <Input {...field} value={field.value || ""} data-testid="input-contact-mobile3" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={settingsForm.control}
+                                name="contactMobile4"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel><AnimatedText translationKey="settings.mobile4" /></FormLabel>
+                                    <FormControl>
+                                      <Input {...field} value={field.value || ""} data-testid="input-contact-mobile4" />
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>
