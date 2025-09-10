@@ -108,7 +108,7 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table with email/password authentication
+// User storage table with email/password authentication and role-based access
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email", { length: 255 }).unique().notNull(),
@@ -117,7 +117,8 @@ export const users = pgTable("users", {
   lastName: varchar("last_name", { length: 100 }),
   profileImageUrl: varchar("profile_image_url"),
   isEmailVerified: boolean("is_email_verified").default(false),
-  isAdmin: boolean("is_admin").default(false),
+  isAdmin: boolean("is_admin").default(false), // Keep for backward compatibility
+  role: varchar("role", { length: 20 }).default("user"), // 'admin', 'moderator', 'user'
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -225,6 +226,22 @@ export const loginUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+export const updateUserRoleSchema = createInsertSchema(users).pick({
+  role: true,
+}).extend({
+  role: z.enum(["admin", "moderator", "user"]),
+});
+
+export const updateUserPasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
+
+// Admin password change schema - doesn't require current password for admin operations
+export const adminUpdateUserPasswordSchema = z.object({
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
+
 
 export const siteSettings = pgTable("site_settings", {
   id: serial("id").primaryKey(),
@@ -295,6 +312,8 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type SignupUser = z.infer<typeof signupUserSchema>;
 export type LoginUser = z.infer<typeof loginUserSchema>;
+export type UpdateUserRole = z.infer<typeof updateUserRoleSchema>;
+export type UpdateUserPassword = z.infer<typeof updateUserPasswordSchema>;
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
 export type SliderImage = typeof sliderImages.$inferSelect;

@@ -74,7 +74,11 @@ export interface IStorage {
   // Users (Email/Password Auth)
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: SignupUser): Promise<User>;
+  updateUser(id: string, userData: Partial<User>): Promise<User>;
+  updateUserPassword(id: string, newPassword: string): Promise<void>;
+  deleteUser(id: string): Promise<void>;
   verifyUserPassword(email: string, password: string): Promise<User | null>;
 
   // Stats
@@ -659,6 +663,49 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Database error during password verification:', error);
       return null;
+    }
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(users.createdAt);
+  }
+
+  async updateUser(id: string, userData: Partial<User>): Promise<User> {
+    // Don't allow password changes through this method - use updateUserPassword instead
+    const { password, ...updateData } = userData as any;
+    
+    const [updated] = await db
+      .update(users)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!updated) {
+      throw new Error('User not found');
+    }
+    
+    return updated;
+  }
+
+  async updateUserPassword(id: string, newPassword: string): Promise<void> {
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    
+    const result = await db
+      .update(users)
+      .set({ password: hashedPassword, updatedAt: new Date() })
+      .where(eq(users.id, id));
+    
+    // Check if user was found and updated
+    if (result.rowCount === 0) {
+      throw new Error('User not found');
+    }
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    
+    if (result.rowCount === 0) {
+      throw new Error('User not found');
     }
   }
 
