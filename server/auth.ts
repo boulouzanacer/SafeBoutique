@@ -1,6 +1,7 @@
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import MemoryStore from "memorystore";
+import { verifyJWTToken } from "./jwt-utils";
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
@@ -74,44 +75,50 @@ export function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  
-  const token = authHeader.substring(7);
-  
   try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
-    if (decoded.expires <= Date.now()) {
-      return res.status(401).json({ message: "Token expired" });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
     
+    const token = authHeader.substring(7);
+    const decoded = verifyJWTToken(token);
+    
     // Store user info in request for use in routes
-    (req as any).user = { userId: decoded.userId, isAdmin: decoded.isAdmin };
+    (req as any).user = {
+      userId: decoded.userId,
+      isAdmin: decoded.isAdmin,
+      role: decoded.role,
+      email: decoded.email
+    };
     return next();
-  } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+  } catch (error: any) {
+    return res.status(401).json({ message: error.message || "Unauthorized" });
   }
 };
 
 export const isAdmin: RequestHandler = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(403).json({ message: "Admin access required" });
-  }
-  
-  const token = authHeader.substring(7);
-  
   try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
-    if (decoded.expires <= Date.now() || !decoded.isAdmin) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(403).json({ message: "Admin access required" });
     }
     
-    (req as any).user = { userId: decoded.userId, isAdmin: decoded.isAdmin };
+    const token = authHeader.substring(7);
+    const decoded = verifyJWTToken(token);
+    
+    if (!decoded.isAdmin && decoded.role !== 'admin') {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    
+    (req as any).user = {
+      userId: decoded.userId,
+      isAdmin: decoded.isAdmin,
+      role: decoded.role,
+      email: decoded.email
+    };
     return next();
-  } catch (error) {
+  } catch (error: any) {
     return res.status(403).json({ message: "Admin access required" });
   }
 };

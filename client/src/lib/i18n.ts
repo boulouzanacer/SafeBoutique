@@ -141,6 +141,21 @@ const resources = {
       "admin.lastUpdated": "Last updated",
       "admin.autoRefresh": "Auto-refresh",
       "admin.manualRefresh": "Manual refresh",
+      "admin.userManager": "User Manager",
+      
+      // User Manager
+      "admin.userManager.title": "User Management",
+      "admin.userManager.description": "Manage admin users, moderators, and user accounts",
+      "admin.userManager.addUser": "Add User",
+      "admin.userManager.createUser": "Create New User",
+      "admin.userManager.editUser": "Edit User",
+      "admin.userManager.changePassword": "Change Password",
+      "admin.userManager.deleteUser": "Delete User",
+      "admin.userManager.confirmDelete": "Are you sure you want to delete this user?",
+      "admin.userManager.userCreated": "User created successfully",
+      "admin.userManager.userUpdated": "User updated successfully",
+      "admin.userManager.userDeleted": "User deleted successfully",
+      "admin.userManager.passwordChanged": "Password changed successfully",
       
       // Products
       "products.title": "Product Management",

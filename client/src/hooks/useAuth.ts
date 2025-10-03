@@ -37,9 +37,28 @@ export function useAuth() {
     },
   });
 
+  // Role-based access helper functions
+  const isAdmin = () => user?.role === 'admin' || user?.isAdmin === true;
+  const isModerator = () => user?.role === 'moderator';
+  const isUser = () => user?.role === 'user' || (!user?.role && user?.isAdmin === false);
+  const hasRole = (role: string) => user?.role === role;
+  const canAccessAdminPanel = () => isAdmin() || isModerator();
+  const canAccessSettings = () => isAdmin(); // Only admins can access settings
+  const canAccessUserManager = () => isAdmin(); // Only admins can manage users
+  const canAccessAPI = () => isAdmin(); // Only admins can access API tab
+
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
+    // Role-based access helpers
+    isAdmin,
+    isModerator,
+    isUser,
+    hasRole,
+    canAccessAdminPanel,
+    canAccessSettings,
+    canAccessUserManager,
+    canAccessAPI,
   };
 }

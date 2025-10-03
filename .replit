@@ -38,4 +38,8 @@ args = "npm run dev"
 waitForPort = 5000
 
 [agent]
+<<<<<<< HEAD
 integrations = ["javascript_websocket:1.0.0", "javascript_object_storage:1.0.0", "javascript_database:1.0.0", "javascript_openai:1.0.0", "javascript_log_in_with_replit:1.0.0"]
+=======
+integrations = ["javascript_log_in_with_replit:1.0.0"]
+>>>>>>> 8f53d5a37131e6be46c0baec4cd3b1fa0b9e8aa1

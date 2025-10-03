@@ -12,13 +12,14 @@ import Families from "@/components/admin/families";
 import API from "@/components/admin/api";
 import Settings from "@/components/admin/settings";
 import BulkImportExport from "@/components/admin/bulk-import-export";
+import UserManager from "@/components/admin/user-manager";
 import AdminAccessDenied from "@/pages/admin-access-denied";
 import { useTranslation } from 'react-i18next';
 import AnimatedText from "@/components/animated-text";
 import LanguageTransition from "@/components/language-transition";
 
 export default function Admin() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, canAccessAdminPanel, canAccessSettings, canAccessUserManager, canAccessAPI } = useAuth();
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
 
@@ -29,9 +30,9 @@ export default function Admin() {
     </div>;
   }
 
-  // Redirect or show access denied if not admin
-  if (!isAuthenticated || !user?.isAdmin) {
-    console.log('Admin access check:', { isAuthenticated, user: user?.email, isAdmin: user?.isAdmin });
+  // Redirect or show access denied if cannot access admin panel
+  if (!isAuthenticated || !canAccessAdminPanel()) {
+    console.log('Admin access check:', { isAuthenticated, user: user?.email, role: user?.role, isAdmin: user?.isAdmin });
     return <AdminAccessDenied />;
   }
   return (
@@ -56,7 +57,7 @@ export default function Admin() {
 
       <div className="p-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8" data-testid="admin-tabs">
+          <TabsList className={`grid w-full ${canAccessUserManager() ? 'grid-cols-9' : 'grid-cols-6'}`} data-testid="admin-tabs">
             <TabsTrigger value="dashboard" data-testid="tab-dashboard">
               <AnimatedText translationKey="admin.dashboard" />
             </TabsTrigger>
@@ -75,12 +76,21 @@ export default function Admin() {
             <TabsTrigger value="bulk" data-testid="tab-bulk">
               <AnimatedText translationKey="admin.importExport" />
             </TabsTrigger>
-            <TabsTrigger value="settings" data-testid="tab-settings">
-              <AnimatedText translationKey="admin.settings" />
-            </TabsTrigger>
-            <TabsTrigger value="api" data-testid="tab-api">
-              <AnimatedText translationKey="admin.api" />
-            </TabsTrigger>
+            {canAccessUserManager() && (
+              <TabsTrigger value="usermanager" data-testid="tab-usermanager">
+                <AnimatedText translationKey="admin.userManager" />
+              </TabsTrigger>
+            )}
+            {canAccessSettings() && (
+              <TabsTrigger value="settings" data-testid="tab-settings">
+                <AnimatedText translationKey="admin.settings" />
+              </TabsTrigger>
+            )}
+            {canAccessAPI() && (
+              <TabsTrigger value="api" data-testid="tab-api">
+                <AnimatedText translationKey="admin.api" />
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -107,13 +117,23 @@ export default function Admin() {
             <BulkImportExport />
           </TabsContent>
 
-          <TabsContent value="settings">
-            <Settings />
-          </TabsContent>
+          {canAccessUserManager() && (
+            <TabsContent value="usermanager">
+              <UserManager />
+            </TabsContent>
+          )}
 
-          <TabsContent value="api">
-            <API />
-          </TabsContent>
+          {canAccessSettings() && (
+            <TabsContent value="settings">
+              <Settings />
+            </TabsContent>
+          )}
+
+          {canAccessAPI() && (
+            <TabsContent value="api">
+              <API />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
       </LanguageTransition>

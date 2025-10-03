@@ -3,10 +3,11 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { storage } from "./storage";
-import { insertProductSchema, insertCustomerSchema, insertOrderSchema, insertSiteSettingsSchema, insertSliderImageSchema, insertProductReviewSchema, insertFamilySchema, signupUserSchema, loginUserSchema } from "@shared/schema";
+import { insertProductSchema, insertCustomerSchema, insertOrderSchema, insertSiteSettingsSchema, insertSliderImageSchema, insertProductReviewSchema, insertFamilySchema, signupUserSchema, loginUserSchema, insertUserSchema, updateUserRoleSchema, updateUserPasswordSchema, adminUpdateUserPasswordSchema } from "@shared/schema";
 import { z } from "zod";
 import { bulkImportExportService } from "./bulk-import-export";
 import { setupAuth, isAuthenticated, isAdmin } from "./auth";
+import { generateUserToken, verifyJWTToken } from "./jwt-utils";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -60,12 +61,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // Create a simple auth token to return in response (for localStorage storage)
-      const authToken = Buffer.from(JSON.stringify({ 
-        userId: user.id, 
-        isAdmin: user.isAdmin || false,
-        expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
-      })).toString('base64');
+      // Create a secure JWT token to return in response (for localStorage storage)
+      const authToken = generateUserToken(user);
       
       console.log('Login success - token created for user:', user.id, 'isAdmin:', user.isAdmin, 'environment:', process.env.NODE_ENV || 'development');
       
@@ -85,21 +82,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', async (req: Request, res: Response) => {
     console.log('Auth check - headers:', req.headers.authorization);
     
-    // Check for Authorization header with Bearer token
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('Auth check - no bearer token');
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    
     try {
-      const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
-      if (decoded.expires <= Date.now()) {
-        console.log('Auth check - token expired');
-        return res.status(401).json({ message: "Token expired" });
+      // Check for Authorization header with Bearer token
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('Auth check - no bearer token');
+        return res.status(401).json({ message: "Unauthorized" });
       }
+      
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      const decoded = verifyJWTToken(token);
       
       console.log('Auth check - token valid for user:', decoded.userId);
       
@@ -111,9 +103,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Don't return password in response
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Auth check error:", error);
-      return res.status(401).json({ message: "Invalid token" });
+      return res.status(401).json({ message: error.message || "Invalid token" });
     }
   });
 
@@ -145,17 +137,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (req.headers.authorization?.startsWith('Bearer ')) {
       const token = req.headers.authorization.substring(7);
       try {
-        const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
+        const decoded = verifyJWTToken(token);
         debugInfo.token = {
-          valid: 'Parsed successfully',
+          valid: 'JWT verified successfully',
           userId: decoded.userId ? 'Present' : 'Missing',
           isAdmin: decoded.isAdmin || false,
-          expires: new Date(decoded.expires).toISOString(),
-          expired: decoded.expires <= Date.now()
+          role: decoded.role || 'user',
+          email: decoded.email ? 'Present' : 'Missing'
         };
       } catch (error: any) {
         debugInfo.token = {
-          valid: 'Failed to parse',
+          valid: 'JWT verification failed',
           error: error?.message || 'Unknown error'
         };
       }
@@ -989,6 +981,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false, 
         error: "Erreur lors de l'envoi de l'email. Vérifiez la configuration Gmail." 
       });
+    }
+  });
+
+  // User Management API (Admin only)
+  const requireAdmin = async (req: Request, res: Response, next: any) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const token = authHeader.substring(7);
+      const decoded = verifyJWTToken(token);
+
+      const user = await storage.getUser(decoded.userId);
+      if (!user || (user.role !== 'admin' && !user.isAdmin)) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      req.user = user;
+      next();
+    } catch (error: any) {
+      return res.status(401).json({ message: error.message || "Invalid token" });
+    }
+  };
+
+  // GET /api/users - List all users (admin only)
+  app.get("/api/users", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Don't return passwords
+      const usersWithoutPasswords = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      res.json(usersWithoutPasswords);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // POST /api/users - Create new user (admin only)
+  app.post("/api/users", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists with this email" });
+      }
+
+      const user = await storage.createUser(validatedData);
+
+      // Don't return password in response
+      const { password, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid user data", details: error.errors });
+      }
+      console.error("Failed to create user:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  // PATCH /api/users/:id - Update user info (admin only)
+  app.patch("/api/users/:id", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.id;
+      const updateData = req.body;
+
+      // Don't allow password updates through this endpoint
+      if (updateData.password) {
+        return res.status(400).json({ message: "Use /api/users/:id/password endpoint to change passwords" });
+      }
+
+      const updatedUser = await storage.updateUser(userId, updateData);
+
+      // Don't return password in response
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof Error && error.message === "User not found") {
+        return res.status(404).json({ message: "User not found" });
+      }
+      console.error("Failed to update user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  // PATCH /api/users/:id/password - Change user password (admin only)
+  app.patch("/api/users/:id/password", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.id;
+      const { newPassword } = req.body;
+
+      if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+
+      await storage.updateUserPassword(userId, newPassword);
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      if (error instanceof Error && error.message === "User not found") {
+        return res.status(404).json({ message: "User not found" });
+      }
+      console.error("Failed to update password:", error);
+      res.status(500).json({ message: "Failed to update password" });
+    }
+  });
+
+  // DELETE /api/users/:id - Delete user (admin only)
+  app.delete("/api/users/:id", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.id;
+
+      // Prevent admin from deleting themselves
+      if ((req as any).user && (req as any).user.id === userId) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+
+      await storage.deleteUser(userId);
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      if (error instanceof Error && error.message === "User not found") {
+        return res.status(404).json({ message: "User not found" });
+      }
+      console.error("Failed to delete user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
     }
   });
 
