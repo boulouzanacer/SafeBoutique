@@ -114,9 +114,9 @@ export function ObjectUploader({
                 uploadURL: data.uploadURL
               });
               
-              // Add to successful uploads with uploadURL
-              const fileWithURL = { ...file, uploadURL: data.uploadURL };
-              uploadedFiles.push(fileWithURL);
+              // Get the updated file from Uppy
+              const updatedFile = uppyInstance.getFile(file.id);
+              uploadedFiles.push(updatedFile);
               
               // Mark as complete
               uppyInstance.emit('upload-success', file, { 
@@ -125,6 +125,7 @@ export function ObjectUploader({
               });
             } catch (fileError) {
               console.error("File upload error:", fileError);
+              console.error("Error details:", fileError instanceof Error ? fileError.message : fileError);
               failedFiles.push(file);
             }
           }
@@ -147,11 +148,29 @@ export function ObjectUploader({
       // Safe wrapper for completion handler
       const handleComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
         try {
-          console.log("Upload complete:", result);
+          console.log("Upload complete event received:", result);
+          console.log("Successful files:", result.successful?.length || 0);
+          console.log("Failed files:", result.failed?.length || 0);
           
-          if (onComplete && mounted) {
-            onComplete(result);
+          // Only call onComplete if we have successful uploads with uploadURL
+          if (result.successful && result.successful.length > 0) {
+            const hasUploadURL = result.successful.some((file: any) => file.uploadURL);
+            console.log("Has uploadURL in successful files:", hasUploadURL);
+            
+            if (hasUploadURL && onComplete && mounted) {
+              console.log("Calling onComplete with valid result");
+              onComplete(result);
+            } else {
+              console.log("Skipping onComplete - no uploadURL yet");
+              return; // Don't close modal or call onComplete yet
+            }
+          } else {
+            console.log("No successful uploads, calling onComplete anyway");
+            if (onComplete && mounted) {
+              onComplete(result);
+            }
           }
+          
           if (mounted) {
             setShowModal(false);
           }
