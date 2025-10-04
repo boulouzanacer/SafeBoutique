@@ -4,7 +4,6 @@ import Uppy from "@uppy/core";
 import { DashboardModal } from "@uppy/react";
 import "@uppy/core/dist/style.min.css";
 import "@uppy/dashboard/dist/style.min.css";
-import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
 
@@ -74,48 +73,45 @@ export function ObjectUploader({
         autoProceed: false,
       });
 
-      // Safe wrapper for upload parameters - now uses multipart upload
-      const handleGetUploadParameters = async (file: any) => {
+      // Direct upload handler without AWS S3 plugin
+      const handleUpload = async (uploadID: string, files: any[]) => {
         try {
-          console.log("Getting upload parameters for file:", file?.name);
-          
-          // Create FormData for multipart upload
-          const formData = new FormData();
-          formData.append('file', file.data);
-          
-          // Get auth token from localStorage
-          const token = localStorage.getItem('authToken');
-          
-          // Upload file directly to our endpoint
-          const response = await fetch('/api/objects/upload', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: formData
-          });
-          
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Upload failed');
+          for (const file of files) {
+            console.log("Uploading file:", file?.name);
+            
+            // Create FormData for multipart upload
+            const formData = new FormData();
+            formData.append('file', file.data);
+            
+            // Get auth token from localStorage
+            const token = localStorage.getItem('authToken');
+            
+            // Upload file directly to our endpoint
+            const response = await fetch('/api/objects/upload', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              body: formData
+            });
+            
+            if (!response.ok) {
+              const error = await response.json();
+              uppyInstance.emit('upload-error', file, new Error(error.error || 'Upload failed'));
+              throw new Error(error.error || 'Upload failed');
+            }
+            
+            const data = await response.json();
+            console.log("Upload successful, received URL:", data.uploadURL);
+            
+            // Mark as complete
+            uppyInstance.emit('upload-success', file, { 
+              status: 200,
+              uploadURL: data.uploadURL 
+            });
           }
-          
-          const data = await response.json();
-          console.log("Upload successful, received URL:", data.uploadURL);
-          
-          // Store the uploaded URL in the file meta for later use
-          file.meta.uploadURL = data.uploadURL;
-          
-          // Return dummy params since upload is already complete
-          return {
-            method: 'PUT' as const,
-            url: 'about:blank', // Dummy URL since upload is done
-            fields: {},
-            headers: {}
-          };
         } catch (error) {
-          console.error("Upload parameters error:", error);
-          throw error;
+          console.error("Upload error:", error);
         }
       };
 
@@ -123,18 +119,6 @@ export function ObjectUploader({
       const handleComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
         try {
           console.log("Upload complete:", result);
-          
-          if (result.successful && result.successful.length > 0) {
-            const uploadedFile = result.successful[0];
-            // Use the uploadURL from file meta that we set during upload
-            const uploadURL = (uploadedFile.meta?.uploadURL as string) || uploadedFile.uploadURL;
-            console.log("Upload URL from meta:", uploadURL);
-            
-            // Inject the uploadURL into the result for compatibility
-            if (uploadURL && !uploadedFile.uploadURL) {
-              uploadedFile.uploadURL = uploadURL as string;
-            }
-          }
           
           if (onComplete && mounted) {
             onComplete(result);
@@ -158,10 +142,7 @@ export function ObjectUploader({
 
       // Configure uppy
       uppyInstance
-        .use(AwsS3, {
-          shouldUseMultipart: false,
-          getUploadParameters: handleGetUploadParameters,
-        })
+        .on("upload", handleUpload)
         .on("complete", handleComplete)
         .on("upload-error", handleUploadError)
         .on("error", handleError);
