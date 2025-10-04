@@ -326,8 +326,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getFamilies(): Promise<string[]> {
-    const families = await db.selectDistinct({ famille: products.famille }).from(products);
-    return families.map(f => f.famille).filter(Boolean) as string[];
+    const familiesFromTable = await db.select({ name: families.name }).from(families).orderBy(families.name);
+    return familiesFromTable.map(f => f.name);
   }
 
   // New Families CRUD methods
