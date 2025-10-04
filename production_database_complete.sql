@@ -5,7 +5,7 @@
 -- Generated on: 2025-09-10
 -- Total Tables: 10
 -- Total Products: 91
--- Contains: Full Schema + Complete Data yes yes yes
+-- Contains: Full Schema + Complete Data yes yes yes mounir
 -- ===================================================================
 
 -- Enable UUID extension
