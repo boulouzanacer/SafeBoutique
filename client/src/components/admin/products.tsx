@@ -356,33 +356,55 @@ export default function Products() {
             photoURL: fullUploadURL
           });
         } else {
-          // For new products - normalize URL to public path and update form
+          // For new products - store the photo URL directly
           console.log("Handling photo upload for new product");
           
-          // Convert GCS URL to normalized public path
-          // https://storage.googleapis.com/bucket-name/public/products/file-id
-          // becomes: /public-objects/products/file-id
-          const url = new URL(fullUploadURL);
-          const pathParts = url.pathname.split('/');
-          if (pathParts.length >= 4 && pathParts[2] === 'public' && pathParts[3] === 'products') {
-            const normalizedPath = `/public-objects/products/${pathParts[4]}`;
-            console.log("Normalized photo path for new product:", normalizedPath);
-            
-            // Update the form field with the normalized path
-            form.setValue('photo', normalizedPath);
-            setCurrentPhotoUrl(normalizedPath);
+          // Accept base64 data URLs directly (our current upload system)
+          if (fullUploadURL.startsWith('data:')) {
+            console.log("Base64 photo for new product");
+            form.setValue('photo', fullUploadURL);
+            setCurrentPhotoUrl(fullUploadURL);
             
             toast({
               title: "Success",
               description: "Photo uploaded successfully!"
             });
           } else {
-            console.error("Unexpected URL format:", fullUploadURL);
-            toast({
-              title: "Warning",
-              description: "Photo uploaded but path format unexpected",
-              variant: "destructive"
-            });
+            // Legacy: Convert GCS URL to normalized public path
+            // https://storage.googleapis.com/bucket-name/public/products/file-id
+            // becomes: /public-objects/products/file-id
+            try {
+              const url = new URL(fullUploadURL);
+              const pathParts = url.pathname.split('/');
+              if (pathParts.length >= 4 && pathParts[2] === 'public' && pathParts[3] === 'products') {
+                const normalizedPath = `/public-objects/products/${pathParts[4]}`;
+                console.log("Normalized photo path for new product:", normalizedPath);
+                
+                form.setValue('photo', normalizedPath);
+                setCurrentPhotoUrl(normalizedPath);
+                
+                toast({
+                  title: "Success",
+                  description: "Photo uploaded successfully!"
+                });
+              } else {
+                console.error("Unexpected URL format:", fullUploadURL);
+                toast({
+                  title: "Warning",
+                  description: "Photo uploaded but path format unexpected",
+                  variant: "destructive"
+                });
+              }
+            } catch (error) {
+              console.error("Error parsing URL:", error);
+              // Fallback: use URL as-is
+              form.setValue('photo', fullUploadURL);
+              setCurrentPhotoUrl(fullUploadURL);
+              toast({
+                title: "Success",
+                description: "Photo uploaded successfully!"
+              });
+            }
           }
         }
       } else {
