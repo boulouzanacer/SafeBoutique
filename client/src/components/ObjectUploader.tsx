@@ -104,6 +104,11 @@ export function ObjectUploader({
             const data = await response.json();
             console.log("Upload successful, received URL:", data.uploadURL);
             
+            // Update file with uploadURL using setFileState
+            uppyInstance.setFileState(file.id, {
+              uploadURL: data.uploadURL
+            });
+            
             // Mark as complete
             uppyInstance.emit('upload-success', file, { 
               status: 200,
