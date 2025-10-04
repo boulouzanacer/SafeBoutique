@@ -75,46 +75,70 @@ export function ObjectUploader({
 
       // Direct upload handler without AWS S3 plugin
       const handleUpload = async (uploadID: string, files: any[]) => {
+        const uploadedFiles: any[] = [];
+        const failedFiles: any[] = [];
+        
         try {
           for (const file of files) {
             console.log("Uploading file:", file?.name);
             
-            // Create FormData for multipart upload
-            const formData = new FormData();
-            formData.append('file', file.data);
-            
-            // Get auth token from localStorage
-            const token = localStorage.getItem('authToken');
-            
-            // Upload file directly to our endpoint
-            const response = await fetch('/api/objects/upload', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`
-              },
-              body: formData
-            });
-            
-            if (!response.ok) {
-              const error = await response.json();
-              uppyInstance.emit('upload-error', file, new Error(error.error || 'Upload failed'));
-              throw new Error(error.error || 'Upload failed');
+            try {
+              // Create FormData for multipart upload
+              const formData = new FormData();
+              formData.append('file', file.data);
+              
+              // Get auth token from localStorage
+              const token = localStorage.getItem('authToken');
+              
+              // Upload file directly to our endpoint
+              const response = await fetch('/api/objects/upload', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                },
+                body: formData
+              });
+              
+              if (!response.ok) {
+                const error = await response.json();
+                failedFiles.push(file);
+                uppyInstance.emit('upload-error', file, new Error(error.error || 'Upload failed'));
+                continue;
+              }
+              
+              const data = await response.json();
+              console.log("Upload successful, received URL:", data.uploadURL);
+              
+              // Update file with uploadURL
+              uppyInstance.setFileState(file.id, {
+                uploadURL: data.uploadURL
+              });
+              
+              // Add to successful uploads with uploadURL
+              const fileWithURL = { ...file, uploadURL: data.uploadURL };
+              uploadedFiles.push(fileWithURL);
+              
+              // Mark as complete
+              uppyInstance.emit('upload-success', file, { 
+                status: 200,
+                uploadURL: data.uploadURL 
+              });
+            } catch (fileError) {
+              console.error("File upload error:", fileError);
+              failedFiles.push(file);
             }
-            
-            const data = await response.json();
-            console.log("Upload successful, received URL:", data.uploadURL);
-            
-            // Update file with uploadURL using setFileState
-            uppyInstance.setFileState(file.id, {
-              uploadURL: data.uploadURL
-            });
-            
-            // Mark as complete
-            uppyInstance.emit('upload-success', file, { 
-              status: 200,
-              uploadURL: data.uploadURL 
-            });
           }
+          
+          // Manually trigger complete event with proper result
+          const result = {
+            successful: uploadedFiles,
+            failed: failedFiles,
+            uploadID: uploadID
+          };
+          
+          console.log("Manual complete trigger with result:", result);
+          uppyInstance.emit('complete', result);
+          
         } catch (error) {
           console.error("Upload error:", error);
         }
