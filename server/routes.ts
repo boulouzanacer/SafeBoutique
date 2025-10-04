@@ -443,18 +443,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object storage routes for product image uploads
-  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+  // Simplified image upload endpoint using multer
+  const imageUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    }
+  });
+
+  app.post("/api/objects/upload", isAuthenticated, imageUpload.single('file'), async (req, res) => {
     try {
-      console.log("Getting upload URL for authenticated user:", (req.user as any)?.userId);
-      const { ObjectStorageService } = await import("./objectStorage");
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      console.log("Upload URL generated successfully");
-      res.json({ uploadURL });
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      console.log("File uploaded successfully:", req.file.originalname, req.file.size, "bytes");
+      
+      // Convert image to base64
+      const base64Image = req.file.buffer.toString('base64');
+      const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+      
+      // Return the data URL as uploadURL so the existing code can use it
+      res.json({ 
+        uploadURL: dataUrl,
+        method: 'POST',
+        url: dataUrl
+      });
     } catch (error) {
-      console.error("Error getting upload URL:", error);
-      res.status(500).json({ error: "Failed to get upload URL" });
+      console.error("Error uploading file:", error);
+      res.status(500).json({ error: "Failed to upload file" });
     }
   });
 

@@ -74,15 +74,42 @@ export function ObjectUploader({
         autoProceed: false,
       });
 
-      // Safe wrapper for upload parameters
+      // Safe wrapper for upload parameters - now uses multipart upload
       const handleGetUploadParameters = async (file: any) => {
         try {
           console.log("Getting upload parameters for file:", file?.name);
-          const params = await onGetUploadParameters(file);
-          console.log("Upload parameters received:", params);
+          
+          // Create FormData for multipart upload
+          const formData = new FormData();
+          formData.append('file', file.data);
+          
+          // Get auth token from localStorage
+          const token = localStorage.getItem('authToken');
+          
+          // Upload file directly to our endpoint
+          const response = await fetch('/api/objects/upload', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
+          
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Upload failed');
+          }
+          
+          const data = await response.json();
+          console.log("Upload successful, received URL:", data.uploadURL);
+          
+          // Store the uploaded URL in the file meta for later use
+          file.meta.uploadURL = data.uploadURL;
+          
+          // Return dummy params since upload is already complete
           return {
-            method: params.method,
-            url: params.url,
+            method: 'PUT' as const,
+            url: 'about:blank', // Dummy URL since upload is done
             fields: {},
             headers: {}
           };
@@ -96,12 +123,17 @@ export function ObjectUploader({
       const handleComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
         try {
           console.log("Upload complete:", result);
-          console.log("Upload complete result:", result);
           
           if (result.successful && result.successful.length > 0) {
             const uploadedFile = result.successful[0];
-            console.log("Full upload URL:", uploadedFile.uploadURL);
-            console.log("Updating product photo with URL:", uploadedFile.uploadURL);
+            // Use the uploadURL from file meta that we set during upload
+            const uploadURL = (uploadedFile.meta?.uploadURL as string) || uploadedFile.uploadURL;
+            console.log("Upload URL from meta:", uploadURL);
+            
+            // Inject the uploadURL into the result for compatibility
+            if (uploadURL && !uploadedFile.uploadURL) {
+              uploadedFile.uploadURL = uploadURL as string;
+            }
           }
           
           if (onComplete && mounted) {
