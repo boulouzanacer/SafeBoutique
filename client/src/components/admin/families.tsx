@@ -92,6 +92,7 @@ export default function Families() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/families-management"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/families"] });
       toast({
         title: t("families.deleteSuccess"),
         description: "Family deleted successfully",
@@ -137,6 +138,7 @@ export default function Families() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/families-management"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/families"] });
       setIsDialogOpen(false);
       form.reset();
       toast({
