@@ -491,23 +491,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Updating product photo for product", productId, "with URL:", photoURL);
 
-      // Extract the object path from the GCS URL for the database storage
-      // photoURL format: https://storage.googleapis.com/bucket-name/.private/uploads/file-id
-      let normalizedPath;
+      // Handle base64 data URLs directly or legacy GCS URLs
+      let photoPath;
       
-      try {
-        const { ObjectStorageService } = await import("./objectStorage");
-        const objectStorageService = new ObjectStorageService();
-        normalizedPath = objectStorageService.normalizeObjectEntityPath(photoURL);
-        console.log("Extracted object path:", normalizedPath);
-      } catch (urlError) {
-        console.error("Error parsing photo URL:", urlError);
-        return res.status(400).json({ error: "Invalid photo URL format" });
+      if (photoURL.startsWith('data:')) {
+        // Base64 data URL - store directly
+        console.log("Storing base64 photo directly");
+        photoPath = photoURL;
+      } else {
+        // Legacy: Extract the object path from the GCS URL for the database storage
+        try {
+          const { ObjectStorageService } = await import("./objectStorage");
+          const objectStorageService = new ObjectStorageService();
+          photoPath = objectStorageService.normalizeObjectEntityPath(photoURL);
+          console.log("Extracted object path:", photoPath);
+        } catch (urlError) {
+          console.error("Error parsing photo URL:", urlError);
+          return res.status(400).json({ error: "Invalid photo URL format" });
+        }
       }
-      
-      // For new uploads, we'll serve them directly without ACL policies
-      // since they're uploaded to the private directory but we'll serve them publicly
-      console.log("Skipping ACL policy for direct serving approach");
       
       // Verify product exists before attempting update
       const existingProduct = await storage.getProduct(productId);
@@ -515,11 +517,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Product not found" });
       }
       
-      console.log("Updating product in database with photo path:", normalizedPath);
+      console.log("Updating product in database with photo path:", photoPath);
       
       try {
         const updatedProduct = await storage.updateProduct(productId, {
-          photo: normalizedPath,
+          photo: photoPath,
         });
         
         console.log("Product updated successfully:", updatedProduct?.recordid);
@@ -529,9 +531,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const verification = await storage.getProduct(productId);
         console.log("Database verification - photo field:", verification?.photo);
         
-        if (verification?.photo !== normalizedPath) {
+        if (verification?.photo !== photoPath) {
           console.error("CRITICAL ERROR: Database update didn't persist!");
-          console.error("Expected:", normalizedPath);
+          console.error("Expected:", photoPath);
           console.error("Actual:", verification?.photo);
           
           // Force direct SQL update as fallback
@@ -539,11 +541,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const { db } = await import("./db");
           const { products } = await import("../shared/schema");
           const { eq } = await import("drizzle-orm");
-          await db.update(products).set({ photo: normalizedPath, updatedAt: new Date() }).where(eq(products.recordid, productId));
+          await db.update(products).set({ photo: photoPath, updatedAt: new Date() }).where(eq(products.recordid, productId));
           
           // Verify the fallback worked
           const finalVerification = await storage.getProduct(productId);
-          if (finalVerification?.photo !== normalizedPath) {
+          if (finalVerification?.photo !== photoPath) {
             throw new Error("Both ORM and direct SQL update failed - critical database issue");
           }
           console.log("Fallback SQL update succeeded!");
@@ -556,7 +558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         success: true, 
-        objectPath: normalizedPath,
+        objectPath: photoPath,
         message: "Product photo updated successfully"
       });
     } catch (error) {

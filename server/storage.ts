@@ -295,16 +295,9 @@ export class DatabaseStorage implements IStorage {
     let processedProduct = { ...product };
     
     if (product.photo && product.photo.startsWith('data:image/')) {
-      console.log('Processing base64 photo for product:', product.codeBarre);
-      try {
-        const photoPath = await this.processProductPhoto(product.photo);
-        processedProduct.photo = photoPath;
-        console.log('Photo processed successfully, saved as:', photoPath);
-      } catch (error) {
-        console.error('Photo processing failed:', error);
-        // You can choose to either fail the request or continue without photo
-        processedProduct.photo = null; // Continue without photo
-      }
+      console.log('Storing base64 photo for product:', product.codeBarre);
+      processedProduct.photo = product.photo; // Store base64 directly in database
+      console.log('Photo stored successfully');
     }
     
     // Check if product exists by codeBarre
